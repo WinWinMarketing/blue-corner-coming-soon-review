@@ -12,6 +12,19 @@
     reducedMotion.addEventListener("change", updateMotionPreference);
   }
 
+  document.querySelectorAll("[data-fallback-image]").forEach((image) => {
+    const frame = image.closest("[data-image-frame]");
+    if (!frame) return;
+
+    const markMissing = () => {
+      frame.classList.add("is-image-missing");
+      image.hidden = true;
+    };
+
+    image.addEventListener("error", markMissing, { once: true });
+    if (image.complete && image.naturalWidth === 0) markMissing();
+  });
+
   document.querySelectorAll("[data-scroll-link]").forEach((link) => {
     link.addEventListener("click", (event) => {
       const href = link.getAttribute("href");
@@ -141,7 +154,7 @@
       if (!submitButton || !status) return;
       form.dataset.state = "loading";
       submitButton.dataset.idleLabel = submitButton.textContent.trim();
-      submitButton.textContent = form.dataset.loadingLabel || "Saving…";
+      submitButton.textContent = form.dataset.loadingLabel || "Checking…";
       submitButton.disabled = true;
       submitButton.setAttribute("aria-busy", "true");
       if (fieldGroup instanceof HTMLFieldSetElement) fieldGroup.disabled = true;
@@ -156,8 +169,8 @@
         submitButton.removeAttribute("aria-busy");
         const title = status.querySelector("[data-status-title]");
         const body = status.querySelector("[data-status-body]");
-        if (title) title.textContent = form.dataset.successTitle || "Your interest is noted.";
-        if (body) body.textContent = form.dataset.successBody || "This prototype has not sent or stored your details.";
+        if (title) title.textContent = form.dataset.successTitle || "Prototype complete.";
+        if (body) body.textContent = form.dataset.successBody || "Your details were checked on this device only. Nothing was sent, stored, or added to a waitlist.";
         status.hidden = false;
         form.dataset.state = "success";
         status.focus();
