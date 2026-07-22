@@ -294,29 +294,36 @@
   overflow: hidden;
 }
 
-.meaning::before {
+.concept-page main .meaning::before {
   content: "";
   position: absolute;
   z-index: -1;
-  inset: 0 50% 0 0;
+  inset: 0 77% 0 0;
   background: var(--brand-blue);
 }
 
-.meaning__inner {
+.concept-page main .meaning__inner {
   display: grid;
-  grid-template-columns: minmax(15rem, 0.7fr) minmax(0, 1.3fr);
+  grid-template-columns: minmax(9.5rem, 0.28fr) minmax(0, 1.72fr);
   align-items: stretch;
 }
 
-.meaning__mark {
+.concept-page main .meaning__mark {
   display: grid;
-  min-block-size: 34rem;
+  min-block-size: 0;
+  grid-column: 1;
+  grid-row: 1;
   place-items: center;
+  padding: clamp(1.5rem, 3vw, 2.5rem);
   background: var(--brand-blue);
 }
 
-.meaning__mark img {
-  inline-size: min(65%, 18rem);
+.concept-page main .meaning__mark img {
+  display: block;
+  inline-size: clamp(5.25rem, 8vw, 7.5rem);
+  max-inline-size: 100%;
+  block-size: auto;
+  object-fit: contain;
 }
 
 .meaning__copy {
@@ -326,6 +333,11 @@
   padding: clamp(2rem, 6vw, 6rem);
   background: var(--brand-navy);
   color: var(--brand-off-white);
+}
+
+.concept-page main .meaning__copy {
+  grid-column: 2;
+  grid-row: 1;
 }
 
 .meaning__copy .eyebrow {
@@ -520,18 +532,32 @@
     min-block-size: min(120vw, 38rem);
   }
 
-  .meaning::before {
-    inset: 0 0 45%;
+  .concept-page main .meaning::before {
+    inset: 0 0 auto;
+    block-size: 6.5rem;
   }
 
-  .meaning__inner,
+  .concept-page main .meaning__inner,
   .conversion__forms,
   .concept-footer__inner {
     grid-template-columns: 1fr;
   }
 
-  .meaning__mark {
-    min-block-size: 22rem;
+  .concept-page main .meaning__mark {
+    min-block-size: 0;
+    grid-column: 1;
+    grid-row: auto;
+    place-items: center start;
+    padding: 1rem max(var(--page-gutter), env(safe-area-inset-left));
+  }
+
+  .concept-page main .meaning__mark img {
+    inline-size: 4.25rem;
+  }
+
+  .concept-page main .meaning__copy {
+    grid-column: 1;
+    grid-row: auto;
   }
 }
 

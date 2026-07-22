@@ -167,10 +167,6 @@
   grid-template-columns: minmax(10rem, 0.45fr) minmax(0, 1.55fr);
 }
 
-.concept--07 .meaning__mark {
-  min-block-size: 30rem;
-}
-
 .concept--07 .meaning__copy {
   padding-inline: clamp(2.5rem, 8vw, 9rem);
 }

@@ -176,14 +176,6 @@
   grid-template-columns: minmax(15rem, 0.68fr) minmax(0, 1.32fr);
 }
 
-.concept--11 .meaning__mark {
-  min-block-size: 35rem;
-}
-
-.concept--11 .meaning__mark img {
-  inline-size: min(48%, 14rem);
-}
-
 .concept--11 .meaning__copy {
   padding: clamp(3rem, 8vw, 8rem);
 }
@@ -324,9 +316,6 @@
     grid-template-columns: 1fr;
   }
 
-  .concept--11 .meaning__mark {
-    min-block-size: 20rem;
-  }
 }
 
 @media (max-width: 39rem) {

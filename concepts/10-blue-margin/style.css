@@ -176,10 +176,6 @@
   grid-template-columns: minmax(15rem, 0.55fr) minmax(0, 1.45fr);
 }
 
-.concept--10 .meaning__mark {
-  min-block-size: 35rem;
-}
-
 .concept--10 .meaning__copy {
   padding: clamp(3rem, 8vw, 8rem);
 }
@@ -299,10 +295,6 @@
 
   .concept--10 .meaning__inner {
     grid-template-columns: 1fr;
-  }
-
-  .concept--10 .meaning__mark {
-    min-block-size: 20rem;
   }
 
   .concept--10 .roadmap-item:last-child {

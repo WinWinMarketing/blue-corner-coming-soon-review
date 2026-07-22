@@ -278,9 +278,6 @@
     grid-template-columns: 1fr;
   }
 
-  .at-the-corner-page .meaning__mark {
-    min-block-size: 18rem;
-  }
 }
 
 @media (max-width: 39rem) {

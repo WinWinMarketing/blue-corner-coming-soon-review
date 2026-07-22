@@ -195,10 +195,6 @@
   padding-inline-end: 0;
 }
 
-.concept--08 .meaning__mark {
-  min-block-size: 38rem;
-}
-
 .concept--08 .meaning__copy {
   padding: clamp(3rem, 8vw, 8rem);
 }
@@ -330,9 +326,6 @@
     padding-inline: max(var(--page-gutter), env(safe-area-inset-left)) max(var(--page-gutter), env(safe-area-inset-right));
   }
 
-  .concept--08 .meaning__mark {
-    min-block-size: 20rem;
-  }
 }
 
 @media (max-width: 39rem) {

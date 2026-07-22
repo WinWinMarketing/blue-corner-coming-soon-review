@@ -142,7 +142,6 @@
 }
 
 .side-by-side-page .meaning__mark {
-  min-block-size: 30rem;
   border-inline-end: clamp(0.625rem, 1vw, 0.875rem) solid var(--brand-yellow);
 }
 
@@ -296,7 +295,6 @@
   }
 
   .side-by-side-page .meaning__mark {
-    min-block-size: 18rem;
     border-block-end: clamp(0.625rem, 1vw, 0.875rem) solid var(--brand-yellow);
     border-inline-end: 0;
   }

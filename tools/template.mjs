@@ -160,7 +160,7 @@ ${renderCrisisUtility("../../")}
       <section class="meaning" aria-labelledby="meaning-title">
         <div class="meaning__inner page-frame">
           <div class="meaning__mark" aria-hidden="true">
-            <img src="../../assets/brand/mark-white.png" width="405" height="402" alt="">
+            <img src="../../assets/brand/corner-off-white.png" width="255" height="248" alt="">
           </div>
           <div class="meaning__copy" data-reveal>
             <p class="eyebrow">${escapeHtml(sourceCopy.meaning.eyebrow)}</p>

@@ -100,6 +100,21 @@ for (const concept of concepts) {
   if (/<form\b[^>]*\baction=/i.test(html)) fail(`${concept.slug}: prototype form must not declare an action`);
   if (/\son[a-z]+\s*=/i.test(html)) fail(`${concept.slug}: inline event handler violates CSP`);
 
+  const meaningSection = html.match(/<section class="meaning"[\s\S]*?<\/section>/)?.[0];
+  if (!meaningSection) {
+    fail(`${concept.slug}: meaning section markup is missing`);
+  } else {
+    if (!meaningSection.includes('src="../../assets/brand/corner-off-white.png" width="255" height="248"')) {
+      fail(`${concept.slug}: meaning section must use the approved 255x248 corner asset`);
+    }
+    if (meaningSection.includes("mark-white.png")) {
+      fail(`${concept.slug}: meaning section still references the logo mark`);
+    }
+    if (count(meaningSection, "corner-off-white.png") !== 1) {
+      fail(`${concept.slug}: meaning section must reference the approved corner asset exactly once`);
+    }
+  }
+
   const ids = [...html.matchAll(/\sid="([^"]+)"/g)].map((match) => match[1]);
   const duplicateIds = ids.filter((id, index) => ids.indexOf(id) !== index);
   if (duplicateIds.length) fail(`${concept.slug}: duplicate IDs: ${[...new Set(duplicateIds)].join(", ")}`);

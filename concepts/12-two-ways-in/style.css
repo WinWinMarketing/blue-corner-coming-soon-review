@@ -167,14 +167,6 @@
   grid-template-columns: 1fr 1fr;
 }
 
-.concept--12 .meaning__mark {
-  min-block-size: 36rem;
-}
-
-.concept--12 .meaning__mark img {
-  inline-size: min(44%, 14rem);
-}
-
 .concept--12 .meaning__copy {
   padding: clamp(3rem, 8vw, 8rem);
 }
@@ -346,10 +338,6 @@
 
   .concept--12 .meaning__inner {
     grid-template-columns: 1fr;
-  }
-
-  .concept--12 .meaning__mark {
-    min-block-size: 20rem;
   }
 
   .concept--12 .conversion__forms::before {

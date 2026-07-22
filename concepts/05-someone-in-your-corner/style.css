@@ -287,7 +287,6 @@
   }
 
   .the-long-walk-page .meaning__mark {
-    min-block-size: 18rem;
     border-block-end: var(--walk-rule) solid var(--brand-blue);
     border-inline-end: 0;
   }

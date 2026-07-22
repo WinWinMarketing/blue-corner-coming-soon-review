@@ -182,9 +182,6 @@
 }
 
 .the-check-in-page .meaning__mark {
-  grid-column: 2;
-  grid-row: 1;
-  min-block-size: 32rem;
   border-inline-start: var(--check-frame) solid var(--brand-yellow);
 }
 
@@ -315,7 +312,6 @@
   }
 
   .the-check-in-page .meaning__mark {
-    min-block-size: 18rem;
     border-block-start: var(--check-frame) solid var(--brand-yellow);
     border-inline-start: 0;
   }
