@@ -278,32 +278,25 @@
   position: absolute;
   inset: 0;
   z-index: -1;
-  background: url("../../assets/art/canvas-print.webp") 58% center / cover no-repeat;
-}
-
-.first-bell .poster-hero__art img {
-  width: min(72%, 25rem);
-  height: auto;
-  padding: clamp(1.25rem, 3vw, 2.5rem);
-  background: var(--fb-paper);
+  background: url("../../assets/art/first-bell-support.webp") 52% center / cover no-repeat;
 }
 
 .first-bell .poster-hero__rule {
   position: absolute;
   display: block;
-  width: 140%;
-  height: clamp(0.75rem, 1.8vw, 1.5rem);
+  width: clamp(3.5rem, 12vw, 8rem);
+  height: clamp(0.35rem, 0.75vw, 0.65rem);
   background: var(--fb-yellow);
-  transform: rotate(-9deg);
 }
 
 .first-bell .poster-hero__rule--one {
-  inset-block-start: 15%;
+  inset-block-start: 8%;
+  inset-inline-end: 0;
 }
 
 .first-bell .poster-hero__rule--two {
-  inset-block-end: 13%;
-  transform: rotate(7deg);
+  inset-block-end: 8%;
+  inset-inline-start: 0;
 }
 
 .first-bell .manifesto-grid {
@@ -766,10 +759,6 @@
     min-height: clamp(16rem, 48vw, 24rem);
     border-block-start: 2px solid var(--fb-navy);
     border-inline-start: 0;
-  }
-
-  .first-bell .poster-hero__art img {
-    width: min(42%, 14rem);
   }
 
   .first-bell .roadmap,

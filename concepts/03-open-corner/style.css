@@ -221,7 +221,7 @@ body.open-corner {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: 68% center;
+  object-position: center 62%;
 }
 
 .open-action__links {

@@ -260,7 +260,7 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: 52% center;
+  object-position: 47% center;
   animation: cyanotype-enter 680ms var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1)) both;
 }
 
@@ -277,17 +277,17 @@
 }
 
 .someone-corner .cyanotype-stage__detail {
-  background-image: url("../../assets/art/cyanotype.webp");
+  background-image: url("../../assets/art/someone-in-your-corner-bench.webp");
   background-repeat: no-repeat;
   background-size: auto 175%;
 }
 
 .someone-corner .cyanotype-stage__detail--rope {
-  background-position: 76% 18%;
+  background-position: 62% 76%;
 }
 
 .someone-corner .cyanotype-stage__detail--wrap {
-  background-position: 30% 82%;
+  background-position: 29% 48%;
 }
 
 .someone-corner .story-sequence {
