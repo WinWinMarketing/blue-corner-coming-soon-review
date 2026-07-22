@@ -62,7 +62,7 @@
   min-block-size: 0;
   aspect-ratio: 3.25 / 1;
   border: 0;
-  background: var(--brand-navy);
+  background: var(--brand-blue);
 }
 
 .concept--09 .concept-hero__image {
@@ -114,7 +114,7 @@
 }
 
 .concept--09 .stat__value {
-  color: var(--brand-navy);
+  color: var(--brand-blue);
   font-size: clamp(3.5rem, 6vw, 6.25rem);
 }
 
@@ -158,7 +158,7 @@
 
 .concept--09 .meaning {
   padding-block: 0;
-  background: var(--brand-navy);
+  background: var(--brand-off-white);
 }
 
 .concept--09 .meaning::before {
@@ -385,10 +385,6 @@
   block-size: 0.75rem;
   flex: 0 0 auto;
   background: var(--brand-yellow);
-}
-
-.concept--09 .concept-hero__media figcaption span {
-  color: var(--brand-off-white);
 }
 
 @keyframes bell-signal-release {

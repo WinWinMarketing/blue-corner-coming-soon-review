@@ -8,7 +8,7 @@
   --color-surface: var(--brand-off-white);
   --color-ink: var(--brand-navy);
   --color-muted: color-mix(in oklch, var(--brand-navy) 68%, var(--brand-off-white));
-  --color-action: var(--brand-navy);
+  --color-action: var(--brand-yellow);
   --color-signal: var(--brand-yellow);
   --color-focus: var(--brand-navy);
   --color-border: color-mix(in oklch, var(--brand-navy) 24%, var(--brand-off-white));

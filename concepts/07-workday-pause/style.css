@@ -69,7 +69,7 @@
   min-block-size: clamp(32rem, 58vw, 46rem);
   margin-inline-end: calc(var(--page-gutter) * -0.45);
   border: 0;
-  background: var(--brand-navy);
+  background: var(--brand-blue);
 }
 
 .concept--07 .concept-hero__image {
@@ -80,7 +80,8 @@
   inset-inline: auto 0;
   inline-size: max-content;
   max-inline-size: 100%;
-  background: var(--brand-navy);
+  background: var(--brand-off-white);
+  color: var(--brand-navy);
 }
 
 .concept--07 .section-heading {
@@ -123,7 +124,7 @@
 }
 
 .concept--07 .stat__value {
-  color: var(--brand-off-white);
+  color: var(--brand-blue);
   font-size: clamp(3.5rem, 6vw, 6.5rem);
 }
 
@@ -198,23 +199,23 @@
 
 .concept--07 .conversion__forms {
   gap: clamp(2rem, 5vw, 5rem);
-  border-block-start: 1px solid var(--brand-off-white);
+  border-block-start: 1px solid var(--brand-blue);
 }
 
 .concept--07 .conversion-path {
   padding: clamp(2rem, 4vw, 4rem) 0 0;
   border: 0;
   background: transparent;
-  color: var(--brand-off-white);
+  color: var(--brand-navy);
 }
 
 .concept--07 .conversion-path + .conversion-path {
   padding-inline-start: clamp(2rem, 5vw, 5rem);
-  border-inline-start: 1px solid var(--brand-off-white);
+  border-inline-start: 1px solid var(--brand-blue);
 }
 
 .concept--07 .conversion-path .field input {
-  border-color: var(--brand-off-white);
+  border-color: var(--brand-navy);
   background: var(--brand-off-white);
 }
 
@@ -224,7 +225,7 @@
 }
 
 .concept--07 .concept-footer {
-  border-block-start-color: var(--brand-off-white);
+  border-block-start-color: var(--brand-blue);
 }
 
 @supports (animation-timeline: view()) {
@@ -412,10 +413,6 @@
   block-size: 0.75rem;
   flex: 0 0 auto;
   background: var(--brand-yellow);
-}
-
-.concept--07 .concept-hero__media figcaption span {
-  color: var(--brand-off-white);
 }
 
 @keyframes held-corner-settle {

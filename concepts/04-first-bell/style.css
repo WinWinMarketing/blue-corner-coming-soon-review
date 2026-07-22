@@ -97,7 +97,7 @@
 }
 
 .at-the-corner-page .stat__value {
-  color: var(--brand-yellow);
+  color: var(--brand-blue);
 }
 
 .at-the-corner-page .symptoms {
@@ -127,7 +127,7 @@
 
 .at-the-corner-page .meaning {
   padding-block: 0;
-  background: var(--brand-navy);
+  background: var(--brand-off-white);
 }
 
 .at-the-corner-page .meaning::before {
@@ -358,10 +358,6 @@
   block-size: 0.75rem;
   flex: 0 0 auto;
   background: var(--brand-yellow);
-}
-
-.at-the-corner-page .concept-hero__media figcaption span {
-  color: var(--brand-off-white);
 }
 
 @media (max-width: 55rem) {

@@ -196,7 +196,7 @@ ${renderForm("therapist", sourceCopy.conversion.therapist)}
     <footer class="concept-footer">
       <div class="concept-footer__inner page-frame">
         <div class="concept-footer__brand">
-          <img src="../../assets/brand/logo-horizontal-white.png" width="1655" height="170" alt="${escapeHtml(sourceCopy.footer.name)}">
+          <img src="../../assets/brand/logo-horizontal-blue.png" width="1655" height="170" alt="${escapeHtml(sourceCopy.footer.name)}">
           <p>${escapeHtml(sourceCopy.footer.promise)}</p>
         </div>
         <div class="concept-footer__meta">
@@ -241,7 +241,7 @@ export const renderGallery = (concepts) => {
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'none'; form-action 'none'; object-src 'none'; base-uri 'none'; media-src 'none'; worker-src 'none'; upgrade-insecure-requests">
     <title>The Blue Corner — Coming-soon concepts</title>
     <meta name="description" content="Twelve production-minded directions for The Blue Corner's Canadian men's mental-health coming-soon experience.">
-    <meta name="theme-color" content="#042874">
+    <meta name="theme-color" content="#197CE3">
     <meta property="og:title" content="Blue Corner — Twelve coming-soon concepts">
     <meta property="og:description" content="Twelve distinctive, responsive directions for Blue Corner's therapy-first launch.">
     <meta property="og:type" content="website">
@@ -295,7 +295,7 @@ ${renderCrisisUtility()}
 
     <footer class="gallery-footer">
       <div class="page-frame">
-        <img src="assets/brand/mark-white.png" width="405" height="402" alt="" aria-hidden="true">
+        <img src="assets/brand/logo-horizontal-blue.png" width="1655" height="170" alt="The Blue Corner">
         <p>Nobody fights alone. In your corner, every round.</p>
         <p>Blue Corner is not an emergency service.</p>
       </div>

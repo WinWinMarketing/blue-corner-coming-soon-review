@@ -57,8 +57,8 @@
 .concept--11 .concept-hero__actions .button--signal {
   position: relative;
   margin-block-end: 0.45rem;
-  background: var(--brand-navy);
-  color: var(--brand-off-white);
+  background: var(--brand-yellow);
+  color: var(--brand-navy);
 }
 
 .concept--11 .concept-hero__actions .button--signal::after {
@@ -67,7 +67,7 @@
   inset-inline: 0.75rem;
   inset-block-end: -0.45rem;
   block-size: 0.35rem;
-  background: var(--brand-yellow);
+  background: var(--brand-blue);
   animation: other-end-underline 680ms var(--ease-out) 320ms both;
   transform-origin: left;
 }
@@ -128,7 +128,7 @@
 }
 
 .concept--11 .stat__value {
-  color: var(--brand-off-white);
+  color: var(--brand-blue);
   font-size: clamp(3.5rem, 6vw, 6.5rem);
 }
 
@@ -164,7 +164,7 @@
 
 .concept--11 .meaning {
   padding-block: 0;
-  background: var(--brand-navy);
+  background: var(--brand-off-white);
 }
 
 .concept--11 .meaning::before {
@@ -403,10 +403,6 @@
   block-size: 0.75rem;
   flex: 0 0 auto;
   background: var(--brand-yellow);
-}
-
-.concept--11 .concept-hero__media figcaption span {
-  color: var(--brand-off-white);
 }
 
 @keyframes bell-signal-release {

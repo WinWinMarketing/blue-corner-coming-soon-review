@@ -101,7 +101,7 @@
 }
 
 .the-long-walk-page .stat__value {
-  color: var(--brand-yellow);
+  color: var(--brand-blue);
 }
 
 .the-long-walk-page .stat p {
@@ -147,7 +147,7 @@
 
 .the-long-walk-page .meaning {
   padding-block: 0;
-  background: var(--brand-navy);
+  background: var(--brand-off-white);
 }
 
 .the-long-walk-page .meaning::before {
@@ -383,10 +383,6 @@
   block-size: 0.75rem;
   flex: 0 0 auto;
   background: var(--brand-yellow);
-}
-
-.the-long-walk-page .concept-hero__media figcaption span {
-  color: var(--brand-off-white);
 }
 
 @keyframes held-corner-settle {

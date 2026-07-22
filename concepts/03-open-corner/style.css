@@ -33,7 +33,7 @@
 .the-check-in-page .concept-hero__inner::before {
   grid-column: 1 / 5;
   grid-row: 1;
-  background: var(--brand-navy);
+  background: var(--brand-blue);
   animation-delay: 100ms;
 }
 
@@ -118,7 +118,7 @@
 }
 
 .the-check-in-page .stat__value {
-  color: var(--brand-yellow);
+  color: var(--brand-blue);
 }
 
 .the-check-in-page .symptoms__heading {
@@ -414,10 +414,6 @@
   block-size: 0.75rem;
   flex: 0 0 auto;
   background: var(--brand-yellow);
-}
-
-.the-check-in-page .concept-hero__media figcaption span {
-  color: var(--brand-off-white);
 }
 
 @keyframes canvas-tension-release {

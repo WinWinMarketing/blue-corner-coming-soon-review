@@ -6,7 +6,7 @@
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  background: var(--brand-navy);
+  background: var(--brand-blue);
   color: var(--brand-off-white);
 }
 
@@ -28,7 +28,7 @@
   inset-block: 0;
   inset-inline-end: 0;
   inline-size: clamp(1rem, 6vw, 6rem);
-  background: var(--brand-blue);
+  background: var(--brand-off-white);
 }
 
 .gallery-hero__inner {
@@ -52,6 +52,9 @@
 }
 
 .gallery-hero__topline span {
+  padding: var(--space-xs) var(--space-sm);
+  background: var(--brand-off-white);
+  color: var(--brand-navy);
   font-size: var(--font-size-small);
   font-weight: var(--font-weight-bold);
   letter-spacing: 0.1em;
@@ -66,7 +69,10 @@
 }
 
 .gallery-hero__copy .eyebrow {
-  color: var(--brand-yellow);
+  display: inline-block;
+  padding: var(--space-xs) var(--space-sm);
+  background: var(--brand-yellow);
+  color: var(--brand-navy);
 }
 
 .gallery-hero h1 {
@@ -80,6 +86,9 @@
 .gallery-hero__copy > p:last-child {
   max-inline-size: 45ch;
   margin: var(--space-2xl) 0 0;
+  padding: var(--space-md) var(--space-lg);
+  background: var(--brand-off-white);
+  color: var(--brand-navy);
   font-size: clamp(1.125rem, 1rem + 0.55vw, 1.5rem);
   font-weight: var(--font-weight-semibold);
 }
@@ -308,8 +317,8 @@
 .gallery-footer {
   padding-block: clamp(3rem, 6vw, 6rem);
   border-block-start: 0.75rem solid var(--brand-blue);
-  background: var(--brand-navy);
-  color: var(--brand-off-white);
+  background: var(--brand-off-white);
+  color: var(--brand-navy);
 }
 
 .gallery-footer .page-frame {
@@ -320,7 +329,7 @@
 }
 
 .gallery-footer img {
-  inline-size: 4rem;
+  inline-size: min(100%, 12rem);
 }
 
 .gallery-footer p {

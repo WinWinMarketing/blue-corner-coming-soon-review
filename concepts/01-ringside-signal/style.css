@@ -5,8 +5,8 @@
 
 .held-seat-page .concept-hero {
   border-block-end: 0;
-  background: var(--brand-navy);
-  color: var(--brand-off-white);
+  background: var(--brand-blue);
+  color: var(--brand-navy);
 }
 
 .held-seat-page .concept-hero::before {
@@ -29,7 +29,11 @@
 }
 
 .held-seat-page .concept-hero__copy .eyebrow {
-  color: var(--brand-yellow);
+  display: inline-flex;
+  inline-size: max-content;
+  padding: var(--space-xs) var(--space-sm);
+  background: var(--brand-off-white);
+  color: var(--brand-navy);
 }
 
 .held-seat-page .concept-hero h1 {
@@ -37,8 +41,23 @@
   font-size: clamp(4rem, 7.5vw, 8rem);
 }
 
+.held-seat-page .concept-hero h1,
+.held-seat-page .concept-hero__lead {
+  color: var(--brand-off-white);
+}
+
 .held-seat-page .concept-hero__body {
-  color: var(--color-dark-muted);
+  padding: var(--space-md);
+  background: var(--brand-off-white);
+  color: var(--brand-navy);
+}
+
+.held-seat-page .concept-hero__actions .button--ghost,
+.held-seat-page .concept-hero__actions .button--ghost:hover,
+.held-seat-page .concept-hero__actions .button--ghost:focus-visible {
+  border-color: var(--brand-navy);
+  background: var(--brand-off-white);
+  color: var(--brand-navy);
 }
 
 .held-seat-page .concept-hero__media {
@@ -93,7 +112,7 @@
 }
 
 .held-seat-page .stat__value {
-  color: var(--brand-yellow);
+  color: var(--brand-blue);
 }
 
 .held-seat-page .symptoms {
@@ -389,10 +408,6 @@
   block-size: 0.75rem;
   flex: 0 0 auto;
   background: var(--brand-yellow);
-}
-
-.held-seat-page .concept-hero__media figcaption span {
-  color: var(--brand-off-white);
 }
 
 @keyframes canvas-tension-release {

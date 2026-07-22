@@ -129,7 +129,7 @@
 }
 
 .concept--10 .stat__value {
-  color: var(--brand-navy);
+  color: var(--brand-blue);
   font-size: clamp(3.5rem, 6vw, 6.5rem);
 }
 
@@ -165,7 +165,7 @@
 .concept--10 .meaning {
   padding-block: 0;
   border-inline-start: clamp(0.75rem, 2vw, 2rem) solid var(--brand-blue);
-  background: var(--brand-navy);
+  background: var(--brand-off-white);
 }
 
 .concept--10 .meaning::before {
@@ -385,10 +385,6 @@
   block-size: 0.75rem;
   flex: 0 0 auto;
   background: var(--brand-yellow);
-}
-
-.concept--10 .concept-hero__media figcaption span {
-  color: var(--brand-off-white);
 }
 
 @keyframes bell-signal-release {

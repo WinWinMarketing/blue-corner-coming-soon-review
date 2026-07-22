@@ -76,7 +76,8 @@
 
 .side-by-side-page .stats {
   border-block-end: 0;
-  background: var(--brand-navy);
+  background: var(--brand-off-white);
+  color: var(--brand-navy);
 }
 
 .side-by-side-page .stats__inner {
@@ -101,7 +102,7 @@
 }
 
 .side-by-side-page .stat__value {
-  color: var(--brand-yellow);
+  color: var(--brand-blue);
 }
 
 .side-by-side-page .stats__sources {
@@ -129,7 +130,7 @@
 
 .side-by-side-page .meaning {
   padding-block: 0;
-  background: var(--brand-navy);
+  background: var(--brand-off-white);
 }
 
 .side-by-side-page .meaning::before {
@@ -388,10 +389,6 @@
   block-size: 0.75rem;
   flex: 0 0 auto;
   background: var(--brand-yellow);
-}
-
-.side-by-side-page .concept-hero__media figcaption span {
-  color: var(--brand-off-white);
 }
 
 @keyframes canvas-tension-release {
