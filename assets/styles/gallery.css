@@ -1,0 +1,392 @@
+.gallery-page {
+  --color-page: var(--brand-off-white);
+  --color-surface: var(--brand-off-white);
+  --color-ink: var(--brand-navy);
+}
+
+.gallery-page .crisis-bar {
+  inline-size: 100%;
+  max-inline-size: none;
+}
+
+.gallery-hero {
+  position: relative;
+  min-block-size: clamp(34rem, 78vh, 53rem);
+  overflow: hidden;
+  background: var(--brand-navy);
+  color: var(--brand-off-white);
+}
+
+.gallery-hero::before {
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(color-mix(in oklch, var(--brand-off-white) 9%, transparent) 1px, transparent 1px), linear-gradient(90deg, color-mix(in oklch, var(--brand-off-white) 9%, transparent) 1px, transparent 1px);
+  background-size: clamp(3rem, 6vw, 6rem) clamp(3rem, 6vw, 6rem);
+  content: "";
+  opacity: 0.42;
+  pointer-events: none;
+}
+
+.gallery-hero::after {
+  position: absolute;
+  inline-size: min(38rem, 72vw);
+  aspect-ratio: 1;
+  inset-block-end: -45%;
+  inset-inline-end: -8%;
+  border: clamp(2rem, 5vw, 5rem) solid var(--brand-blue);
+  border-radius: 50%;
+  content: "";
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.gallery-hero__inner {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  min-block-size: inherit;
+  grid-template-rows: auto 1fr auto;
+  gap: var(--space-xl);
+  padding-block: var(--space-xl) var(--space-2xl);
+}
+
+.gallery-hero__topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-xl);
+  font-size: var(--font-size-small);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.gallery-logo {
+  inline-size: clamp(10rem, 18vw, 15.5rem);
+  block-size: auto;
+}
+
+.gallery-hero__copy {
+  align-self: center;
+  display: grid;
+  gap: var(--space-lg);
+  max-inline-size: 68rem;
+}
+
+.gallery-hero__copy .eyebrow {
+  color: var(--brand-yellow);
+}
+
+.gallery-hero h1 {
+  max-inline-size: 11ch;
+  margin: 0;
+  font-size: clamp(4rem, 11vw, 10rem);
+  font-weight: 900;
+  letter-spacing: -0.065em;
+  line-height: 0.78;
+  text-transform: uppercase;
+}
+
+.gallery-hero__copy > p:last-child {
+  max-inline-size: 42rem;
+  margin: 0;
+  color: var(--color-dark-muted);
+  font-size: clamp(1.05rem, 0.92rem + 0.6vw, 1.45rem);
+}
+
+.gallery-down {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-lg);
+  padding-block-start: var(--space-md);
+  border-block-start: 1px solid color-mix(in oklch, var(--brand-off-white) 36%, transparent);
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.gallery-down span:last-child {
+  color: var(--brand-yellow);
+  font-size: 1.5rem;
+}
+
+.gallery-section {
+  display: grid;
+  gap: clamp(var(--space-3xl), 8vw, var(--space-5xl));
+  padding-block: clamp(var(--space-4xl), 10vw, var(--space-5xl));
+}
+
+.gallery-intro {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(18rem, 1.4fr);
+  gap: var(--space-lg) clamp(var(--space-xl), 5vw, var(--space-4xl));
+  align-items: end;
+}
+
+.gallery-intro .eyebrow {
+  grid-column: 1 / -1;
+  color: var(--brand-blue);
+}
+
+.gallery-intro h2 {
+  margin: 0;
+  font-size: clamp(2.8rem, 5.8vw, 6.2rem);
+  font-weight: 900;
+  letter-spacing: -0.055em;
+  line-height: 0.9;
+}
+
+.gallery-intro > p:last-child {
+  max-inline-size: 38rem;
+  margin: 0;
+  color: var(--color-muted);
+}
+
+.concept-grid {
+  display: grid;
+  gap: var(--space-md);
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+}
+
+.concept-tile {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  min-block-size: 24rem;
+  overflow: hidden;
+  padding: var(--space-lg);
+  border: 1px solid currentColor;
+  background: var(--brand-off-white);
+  color: var(--brand-navy);
+  text-decoration: none;
+  transition: transform var(--duration-medium) var(--ease-out);
+}
+
+.concept-tile--01 {
+  grid-column: span 7;
+  min-block-size: 31rem;
+  color: var(--brand-off-white);
+}
+
+.concept-tile--02 {
+  grid-column: span 5;
+  min-block-size: 31rem;
+  color: var(--brand-navy);
+}
+
+.concept-tile--03 {
+  grid-column: span 4;
+  background: var(--brand-blue);
+  color: var(--brand-off-white);
+}
+
+.concept-tile--04 {
+  grid-column: span 3;
+  background: var(--brand-yellow);
+  color: var(--brand-navy);
+}
+
+.concept-tile--05 {
+  grid-column: span 5;
+  color: var(--brand-off-white);
+}
+
+.concept-tile__art,
+.concept-tile__wash {
+  position: absolute;
+  z-index: -2;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+}
+
+.concept-tile__art {
+  object-fit: cover;
+  transition: transform var(--duration-reveal) var(--ease-out);
+}
+
+.concept-tile__wash {
+  z-index: -1;
+  background: linear-gradient(145deg, color-mix(in oklch, var(--brand-navy) 88%, transparent), color-mix(in oklch, var(--brand-navy) 24%, transparent));
+}
+
+.concept-tile--02 .concept-tile__wash {
+  background: linear-gradient(145deg, color-mix(in oklch, var(--brand-off-white) 92%, transparent), color-mix(in oklch, var(--brand-yellow) 40%, transparent));
+}
+
+.concept-tile--05 .concept-tile__wash {
+  background: linear-gradient(145deg, color-mix(in oklch, var(--brand-navy) 12%, transparent), color-mix(in oklch, var(--brand-navy) 78%, transparent));
+}
+
+.concept-tile__number {
+  align-self: start;
+  justify-self: start;
+  font-size: var(--font-size-small);
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+
+.concept-tile__copy {
+  align-self: end;
+  display: grid;
+  gap: var(--space-xs);
+  max-inline-size: 24rem;
+}
+
+.concept-tile__copy strong {
+  font-size: clamp(2rem, 1.55rem + 2vw, 4rem);
+  letter-spacing: -0.045em;
+  line-height: 0.92;
+}
+
+.concept-tile__copy small {
+  font-size: var(--font-size-small);
+  font-weight: 700;
+}
+
+.concept-tile__arrow {
+  position: absolute;
+  inset-block-start: var(--space-lg);
+  inset-inline-end: var(--space-lg);
+  font-size: 1.75rem;
+  line-height: 1;
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+
+.concept-tile__corner {
+  position: absolute;
+  z-index: -1;
+  inline-size: 21rem;
+  aspect-ratio: 1;
+  inset-block-start: 9%;
+  inset-inline-end: -31%;
+  border: 3.5rem solid color-mix(in oklch, var(--brand-off-white) 62%, transparent);
+  border-radius: 50%;
+}
+
+.concept-tile__poster {
+  position: absolute;
+  z-index: -1;
+  inset-block-start: 18%;
+  inset-inline-start: -0.04em;
+  color: color-mix(in oklch, var(--brand-navy) 16%, transparent);
+  font-size: clamp(4rem, 8vw, 8rem);
+  font-weight: 900;
+  letter-spacing: -0.07em;
+  line-height: 0.7;
+}
+
+.gallery-footer {
+  padding-block: var(--space-3xl);
+  background: var(--brand-navy);
+  color: var(--brand-off-white);
+}
+
+.gallery-footer .page-frame {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: end;
+  gap: var(--space-lg) var(--space-xl);
+}
+
+.gallery-footer img {
+  inline-size: 3.25rem;
+  block-size: auto;
+}
+
+.gallery-footer p {
+  margin: 0;
+}
+
+.gallery-footer p:first-of-type {
+  font-size: clamp(1.2rem, 1rem + 0.5vw, 1.6rem);
+  font-weight: 800;
+}
+
+.gallery-footer p:last-child {
+  color: var(--color-dark-muted);
+  font-size: var(--font-size-small);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .concept-tile:hover {
+    transform: translateY(-0.25rem);
+  }
+
+  .concept-tile:hover .concept-tile__art {
+    transform: scale(1.025);
+  }
+
+  .concept-tile:hover .concept-tile__arrow {
+    transform: translate(0.125rem, -0.125rem);
+  }
+}
+
+@media (max-width: 59.99rem) {
+  .concept-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .concept-tile,
+  .concept-tile--01,
+  .concept-tile--02,
+  .concept-tile--03,
+  .concept-tile--04,
+  .concept-tile--05 {
+    grid-column: auto;
+    min-block-size: 25rem;
+  }
+
+  .concept-tile--01 {
+    grid-column: 1 / -1;
+  }
+
+  .concept-tile--05 {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 39.99rem) {
+  .gallery-hero {
+    min-block-size: 39rem;
+  }
+
+  .gallery-hero__topline {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .gallery-hero h1 {
+    font-size: clamp(3.5rem, 17vw, 5.5rem);
+  }
+
+  .gallery-intro {
+    grid-template-columns: 1fr;
+  }
+
+  .gallery-intro .eyebrow {
+    grid-column: auto;
+  }
+
+  .concept-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .concept-tile,
+  .concept-tile--01,
+  .concept-tile--02,
+  .concept-tile--03,
+  .concept-tile--04,
+  .concept-tile--05 {
+    grid-column: auto;
+    min-block-size: 23rem;
+  }
+
+  .gallery-footer .page-frame {
+    grid-template-columns: auto 1fr;
+  }
+
+  .gallery-footer p:last-child {
+    grid-column: 1 / -1;
+  }
+}
