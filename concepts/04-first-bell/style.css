@@ -19,6 +19,10 @@
   box-sizing: border-box;
 }
 
+.first-bell [data-reveal] {
+  opacity: 1;
+}
+
 .first-bell :where(a, button, input):focus-visible {
   outline: 3px solid var(--fb-navy);
   outline-offset: 4px;
@@ -190,12 +194,10 @@
 
 @keyframes bell-snap {
   from {
-    opacity: 0;
     transform: translate3d(-0.22em, 0, 0) scale(1.035);
   }
 
   to {
-    opacity: 1;
     transform: translate3d(0, 0, 0) scale(1);
   }
 }
@@ -264,12 +266,10 @@
 
 @keyframes bell-art {
   from {
-    opacity: 0;
     transform: translate3d(8%, 0, 0);
   }
 
   to {
-    opacity: 1;
     transform: translate3d(0, 0, 0);
   }
 }
