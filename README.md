@@ -26,7 +26,7 @@ See [CONCEPT-GOALS.md](CONCEPT-GOALS.md) for the rationale behind each direction
 ## Content and generation
 
 - `tools/source-copy.mjs` is the single source for the locked reference-site copy.
-- `tools/concepts.mjs` maps the 12 titles, public slugs, descriptions, and realistic image assets.
+- `tools/concepts.mjs` maps the 12 titles, public slugs, descriptions, and tactile material art assets.
 - `node tools/generate.mjs` rebuilds the gallery and all concept HTML without dependencies or runtime fetching.
 - `node tools/check-site.mjs` checks copy parity, page order, local links, security metadata, form hooks, shared brand colours, and font weights. Add `--strict-images` for the final pre-deploy gate.
 - Each concept keeps its own `style.css`; the generator creates a clearly marked empty scaffold only when that file does not exist.

@@ -367,3 +367,84 @@
     transform: none;
   }
 }
+
+.concept--07 .concept-hero::before {
+  animation: none !important;
+  opacity: 1;
+  transform: none;
+}
+
+.concept--07 .concept-hero__copy {
+  position: relative;
+}
+
+.concept--07 .concept-hero__copy::before {
+  content: "";
+  position: absolute;
+  inset-block-start: -1.5rem;
+  inset-inline-start: 0;
+  inline-size: clamp(3rem, 5vw, 5rem);
+  block-size: clamp(3rem, 5vw, 5rem);
+  border-block-start: 2px solid var(--brand-blue);
+  border-inline-start: 2px solid var(--brand-blue);
+  transform-origin: left top;
+  animation: held-corner-settle 620ms var(--ease-out) both;
+  pointer-events: none;
+}
+
+.concept--07 .concept-hero__media {
+  isolation: isolate;
+  overflow: hidden;
+  outline: 1px solid var(--brand-off-white);
+  outline-offset: -0.75rem;
+}
+
+.concept--07 .concept-hero__media::before {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  inset-block-start: 18%;
+  inset-inline: 0 clamp(1rem, 4vw, 3rem);
+  block-size: 0.875rem;
+  border-block: 1px solid var(--brand-off-white);
+  pointer-events: none;
+}
+
+.concept--07 .concept-hero__media figcaption::before {
+  content: "";
+  inline-size: 0.75rem;
+  block-size: 0.75rem;
+  flex: 0 0 auto;
+  background: var(--brand-yellow);
+}
+
+.concept--07 .concept-hero__media figcaption span {
+  color: var(--brand-off-white);
+}
+
+@keyframes held-corner-settle {
+  from {
+    opacity: 0;
+    transform: translate(1.25rem, -1.25rem);
+  }
+  to {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+}
+
+@media (max-width: 55rem) {
+  .concept--07 .concept-hero__copy::before {
+    inset-block-start: 0;
+    inline-size: 2.5rem;
+    block-size: 2.5rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .concept--07 .concept-hero__copy::before {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}

@@ -10,6 +10,17 @@
   color: var(--brand-off-white);
 }
 
+.gallery-hero::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset-block-start: 24%;
+  inset-inline: max(var(--page-gutter), env(safe-area-inset-left)) clamp(3rem, 12vw, 12rem);
+  block-size: clamp(0.625rem, 1vw, 0.875rem);
+  border-block: 1px solid var(--brand-off-white);
+  pointer-events: none;
+}
+
 .gallery-hero::after {
   content: "";
   position: absolute;
@@ -123,14 +134,23 @@
 }
 
 .editorial-note {
+  position: relative;
   display: grid;
   grid-template-columns: minmax(12rem, 0.55fr) minmax(0, 1.45fr);
   gap: var(--space-xl) clamp(2rem, 8vw, 8rem);
   margin-block: clamp(3rem, 6vw, 6rem);
-  padding-block: var(--space-xl);
-  border-block: 1px solid var(--brand-navy);
-  border-inline-start: 0.75rem solid var(--brand-yellow);
-  padding-inline-start: var(--space-lg);
+  padding: var(--space-xl);
+  border: 1px solid var(--brand-navy);
+}
+
+.editorial-note::before {
+  content: "";
+  position: absolute;
+  inset-block-start: -1px;
+  inset-inline-start: -1px;
+  inline-size: 1rem;
+  block-size: 1rem;
+  background: var(--brand-yellow);
 }
 
 .editorial-note strong {
@@ -177,9 +197,52 @@
 }
 
 .concept-tile__media {
+  position: relative;
+  isolation: isolate;
   display: block;
+  overflow: hidden;
   aspect-ratio: 4 / 3;
   border-block-end: 1px solid var(--brand-navy);
+  background: var(--brand-blue);
+}
+
+.concept-tile__media::before,
+.concept-tile__media::after {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.concept-tile:is(.concept-tile--01, .concept-tile--02, .concept-tile--03, .concept-tile--04) .concept-tile__media::before {
+  inset-block-start: 18%;
+  inset-inline: 0 clamp(1rem, 4vw, 3rem);
+  block-size: 0.75rem;
+  border-block: 1px solid var(--brand-off-white);
+}
+
+.concept-tile:is(.concept-tile--05, .concept-tile--06, .concept-tile--07, .concept-tile--08) .concept-tile__media::before {
+  inset-block-start: clamp(1rem, 3vw, 2rem);
+  inset-inline-start: clamp(1rem, 3vw, 2rem);
+  inline-size: clamp(2.5rem, 6vw, 4.5rem);
+  block-size: clamp(2.5rem, 6vw, 4.5rem);
+  border-block-start: 2px solid var(--brand-off-white);
+  border-inline-start: 2px solid var(--brand-off-white);
+}
+
+.concept-tile:is(.concept-tile--09, .concept-tile--10, .concept-tile--11, .concept-tile--12) .concept-tile__media::before {
+  inset-block-start: calc(50% - 0.5rem);
+  inset-inline: clamp(1rem, 4vw, 3rem) 0;
+  block-size: 1rem;
+  border-block: 1px solid var(--brand-off-white);
+}
+
+.concept-tile__media::after {
+  inset-block-end: clamp(0.75rem, 2vw, 1.25rem);
+  inset-inline-end: clamp(0.75rem, 2vw, 1.25rem);
+  inline-size: clamp(0.75rem, 1.4vw, 1rem);
+  block-size: clamp(0.75rem, 1.4vw, 1rem);
+  background: var(--brand-yellow);
 }
 
 .concept-tile--01 .concept-tile__media,
@@ -275,11 +338,11 @@
 @media (hover: hover) and (pointer: fine) {
   .gallery-down:hover,
   .concept-tile:hover {
-    transform: translateY(-0.25rem);
+    transform: translateY(-0.125rem);
   }
 
   .concept-tile:hover .concept-tile__art {
-    transform: scale(1.025);
+    transform: scale(1.012);
   }
 
   .concept-tile:hover .concept-tile__arrow {
@@ -306,6 +369,11 @@
 }
 
 @media (max-width: 47.99rem) {
+  .gallery-hero::before {
+    inset-block-start: 30%;
+    inset-inline: var(--page-gutter) 2rem;
+  }
+
   .gallery-hero::after {
     inline-size: 0.75rem;
   }

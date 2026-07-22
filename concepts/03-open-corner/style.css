@@ -358,3 +358,95 @@
     animation: none;
   }
 }
+
+.the-check-in-page .concept-hero__inner::before,
+.the-check-in-page .concept-hero__inner::after,
+.the-check-in-page .concept-hero__media {
+  animation: none;
+  opacity: 1;
+  transform: none;
+}
+
+.the-check-in-page .concept-hero__copy {
+  position: relative;
+}
+
+.the-check-in-page .concept-hero__copy::after {
+  content: "";
+  position: absolute;
+  inset-block-start: 1rem;
+  inset-inline-end: 1rem;
+  inline-size: clamp(2.5rem, 4vw, 4rem);
+  block-size: clamp(2.5rem, 4vw, 4rem);
+  border-block-start: 2px solid var(--brand-blue);
+  border-inline-end: 2px solid var(--brand-blue);
+  pointer-events: none;
+}
+
+.the-check-in-page .concept-hero__media {
+  isolation: isolate;
+  overflow: hidden;
+  border: var(--check-frame) solid var(--brand-off-white);
+  outline: 1px solid var(--brand-blue);
+  outline-offset: 0;
+}
+
+.the-check-in-page .concept-hero__media::before {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  inset-block-start: 17%;
+  inset-inline: 0 clamp(1rem, 4vw, 3rem);
+  block-size: clamp(0.625rem, 1vw, 0.875rem);
+  border-block: 1px solid var(--brand-off-white);
+  transform-origin: left center;
+  animation: canvas-tension-release 680ms var(--ease-out) both;
+  pointer-events: none;
+}
+
+.the-check-in-page .concept-hero__media figcaption {
+  inset-inline: auto 1rem;
+  inset-block-end: 1rem;
+  inline-size: max-content;
+  max-inline-size: calc(100% - 2rem);
+  border-block-start: 0;
+}
+
+.the-check-in-page .concept-hero__media figcaption::before {
+  content: "";
+  inline-size: 0.75rem;
+  block-size: 0.75rem;
+  flex: 0 0 auto;
+  background: var(--brand-yellow);
+}
+
+.the-check-in-page .concept-hero__media figcaption span {
+  color: var(--brand-off-white);
+}
+
+@keyframes canvas-tension-release {
+  from {
+    opacity: 0;
+    transform: scaleX(0.08);
+  }
+
+  to {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+}
+
+@media (max-width: 55rem) {
+  .the-check-in-page .concept-hero__copy::after {
+    inline-size: 2.5rem;
+    block-size: 2.5rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .the-check-in-page .concept-hero__media::before {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}

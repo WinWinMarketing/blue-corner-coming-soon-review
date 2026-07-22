@@ -282,7 +282,7 @@ ${renderCrisisUtility()}
         <div class="gallery-intro" data-reveal>
           <p class="eyebrow">Choose a direction</p>
           <h2 id="gallery-title">Same corner. Different signal.</h2>
-          <p>Every concept uses the same supplied copy, realistic human imagery, therapy-first path, local-only form demonstration, and exact Blue Corner palette.</p>
+          <p>Every concept uses the same supplied copy, tactile abstract material imagery, therapy-first path, local-only form demonstration, and exact Blue Corner palette.</p>
         </div>
         <aside class="editorial-note" aria-label="Editorial verification note" data-reveal>
           <strong>Before production launch</strong>

@@ -365,3 +365,84 @@
     transform: none;
   }
 }
+
+.concept--11 .concept-hero__actions .button--signal::after {
+  animation: none;
+  opacity: 1;
+  transform: none;
+}
+
+.concept--11 .concept-hero__copy {
+  position: relative;
+}
+
+.concept--11 .concept-hero__copy::before {
+  content: "";
+  position: absolute;
+  inset-block-start: -2rem;
+  inset-inline-start: 0;
+  inline-size: clamp(3rem, 5vw, 5rem);
+  block-size: clamp(3rem, 5vw, 5rem);
+  border-block-start: 2px solid var(--brand-blue);
+  border-inline-start: 2px solid var(--brand-blue);
+  pointer-events: none;
+}
+
+.concept--11 .concept-hero__media {
+  isolation: isolate;
+  overflow: hidden;
+  outline: 1px solid var(--brand-off-white);
+  outline-offset: -1.25rem;
+}
+
+.concept--11 .concept-hero__media::before {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  inset-block-start: calc(50% - 0.5rem);
+  inset-inline: 0 clamp(1rem, 4vw, 3rem);
+  block-size: 1rem;
+  border-block: 1px solid var(--brand-off-white);
+  transform-origin: left center;
+  animation: bell-signal-release 700ms var(--ease-out) both;
+  pointer-events: none;
+}
+
+.concept--11 .concept-hero__media figcaption::before {
+  content: "";
+  inline-size: 0.75rem;
+  block-size: 0.75rem;
+  flex: 0 0 auto;
+  background: var(--brand-yellow);
+}
+
+.concept--11 .concept-hero__media figcaption span {
+  color: var(--brand-off-white);
+}
+
+@keyframes bell-signal-release {
+  from {
+    opacity: 0;
+    transform: scaleX(0.06);
+  }
+  to {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+}
+
+@media (max-width: 55rem) {
+  .concept--11 .concept-hero__copy::before {
+    inset-block-start: 0;
+    inline-size: 2.5rem;
+    block-size: 2.5rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .concept--11 .concept-hero__media::before {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}

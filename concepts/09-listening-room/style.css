@@ -351,3 +351,80 @@
     transform: none;
   }
 }
+
+.concept--09 .concept-hero__copy {
+  position: relative;
+  animation: none;
+  opacity: 1;
+  transform: none;
+}
+
+.concept--09 .concept-hero__copy::before {
+  content: "";
+  position: absolute;
+  inset-block-start: clamp(2rem, 5vw, 4rem);
+  inset-inline-end: max(var(--page-gutter), env(safe-area-inset-right));
+  inline-size: clamp(3rem, 5vw, 5rem);
+  block-size: clamp(3rem, 5vw, 5rem);
+  border-block-start: 2px solid var(--brand-blue);
+  border-inline-end: 2px solid var(--brand-blue);
+  pointer-events: none;
+}
+
+.concept--09 .concept-hero__media {
+  isolation: isolate;
+  overflow: hidden;
+  outline: 1px solid var(--brand-off-white);
+  outline-offset: -0.75rem;
+}
+
+.concept--09 .concept-hero__media::before {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  inset-block-start: calc(50% - 0.5rem);
+  inset-inline: 0 clamp(1rem, 5vw, 5rem);
+  block-size: 1rem;
+  border-block: 1px solid var(--brand-off-white);
+  transform-origin: left center;
+  animation: bell-signal-release 700ms var(--ease-out) both;
+  pointer-events: none;
+}
+
+.concept--09 .concept-hero__media figcaption::before {
+  content: "";
+  inline-size: 0.75rem;
+  block-size: 0.75rem;
+  flex: 0 0 auto;
+  background: var(--brand-yellow);
+}
+
+.concept--09 .concept-hero__media figcaption span {
+  color: var(--brand-off-white);
+}
+
+@keyframes bell-signal-release {
+  from {
+    opacity: 0;
+    transform: scaleX(0.06);
+  }
+  to {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+}
+
+@media (max-width: 55rem) {
+  .concept--09 .concept-hero__copy::before {
+    inline-size: 2.5rem;
+    block-size: 2.5rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .concept--09 .concept-hero__media::before {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}

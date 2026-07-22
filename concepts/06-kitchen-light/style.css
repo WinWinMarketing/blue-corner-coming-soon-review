@@ -344,3 +344,91 @@
     animation: none;
   }
 }
+
+.kitchen-light-page .concept-hero__media,
+.kitchen-light-page .concept-hero__copy {
+  animation: none;
+  opacity: 1;
+  transform: none;
+}
+
+.kitchen-light-page .concept-hero__copy {
+  position: relative;
+}
+
+.kitchen-light-page .concept-hero__copy::before {
+  content: "";
+  position: absolute;
+  inset-block-start: clamp(1.25rem, 3vw, 2.5rem);
+  inset-inline-start: max(var(--page-gutter), env(safe-area-inset-left));
+  inline-size: clamp(3rem, 5vw, 5rem);
+  block-size: clamp(3rem, 5vw, 5rem);
+  border-block-start: 2px solid var(--brand-blue);
+  border-inline-start: 2px solid var(--brand-blue);
+  transform-origin: left top;
+  animation: held-corner-settle 620ms var(--ease-out) both;
+  pointer-events: none;
+}
+
+.kitchen-light-page .concept-hero__media {
+  isolation: isolate;
+  overflow: hidden;
+  outline: 1px solid var(--brand-off-white);
+  outline-offset: -0.75rem;
+}
+
+.kitchen-light-page .concept-hero__media::before {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  inset-block-start: 18%;
+  inset-inline: 0 clamp(1rem, 5vw, 5rem);
+  block-size: 0.875rem;
+  border-block: 1px solid var(--brand-off-white);
+  pointer-events: none;
+}
+
+.kitchen-light-page .concept-hero__media figcaption {
+  inset-inline: clamp(1rem, 3vw, 3rem) auto;
+  inset-block-end: clamp(1rem, 2vw, 2rem);
+  inline-size: max-content;
+  max-inline-size: calc(100% - 2rem);
+}
+
+.kitchen-light-page .concept-hero__media figcaption::before {
+  content: "";
+  inline-size: 0.75rem;
+  block-size: 0.75rem;
+  flex: 0 0 auto;
+  background: var(--brand-yellow);
+}
+
+.kitchen-light-page .concept-hero__media figcaption span {
+  color: var(--brand-off-white);
+}
+
+@keyframes held-corner-settle {
+  from {
+    opacity: 0;
+    transform: translate(1.25rem, -1.25rem);
+  }
+  to {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+}
+
+@media (max-width: 55rem) {
+  .kitchen-light-page .concept-hero__copy::before {
+    inline-size: 2.5rem;
+    block-size: 2.5rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kitchen-light-page .concept-hero__copy::before {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}

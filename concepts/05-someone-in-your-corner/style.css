@@ -329,3 +329,89 @@
     animation: none;
   }
 }
+
+.the-long-walk-page .concept-hero__image {
+  animation: none;
+  transform: none;
+}
+
+.the-long-walk-page .concept-hero__copy {
+  position: relative;
+}
+
+.the-long-walk-page .concept-hero__copy::before {
+  content: "";
+  position: absolute;
+  inset-block-start: clamp(1.25rem, 3vw, 2.5rem);
+  inset-inline-start: max(var(--page-gutter), env(safe-area-inset-left));
+  inline-size: clamp(3rem, 5vw, 5rem);
+  block-size: clamp(3rem, 5vw, 5rem);
+  border-block-start: 2px solid var(--brand-blue);
+  border-inline-start: 2px solid var(--brand-blue);
+  transform-origin: left top;
+  animation: held-corner-settle 620ms var(--ease-out) both;
+  pointer-events: none;
+}
+
+.the-long-walk-page .concept-hero__media {
+  isolation: isolate;
+  overflow: hidden;
+  outline: 1px solid var(--brand-off-white);
+  outline-offset: -0.75rem;
+}
+
+.the-long-walk-page .concept-hero__media::before {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  inset-block-start: 18%;
+  inset-inline: clamp(1rem, 5vw, 5rem) 0;
+  block-size: 0.875rem;
+  border-block: 1px solid var(--brand-off-white);
+  pointer-events: none;
+}
+
+.the-long-walk-page .concept-hero__media figcaption {
+  inset-inline: auto clamp(1rem, 3vw, 3rem);
+  inset-block-end: clamp(1rem, 2vw, 2rem);
+  inline-size: max-content;
+  max-inline-size: calc(100% - 2rem);
+}
+
+.the-long-walk-page .concept-hero__media figcaption::before {
+  content: "";
+  inline-size: 0.75rem;
+  block-size: 0.75rem;
+  flex: 0 0 auto;
+  background: var(--brand-yellow);
+}
+
+.the-long-walk-page .concept-hero__media figcaption span {
+  color: var(--brand-off-white);
+}
+
+@keyframes held-corner-settle {
+  from {
+    opacity: 0;
+    transform: translate(1.25rem, -1.25rem);
+  }
+  to {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+}
+
+@media (max-width: 55rem) {
+  .the-long-walk-page .concept-hero__copy::before {
+    inline-size: 2.5rem;
+    block-size: 2.5rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .the-long-walk-page .concept-hero__copy::before {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
