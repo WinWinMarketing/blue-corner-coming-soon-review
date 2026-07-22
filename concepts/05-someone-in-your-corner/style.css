@@ -26,7 +26,7 @@
 }
 
 .someone-corner :where(.crisis-utility, .evidence, .site-footer) :where(a, button):focus-visible {
-  outline-color: var(--sc-yellow);
+  outline-color: var(--sc-paper);
 }
 
 .someone-corner img {
@@ -45,7 +45,7 @@
 }
 
 .someone-corner .crisis-utility {
-  background: var(--sc-navy);
+  background: var(--sc-blue);
   color: var(--sc-paper);
 }
 
@@ -113,7 +113,7 @@
   margin-block-end: 0;
   color: var(--sc-navy);
   font-size: 0.77rem;
-  font-weight: 750;
+  font-weight: 700;
   letter-spacing: 0.09em;
   text-transform: uppercase;
 }
@@ -152,7 +152,7 @@
   margin-block-end: 1rem;
   color: var(--sc-navy);
   font-size: 0.78rem;
-  font-weight: 750;
+  font-weight: 700;
   letter-spacing: 0.13em;
   line-height: 1.25;
   text-transform: uppercase;
@@ -162,7 +162,7 @@
   max-width: 8ch;
   margin-block-end: 1.5rem;
   font-size: clamp(4rem, 8.7vw, 8.7rem);
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: -0.072em;
   line-height: 0.84;
 }
@@ -199,7 +199,7 @@
   border: 2px solid var(--sc-blue);
   border-radius: 0;
   font: inherit;
-  font-weight: 750;
+  font-weight: 700;
   line-height: 1.15;
   text-align: center;
   text-decoration: none;
@@ -208,8 +208,8 @@
 
 .someone-corner .button--primary {
   border-color: var(--sc-navy);
-  background: var(--sc-navy);
-  color: var(--sc-paper);
+  background: var(--sc-yellow);
+  color: var(--sc-navy);
 }
 
 .someone-corner .button--secondary {
@@ -320,7 +320,7 @@
   max-width: 13ch;
   margin-block-end: 1.5rem;
   font-size: clamp(2.65rem, 5.5vw, 5.5rem);
-  font-weight: 750;
+  font-weight: 700;
   letter-spacing: -0.06em;
   line-height: 0.95;
 }
@@ -371,7 +371,7 @@
 
 .someone-corner .service-list__first span {
   font-size: 1.35rem;
-  font-weight: 750;
+  font-weight: 700;
 }
 
 .someone-corner .service-list__first strong {
@@ -449,7 +449,7 @@
 
 .someone-corner .evidence {
   padding: clamp(4rem, 8vw, 8rem) max(var(--sc-gutter), env(safe-area-inset-right)) clamp(4rem, 8vw, 8rem) max(var(--sc-gutter), env(safe-area-inset-left));
-  background: var(--sc-navy);
+  background: var(--sc-blue);
   color: var(--sc-paper);
 }
 
@@ -488,7 +488,7 @@
 
 .someone-corner .evidence-list strong {
   font-size: clamp(2.5rem, 5.5vw, 5.4rem);
-  font-weight: 750;
+  font-weight: 700;
   letter-spacing: -0.065em;
   line-height: 0.9;
 }
@@ -618,7 +618,7 @@
 .someone-corner .field label {
   color: var(--sc-navy);
   font-size: 0.8rem;
-  font-weight: 750;
+  font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -652,8 +652,8 @@
   width: 100%;
   margin-block-start: 0.5rem;
   border-color: var(--sc-navy);
-  background: var(--sc-navy);
-  color: var(--sc-paper);
+  background: var(--sc-yellow);
+  color: var(--sc-navy);
   cursor: pointer;
 }
 
@@ -691,7 +691,7 @@
   grid-template-columns: minmax(0, 1.3fr) minmax(12rem, 0.7fr) minmax(12rem, 0.7fr);
   padding: clamp(3rem, 7vw, 6rem) max(var(--sc-gutter), env(safe-area-inset-right)) max(3rem, env(safe-area-inset-bottom)) max(var(--sc-gutter), env(safe-area-inset-left));
   gap: 2rem;
-  background: var(--sc-navy);
+  background: var(--sc-blue);
   color: var(--sc-paper);
 }
 

@@ -11,12 +11,16 @@
   border-block-end: 1px solid var(--color-border);
 }
 
+.ringside-page :where(.ringside-hero, .roadmap, .capture-path--member, .ringside-footer) :focus-visible {
+  outline-color: var(--brand-off-white);
+}
+
 .ringside-hero {
   position: relative;
   isolation: isolate;
   min-block-size: clamp(46rem, 88vh, 65rem);
   overflow: hidden;
-  background: var(--brand-navy);
+  background: var(--brand-blue);
   color: var(--brand-off-white);
 }
 
@@ -100,7 +104,7 @@
 .ringside-back,
 .ringside-launch {
   font-size: var(--font-size-small);
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
 }
@@ -141,7 +145,7 @@
   gap: 0;
   margin: 0;
   font-size: clamp(4.3rem, 9.2vw, 9.5rem);
-  font-weight: 900;
+  font-weight: 700;
   letter-spacing: -0.07em;
   line-height: 0.76;
   text-transform: uppercase;
@@ -197,7 +201,7 @@
 .round-signal span,
 .round-signal small {
   font-size: var(--font-size-small);
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
@@ -235,7 +239,7 @@
 .evidence h2 {
   margin: 0;
   font-size: clamp(3rem, 6vw, 6.5rem);
-  font-weight: 900;
+  font-weight: 700;
   letter-spacing: -0.06em;
   line-height: 0.86;
 }
@@ -255,7 +259,7 @@
 .corner-story__closing {
   padding-block-start: var(--space-lg);
   border-block-start: 1px solid var(--color-border);
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .corner-story__mark {
@@ -269,7 +273,7 @@
 }
 
 .roadmap {
-  background: var(--brand-navy);
+  background: var(--brand-blue);
   color: var(--brand-off-white);
 }
 
@@ -329,7 +333,7 @@
 
 .service-list span {
   font-size: clamp(1.6rem, 1.25rem + 1.2vw, 2.8rem);
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: -0.035em;
 }
 
@@ -401,7 +405,7 @@
 .recognition__closing {
   margin: 0;
   font-size: clamp(1.6rem, 1.25rem + 1vw, 2.6rem);
-  font-weight: 900;
+  font-weight: 700;
   letter-spacing: -0.03em;
 }
 
@@ -444,7 +448,7 @@
 .evidence-band strong {
   color: var(--brand-yellow);
   font-size: clamp(2.5rem, 4vw, 5.2rem);
-  font-weight: 900;
+  font-weight: 700;
   letter-spacing: -0.06em;
   line-height: 0.85;
 }
@@ -521,7 +525,7 @@
 }
 
 .capture-path--member {
-  background: var(--brand-navy);
+  background: var(--brand-blue);
   color: var(--brand-off-white);
 }
 
@@ -570,13 +574,13 @@
 }
 
 .capture-path--therapist .button--ghost {
-  background: var(--brand-navy);
-  color: var(--brand-off-white);
+  background: var(--brand-yellow);
+  color: var(--brand-navy);
 }
 
 .ringside-footer {
   padding-block: var(--space-4xl) max(var(--space-3xl), env(safe-area-inset-bottom));
-  background: var(--brand-navy);
+  background: var(--brand-blue);
   color: var(--brand-off-white);
 }
 
@@ -608,7 +612,7 @@
   max-inline-size: 24rem;
   color: var(--brand-yellow);
   font-size: clamp(1.25rem, 1.1rem + 0.5vw, 1.65rem);
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .ringside-footer__meta,
@@ -619,7 +623,7 @@
 
 .ringside-footer__meta p:first-child {
   color: var(--brand-off-white);
-  font-weight: 800;
+  font-weight: 700;
 }
 
 @keyframes canvas-settle {

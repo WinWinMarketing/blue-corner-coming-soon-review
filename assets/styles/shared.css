@@ -138,7 +138,7 @@ button {
 .eyebrow {
   margin: 0;
   font-size: var(--font-size-small);
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: 0.12em;
   line-height: 1.25;
   text-transform: uppercase;
@@ -155,7 +155,7 @@ button {
   border-radius: var(--radius-small);
   background: var(--color-action);
   color: var(--color-on-dark);
-  font-weight: 800;
+  font-weight: 700;
   line-height: 1.1;
   text-align: center;
   text-decoration: none;
@@ -206,7 +206,7 @@ button {
 
 .field label {
   font-size: var(--font-size-small);
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: 0.03em;
 }
 

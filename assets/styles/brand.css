@@ -14,7 +14,7 @@
   --color-border: color-mix(in oklch, var(--brand-navy) 24%, var(--brand-off-white));
   --color-on-dark: var(--brand-off-white);
   --color-on-signal: var(--brand-navy);
-  --color-dark-muted: color-mix(in oklch, var(--brand-off-white) 72%, var(--brand-navy));
+  --color-dark-muted: color-mix(in oklch, var(--brand-off-white) 84%, var(--brand-blue));
 
   --font-brand: "Proxima Nova", "Proxima Nova Alt", "Avenir Next", "Segoe UI", sans-serif;
   --font-size-body: clamp(1rem, 0.96rem + 0.18vw, 1.125rem);

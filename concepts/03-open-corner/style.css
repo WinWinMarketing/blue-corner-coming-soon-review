@@ -58,7 +58,7 @@ body.open-corner {
   padding: 0.75rem 1rem;
   background: var(--yellow);
   color: var(--ink);
-  font-weight: 800;
+  font-weight: 700;
   transform: translateY(-180%);
   transition: transform 180ms var(--ease-out);
 }
@@ -73,7 +73,7 @@ body.open-corner {
 }
 
 .evidence :where(a, button, input):focus-visible {
-  outline-color: var(--yellow);
+  outline-color: var(--daylight);
 }
 
 .site-footer :where(a, button, input):focus-visible {
@@ -109,7 +109,7 @@ body.open-corner {
   display: inline-flex;
   align-items: center;
   color: var(--ink);
-  font-weight: 800;
+  font-weight: 700;
   text-decoration-thickness: 0.08em;
   text-underline-offset: 0.25em;
 }
@@ -139,7 +139,7 @@ body.open-corner {
   gap: 0.25rem 1.5rem;
   color: var(--quiet);
   font-size: 0.75rem;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: 0.1em;
   line-height: 1.25;
   text-transform: uppercase;
@@ -158,7 +158,7 @@ body.open-corner {
 .audience-label {
   color: var(--ink);
   font-size: 0.76rem;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: 0.14em;
   line-height: 1.25;
   text-transform: uppercase;
@@ -247,7 +247,7 @@ body.open-corner {
   border: 1px solid transparent;
   border-radius: var(--radius-round);
   font: inherit;
-  font-weight: 800;
+  font-weight: 700;
   line-height: 1.15;
   text-align: center;
   text-decoration: none;
@@ -256,12 +256,12 @@ body.open-corner {
 }
 
 .button--primary {
-  background: var(--ink);
-  color: var(--daylight);
+  background: var(--yellow);
+  color: var(--ink);
 }
 
 .open-action__links .button--primary {
-  color: var(--daylight);
+  color: var(--ink);
 }
 
 .button--quiet {
@@ -307,7 +307,7 @@ body.open-corner {
   border-top: 1px solid var(--blue);
   color: var(--blue);
   font-size: clamp(1.3rem, 2vw, 1.8rem);
-  font-weight: 800;
+  font-weight: 700;
   line-height: 1.2;
 }
 
@@ -412,7 +412,7 @@ body.open-corner {
 .recognition-number {
   color: var(--ink);
   font-size: 0.78rem;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: 0.12em;
 }
 
@@ -438,7 +438,7 @@ body.open-corner {
 }
 
 .evidence {
-  background: var(--ink);
+  background: var(--blue);
   color: var(--daylight);
 }
 
@@ -458,7 +458,7 @@ body.open-corner {
 
 .evidence .evidence-heading > p:last-child,
 .evidence-note {
-  color: color-mix(in oklch, var(--daylight) 76%, var(--ink));
+  color: color-mix(in oklch, var(--daylight) 86%, var(--blue));
 }
 
 .evidence-list {
@@ -564,7 +564,7 @@ form[data-prototype-form] {
 
 .form-field label {
   font-size: 0.8rem;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -671,7 +671,7 @@ form[data-prototype-form] {
   }
 
   .button--primary:hover {
-    background: var(--ink);
+    background: var(--yellow);
   }
 
   .button--quiet:hover {

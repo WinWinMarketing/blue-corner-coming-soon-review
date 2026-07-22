@@ -9,11 +9,15 @@
   max-inline-size: none;
 }
 
+.gallery-page :where(.gallery-hero, .gallery-footer) :focus-visible {
+  outline-color: var(--brand-off-white);
+}
+
 .gallery-hero {
   position: relative;
   min-block-size: clamp(34rem, 78vh, 53rem);
   overflow: hidden;
-  background: var(--brand-navy);
+  background: var(--brand-blue);
   color: var(--brand-off-white);
 }
 
@@ -29,14 +33,13 @@
 
 .gallery-hero::after {
   position: absolute;
-  inline-size: min(38rem, 72vw);
-  aspect-ratio: 1;
-  inset-block-end: -45%;
-  inset-inline-end: -8%;
-  border: clamp(2rem, 5vw, 5rem) solid var(--brand-blue);
-  border-radius: 50%;
+  inline-size: clamp(7rem, 16vw, 14rem);
+  aspect-ratio: 255 / 248;
+  inset-block-start: 0;
+  inset-inline-end: 0;
+  background: url("../brand/corner-off-white.png") top right / contain no-repeat;
   content: "";
-  opacity: 0.55;
+  opacity: 0.94;
   pointer-events: none;
 }
 
@@ -56,7 +59,7 @@
   justify-content: space-between;
   gap: var(--space-xl);
   font-size: var(--font-size-small);
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -81,7 +84,7 @@
   max-inline-size: 11ch;
   margin: 0;
   font-size: clamp(4rem, 11vw, 10rem);
-  font-weight: 900;
+  font-weight: 700;
   letter-spacing: -0.065em;
   line-height: 0.78;
   text-transform: uppercase;
@@ -101,7 +104,7 @@
   gap: var(--space-lg);
   padding-block-start: var(--space-md);
   border-block-start: 1px solid color-mix(in oklch, var(--brand-off-white) 36%, transparent);
-  font-weight: 800;
+  font-weight: 700;
   text-decoration: none;
 }
 
@@ -131,7 +134,7 @@
 .gallery-intro h2 {
   margin: 0;
   font-size: clamp(2.8rem, 5.8vw, 6.2rem);
-  font-weight: 900;
+  font-weight: 700;
   letter-spacing: -0.055em;
   line-height: 0.9;
 }
@@ -182,8 +185,8 @@
 
 .concept-tile--04 {
   grid-column: span 3;
-  background: var(--brand-yellow);
-  color: var(--brand-navy);
+  background: var(--brand-blue);
+  color: var(--brand-off-white);
 }
 
 .concept-tile--05 {
@@ -222,7 +225,7 @@
   align-self: start;
   justify-self: start;
   font-size: var(--font-size-small);
-  font-weight: 900;
+  font-weight: 700;
   letter-spacing: 0.08em;
 }
 
@@ -271,14 +274,14 @@
   inset-inline-start: -0.04em;
   color: color-mix(in oklch, var(--brand-navy) 16%, transparent);
   font-size: clamp(4rem, 8vw, 8rem);
-  font-weight: 900;
+  font-weight: 700;
   letter-spacing: -0.07em;
   line-height: 0.7;
 }
 
 .gallery-footer {
   padding-block: var(--space-3xl);
-  background: var(--brand-navy);
+  background: var(--brand-blue);
   color: var(--brand-off-white);
 }
 
@@ -300,7 +303,7 @@
 
 .gallery-footer p:first-of-type {
   font-size: clamp(1.2rem, 1rem + 0.5vw, 1.6rem);
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .gallery-footer p:last-child {

@@ -80,7 +80,7 @@
 .first-bell .gallery-link {
   color: inherit;
   font-size: 0.78rem;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: 0.05em;
   text-decoration-thickness: 2px;
   text-underline-offset: 0.2em;
@@ -112,7 +112,7 @@
   margin-block-end: 0;
   color: var(--fb-navy);
   font-size: 0.76rem;
-  font-weight: 900;
+  font-weight: 700;
   letter-spacing: 0.12em;
   text-align: end;
   text-transform: uppercase;
@@ -130,7 +130,7 @@
   min-height: min(48rem, 78vh);
   overflow: hidden;
   border-block-end: 2px solid var(--fb-navy);
-  background: var(--fb-navy);
+  background: var(--fb-blue);
   color: var(--fb-paper);
 }
 
@@ -147,7 +147,7 @@
 .first-bell .audience {
   margin-block-end: 1rem;
   font-size: clamp(0.72rem, 1.2vw, 0.9rem);
-  font-weight: 900;
+  font-weight: 700;
   letter-spacing: 0.16em;
   line-height: 1.2;
   text-transform: uppercase;
@@ -164,7 +164,7 @@
   max-width: 7ch;
   margin-block-end: 1.25rem;
   font-size: clamp(4rem, 10vw, 10rem);
-  font-weight: 900;
+  font-weight: 700;
   letter-spacing: -0.075em;
   line-height: 0.73;
   text-transform: uppercase;
@@ -232,7 +232,7 @@
   border: 2px solid var(--fb-navy);
   border-radius: 0;
   font: inherit;
-  font-weight: 900;
+  font-weight: 700;
   line-height: 1.1;
   text-align: center;
   text-decoration: none;
@@ -257,7 +257,7 @@
   overflow: hidden;
   place-items: center;
   border-inline-start: 2px solid var(--fb-navy);
-  background: var(--fb-yellow);
+  background: var(--fb-blue);
   isolation: isolate;
   animation: bell-art 680ms var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1)) 120ms both;
 }
@@ -293,7 +293,7 @@
   display: block;
   width: 140%;
   height: clamp(0.75rem, 1.8vw, 1.5rem);
-  background: var(--fb-navy);
+  background: var(--fb-yellow);
   transform: rotate(-9deg);
 }
 
@@ -321,7 +321,7 @@
 }
 
 .first-bell .corner-story {
-  background: var(--fb-navy);
+  background: var(--fb-blue);
   color: var(--fb-paper);
 }
 
@@ -334,7 +334,7 @@
   max-width: 15ch;
   margin-block-end: 1.5rem;
   font-size: clamp(2.35rem, 5.2vw, 5.5rem);
-  font-weight: 900;
+  font-weight: 700;
   letter-spacing: -0.055em;
   line-height: 0.93;
   text-transform: uppercase;
@@ -352,7 +352,7 @@
   padding-block-start: 1rem;
   border-block-start: 0.65rem solid var(--fb-yellow);
   color: var(--fb-yellow);
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .first-bell .service-list,
@@ -387,12 +387,12 @@
 .first-bell .service-list__first {
   padding-inline: 0.75rem;
   background: var(--fb-yellow);
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .first-bell .recognition {
   border-block-end: 2px solid var(--fb-navy);
-  background: var(--fb-yellow);
+  background: var(--fb-paper);
 }
 
 .first-bell .section-heading {
@@ -426,7 +426,7 @@
 .first-bell .recognition-list h3 {
   margin-block-end: 1rem;
   font-size: clamp(1.35rem, 2.2vw, 2rem);
-  font-weight: 900;
+  font-weight: 700;
   letter-spacing: -0.035em;
   line-height: 1;
   text-transform: uppercase;
@@ -441,15 +441,15 @@
   width: fit-content;
   margin: 2rem 0 0 auto;
   padding: 0.65rem 0.85rem;
-  background: var(--fb-navy);
-  color: var(--fb-paper);
+  background: var(--fb-yellow);
+  color: var(--fb-navy);
   font-size: clamp(1rem, 1.5vw, 1.2rem);
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .first-bell .evidence {
   border-block-end: 2px solid var(--fb-navy);
-  background: var(--fb-navy);
+  background: var(--fb-blue);
   color: var(--fb-paper);
 }
 
@@ -466,7 +466,7 @@
 }
 
 .first-bell .evidence__intro > p:last-child {
-  color: color-mix(in oklch, var(--fb-paper) 76%, var(--fb-navy));
+  color: color-mix(in oklch, var(--fb-paper) 86%, var(--fb-blue));
   line-height: 1.55;
 }
 
@@ -492,7 +492,7 @@
 .first-bell .evidence-grid strong {
   color: var(--fb-yellow);
   font-size: clamp(2.5rem, 5vw, 5rem);
-  font-weight: 900;
+  font-weight: 700;
   letter-spacing: -0.065em;
   line-height: 0.85;
 }
@@ -527,7 +527,7 @@
 }
 
 .first-bell .capture {
-  background: var(--fb-yellow);
+  background: color-mix(in oklch, var(--fb-blue) 8%, var(--fb-paper));
   color: var(--fb-navy);
 }
 
@@ -571,13 +571,13 @@
 }
 
 .first-bell .signup-panel--therapist {
-  background: var(--fb-yellow);
+  background: color-mix(in oklch, var(--fb-blue) 10%, var(--fb-paper));
 }
 
 .first-bell .signup-panel h3 {
   margin-block-end: 0.65rem;
   font-size: clamp(2rem, 4vw, 3.75rem);
-  font-weight: 900;
+  font-weight: 700;
   letter-spacing: -0.05em;
   line-height: 0.95;
   text-transform: uppercase;
@@ -606,7 +606,7 @@
 
 .first-bell .field label {
   font-size: 0.78rem;
-  font-weight: 900;
+  font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
 }
@@ -639,8 +639,8 @@
   width: 100%;
   margin-block-start: 0.5rem;
   border-color: var(--fb-navy);
-  background: var(--fb-navy);
-  color: var(--fb-paper);
+  background: var(--fb-yellow);
+  color: var(--fb-navy);
   cursor: pointer;
 }
 
@@ -663,7 +663,7 @@
 .first-bell .form-status h4 {
   margin-block-end: 0.4rem;
   font-size: 1.4rem;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .first-bell .form-status p {
@@ -679,8 +679,8 @@
   gap: 2rem;
   border: 2px solid var(--fb-navy);
   border-block-start: 0;
-  background: var(--fb-yellow);
-  color: var(--fb-navy);
+  background: var(--fb-blue);
+  color: var(--fb-paper);
 }
 
 .first-bell .site-footer p {
@@ -690,7 +690,7 @@
 .first-bell .site-footer__mission {
   max-width: 18ch;
   font-size: clamp(1.6rem, 3vw, 2.8rem);
-  font-weight: 900;
+  font-weight: 700;
   letter-spacing: -0.04em;
   line-height: 1;
   text-transform: uppercase;
@@ -704,12 +704,12 @@
 }
 
 .first-bell .site-footer__identity p:first-child {
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .first-bell .site-footer a {
   color: inherit;
-  font-weight: 800;
+  font-weight: 700;
   text-underline-offset: 0.2em;
 }
 
