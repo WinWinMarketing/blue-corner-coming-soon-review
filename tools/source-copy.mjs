@@ -2,7 +2,7 @@ export const referenceHero = Object.freeze({
   image: "blue-corner-reference-ring-brand-v2.webp",
   width: 1774,
   height: 887,
-  alt: "An empty boxing-ring corner with yellow ropes, a black post and stool, and a deep blue backdrop.",
+  alt: "An empty boxing-ring corner with yellow ropes, a bright-blue padded corner post, a black stool, and a deep blue backdrop.",
 });
 
 export const sourceCopy = Object.freeze({
@@ -22,8 +22,8 @@ export const sourceCopy = Object.freeze({
     items: Object.freeze([
       Object.freeze({ value: "85%", label: "of working men have hit burnout" }),
       Object.freeze({ value: "2×", label: "anxiety disorders have doubled in a decade" }),
-      Object.freeze({ value: "#1", label: "cause of death for men aged 20 to 49 is overdose" }),
-      Object.freeze({ value: "~300%", label: "more young men seeking gambling help since legalization" }),
+      Object.freeze({ value: "#1", label: "cause of death for men 20 to 49 is overdose" }),
+      Object.freeze({ value: "~300%", label: "more young men seeking gambling help" }),
     ]),
     source: "Sources: Statistics Canada · Public Health Agency of Canada · CMAJ · Cogent Mental Health.",
     gamblingSource: "Gambling figure: help-seeking among men aged 15 to 24 in Ontario after online betting was legalized in 2022 (CMAJ, 2026).",

@@ -2,6 +2,7 @@
   --section-space: clamp(4rem, 6.5vw, 6.5rem);
   --signal-bar: clamp(2.375rem, 2.9vw, 2.75rem);
   --page-gutter: clamp(1rem, 3.8889vw, 3.5rem);
+  --header-h: 8rem;
   background: var(--brand-off-white);
 }
 
@@ -114,14 +115,15 @@
 .concept-hero__underline {
   text-decoration: underline;
   text-decoration-color: var(--brand-yellow);
-  text-decoration-thickness: 0.09em;
-  text-underline-offset: 0.08em;
+  text-decoration-thickness: 0.11em;
+  text-underline-offset: 0.16em;
+  text-decoration-skip-ink: none;
 }
 
 .marker-band {
   display: inline;
-  padding-inline: 0.06em;
-  background: linear-gradient(to top, var(--brand-yellow) 0 38%, transparent 38% 100%);
+  padding-inline: 0.08em;
+  background: linear-gradient(to top, var(--brand-yellow) 0 62%, transparent 62% 100%);
   color: inherit;
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
@@ -262,16 +264,18 @@
   line-height: 0.9;
   text-decoration: underline;
   text-decoration-color: var(--brand-yellow);
-  text-decoration-thickness: 0.1em;
-  text-underline-offset: 0.08em;
+  text-decoration-thickness: 0.12em;
+  text-underline-offset: 0.12em;
+  text-decoration-skip-ink: none;
 }
 
 .stat p {
-  max-inline-size: 20ch;
-  margin: clamp(2.5rem, 4vw, 4rem) 0 0;
-  font-size: var(--font-size-support);
+  max-inline-size: 24ch;
+  margin: clamp(1.5rem, 2.4vw, 2.5rem) 0 0;
+  font-size: clamp(1.0625rem, 0.85rem + 0.6vw, 1.3rem);
   font-weight: var(--font-weight-semibold);
-  line-height: 1.5;
+  line-height: 1.4;
+  text-wrap: balance;
 }
 
 .stats__sources {
@@ -390,17 +394,17 @@
 
 .roadmap {
   display: flex;
-  min-block-size: clamp(30rem, 40vw, 36rem);
+  min-block-size: 0;
   flex-direction: column;
   justify-content: center;
-  padding-block: clamp(3rem, 4vw, 4rem);
+  padding-block: clamp(3rem, 4.5vw, 4.5rem);
 }
 
 .roadmap__list {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   padding: 0;
-  margin: clamp(2rem, 3vw, 3rem) 0 0;
+  margin: clamp(1.5rem, 2.4vw, 2.25rem) 0 0;
   list-style: none;
 }
 
@@ -429,8 +433,12 @@
 }
 
 .roadmap-item--future {
-  background: color-mix(in oklch, var(--brand-navy) 7%, var(--brand-off-white));
+  background: color-mix(in oklch, var(--brand-navy) 13%, var(--brand-off-white));
   color: var(--color-muted);
+}
+
+.roadmap-item--current {
+  border-block-start: 0.5rem solid var(--brand-yellow);
 }
 
 .roadmap-item strong {
@@ -948,19 +956,35 @@
   transform: translateY(0);
 }
 
-@media (min-width: 82.0625rem) {
-  .site-header__inner.page-frame,
-  .concept-hero__inner.page-frame {
-    inline-size: min(100%, 79rem);
+@media (min-width: 64.0625rem) {
+  .concept-hero {
+    display: flex;
+    align-items: stretch;
+    min-block-size: calc(100svh - var(--header-h) - var(--signal-bar));
   }
 
-  .concept-hero h1 {
-    font-size: 7.25rem;
+  .concept-hero__inner {
+    flex: 1;
+    align-content: center;
+    min-block-size: 0;
+    padding-block: clamp(1.25rem, 2.2vh, 2.5rem);
+  }
+}
+
+@media (min-width: 80rem) {
+  .meaning__copy {
+    padding-inline: 4.5vw 4vw;
   }
 
   .meaning__body-line {
     display: block;
     white-space: nowrap;
+  }
+}
+
+@media (min-width: 82.0625rem) {
+  .concept-hero h1 {
+    font-size: 7.25rem;
   }
 
   .conversion__inner {

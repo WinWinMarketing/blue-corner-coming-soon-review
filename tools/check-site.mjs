@@ -9,13 +9,13 @@ const toolsDirectory = path.dirname(fileURLToPath(import.meta.url));
 const rootDirectory = path.resolve(toolsDirectory, "..");
 const failures = [];
 const strictImages = process.argv.includes("--strict-images");
-const approvedHomeSha256 = "77e67cc759ba8371434fd8e722eb3f93c7b703542694c71f76e90ef4d83bc589";
+const approvedHomeSha256 = "c56ad429d0fe496cbf806bec3decf615217de05755a1c65c63a0696fb01e91c2";
 const approvedAssets = Object.freeze({
   "assets/styles/brand.css": "86c57f4478c132ae687d6857352b9eefa7cd24ee83c4ff8e7240c560ea409370",
-  "assets/styles/shared.css": "09dd5672c3345e513969fa8c45ea7b2599c85aed904af344f13fa2ce47408e7b",
-  "assets/styles/concept-base.css": "70ee86081f08ed9ffc4fcc5d408ad9dbaceefa4fc1541e2390a064f9f930f43d",
+  "assets/styles/shared.css": "3198759ed41f78f8719a9355f9c48868c8473f0fb9d10b71be368073921e20ad",
+  "assets/styles/concept-base.css": "a8323802acea299b04478a00e766aafdb63f5493676d0281efee79530c9801a6",
   "assets/scripts/shared.js": "5d77e4a770625571bd3e97257be4e2be0f1e303503cc813d5d98ded91618cd36",
-  "assets/art/blue-corner-reference-ring-brand-v2.webp": "805dafa5d496b4be6d0a912a50ee37f202fe8ba98d8b2241275867ce2b9f8b22",
+  "assets/art/blue-corner-reference-ring-brand-v2.webp": "b7681e542ac272951e5be0d86ce6c6eae06f5e10a5fb73293a751da3ee4bf4db",
 });
 
 const fail = (message) => failures.push(message);
@@ -88,7 +88,7 @@ if (count(home, 'href="https://use.typekit.net/ciy6txz.css"') !== 1
   || !home.includes("font-src 'self' https://use.typekit.net;")) {
   fail("Typekit stylesheet and constrained style/font CSP are required");
 }
-if (count(home, 'href="assets/styles/concept-base.css?v=70ee8608"') !== 1) {
+if (count(home, 'href="assets/styles/concept-base.css?v=a8323802"') !== 1) {
   fail("Homepage must version the corrected core stylesheet for cache refresh");
 }
 if (!home.includes(`src="assets/art/${referenceHero.image}"`) || /(?:href|src)="\/assets\//.test(home)) {
@@ -112,16 +112,16 @@ for (const typographyRule of ["font-kerning: normal", "text-rendering: optimizeL
   if (!sharedCss.includes(typographyRule)) fail(`Shared typography is missing ${typographyRule}`);
 }
 for (const readabilityRule of [
-  /\.stat p\s*\{[^}]*font-size:\s*var\(--font-size-support\);[^}]*line-height:\s*1\.5;/,
+  /\.stat p\s*\{[^}]*font-size:\s*clamp\([^;]*\);[^}]*line-height:\s*1\.4;/,
   /\.stats__sources\s*\{[^}]*font-size:\s*var\(--font-size-support\);[^}]*line-height:\s*1\.5;/,
   /\.prototype-disclosure\s*\{[^}]*font-size:\s*var\(--font-size-support\);[^}]*line-height:\s*1\.5;/,
   /\.prototype-role > legend\s*\{[^}]*font-size:\s*var\(--font-size-support\);[^}]*line-height:\s*1\.35;/,
   /\.field-error\s*\{[^}]*font-size:\s*var\(--font-size-support\);[^}]*line-height:\s*1\.45;/,
   /\.concept-footer__support a\s*\{[^}]*font-size:\s*var\(--font-size-support\);[^}]*line-height:\s*1\.35;/,
 ]) {
-  if (!readabilityRule.test(`${conceptCss}\n${sharedCss}`)) fail("Supporting copy must use the readable 1rem scale");
+  if (!readabilityRule.test(`${conceptCss}\n${sharedCss}`)) fail("Supporting copy must use the readable scale");
 }
-if (!/\.eyebrow\s*\{[^}]*max-inline-size:\s*min\(100%, 38ch\);[^}]*background:\s*var\(--brand-yellow\);[^}]*color:\s*var\(--brand-navy\);[^}]*font-size:\s*var\(--font-size-support\);/.test(sharedCss)) {
+if (!/\.eyebrow\s*\{[^}]*max-inline-size:\s*min\(100%, 34ch\);[^}]*background:\s*var\(--brand-yellow\);[^}]*color:\s*var\(--brand-navy\);[^}]*font-size:\s*clamp\([^;]*\);/.test(sharedCss)) {
   fail("Eyebrows must use the readable navy-on-yellow two-line treatment");
 }
 if (count(home, 'class="marker-band"') !== 5
@@ -151,8 +151,11 @@ if (!/@media \(min-width: 64\.0625rem\)\s*\{\s*\.conversion__heading h2\s*\{[^}]
 if (!/@media \(min-width: 48\.0625rem\) and \(max-width: 64rem\)\s*\{\s*\.conversion__heading h2\s*\{[^}]*font-size:\s*clamp\(4rem, 7\.2vw, 4\.75rem\);/.test(conceptCss)) {
   fail("Intermediate conversion headline must match the hero display scale");
 }
-if (!/@media \(min-width: 82\.0625rem\)\s*\{\s*\.site-header__inner\.page-frame,\s*\.concept-hero__inner\.page-frame\s*\{[^}]*inline-size:\s*min\(100%, 79rem\);/.test(conceptCss)) {
-  fail("Only the wide-desktop masthead and hero must use the tightened 79rem frame");
+if (/inline-size:\s*min\(100%, 79rem\)/.test(conceptCss)) {
+  fail("Hero and masthead must span the full page frame, not the retired 79rem width");
+}
+if (!/@media \(min-width: 64\.0625rem\)\s*\{\s*\.concept-hero\s*\{[^}]*min-block-size:\s*calc\(100svh - var\(--header-h\) - var\(--signal-bar\)\);/.test(conceptCss)) {
+  fail("Header plus hero must fit one desktop viewport (svh-based hero height)");
 }
 if (!/@media \(min-width: 82\.0625rem\)\s*\{[\s\S]*?\.concept-hero h1\s*\{[^}]*font-size:\s*7\.25rem;/.test(conceptCss)) {
   fail("Wide-desktop hero display must cap at 7.25rem to preserve the image gap");
@@ -167,11 +170,14 @@ if (!/\.stats__sources\s*\{[^}]*grid-template-columns:\s*1fr;/.test(conceptCss)
 }
 if (!/\.roadmap__list\s*\{[^}]*grid-template-columns:[^}]*\}[^@]*?\.roadmap-item\s*\{[^}]*border-inline-end:\s*1px solid var\(--brand-navy\);/.test(conceptCss)
   || /\.roadmap__list\s*\{[^}]*border-block/.test(conceptCss)
-  || !/\.roadmap-item--future\s*\{[^}]*background:\s*color-mix\(in oklch, var\(--brand-navy\) 7%, var\(--brand-off-white\)\);[^}]*color:\s*var\(--color-muted\);/.test(conceptCss)) {
+  || !/\.roadmap-item--future\s*\{[^}]*background:\s*color-mix\(in oklch, var\(--brand-navy\) 13%, var\(--brand-off-white\)\);[^}]*color:\s*var\(--color-muted\);/.test(conceptCss)) {
   fail("Roadmap must stay dense with vertical dividers and muted future services");
 }
-if (!/@media \(min-width: 82\.0625rem\)\s*\{[\s\S]*?\.meaning__body-line\s*\{[^}]*display:\s*block;[^}]*white-space:\s*nowrap;[\s\S]*?\.conversion__inner\s*\{[^}]*grid-template-columns:\s*minmax\(0, 1fr\) minmax\(0, 40\.625rem\);/.test(conceptCss)) {
-  fail("Wide-desktop manifesto lines and 650px conversion form track are required");
+if (!/@media \(min-width: 80rem\)\s*\{[\s\S]*?\.meaning__body-line\s*\{[^}]*display:\s*block;[^}]*white-space:\s*nowrap;/.test(conceptCss)) {
+  fail("Desktop manifesto body must hold its two deliberate lines");
+}
+if (!/@media \(min-width: 82\.0625rem\)\s*\{[\s\S]*?\.conversion__inner\s*\{[^}]*grid-template-columns:\s*minmax\(0, 1fr\) minmax\(0, 40\.625rem\);/.test(conceptCss)) {
+  fail("Wide-desktop 650px conversion form track is required");
 }
 if (!/\.conversion__forms\s*\{[^}]*align-self:\s*start;/.test(conceptCss)
   || !/\.conversion-path\s*\{[^}]*align-self:\s*start;[^}]*padding:\s*1\.25rem clamp\(1\.5rem, 2vw, 1\.75rem\);/.test(conceptCss)
