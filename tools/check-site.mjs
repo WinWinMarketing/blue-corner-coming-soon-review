@@ -9,7 +9,7 @@ const toolsDirectory = path.dirname(fileURLToPath(import.meta.url));
 const rootDirectory = path.resolve(toolsDirectory, "..");
 const failures = [];
 const strictImages = process.argv.includes("--strict-images");
-const approvedHomeSha256 = "ab7ed2e7a396097a3e20519a6ca3b622e15b38c68958f35216ae5fce4aafbbf9";
+const approvedHomeSha256 = "428963d0d8daa03bf33f033ee4e587e9be2726fbd31d541a81f961420db4f768";
 const approvedAssets = Object.freeze({
   "assets/styles/brand.css": "7ee7f24f04f7cc6c14ca3eaffc9c5e263342cc60b9070d3c35460e3cee5c3613",
   "assets/styles/shared.css": "30af41cf2be7a0951e4e123702da7263c9fd2bb3f5f63a791cd3065665d7dc60",
@@ -79,6 +79,9 @@ if (count(home, 'href="https://use.typekit.net/ciy6txz.css"') !== 1
   || !home.includes("style-src 'self' https://use.typekit.net;")
   || !home.includes("font-src 'self' https://use.typekit.net;")) {
   fail("Typekit stylesheet and constrained style/font CSP are required");
+}
+if (count(home, 'href="assets/styles/concept-base.css?v=036f9ae2"') !== 1) {
+  fail("Homepage must version the corrected core stylesheet for cache refresh");
 }
 if (!home.includes(`src="assets/art/${referenceHero.image}"`) || /(?:href|src)="\/assets\//.test(home)) {
   fail("Homepage assets must be project-relative and use the approved hero");
