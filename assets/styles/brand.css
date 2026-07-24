@@ -21,6 +21,7 @@
   --font-weight-semibold: 700;
   --font-weight-bold: 700;
   --font-size-body: clamp(1rem, 0.96rem + 0.18vw, 1.125rem);
+  --font-size-support: 1rem;
   --font-size-small: 0.875rem;
 
   --space-2xs: 0.25rem;

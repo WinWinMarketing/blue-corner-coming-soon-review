@@ -239,9 +239,9 @@
 .stat p {
   max-inline-size: 20ch;
   margin: clamp(2.5rem, 4vw, 4rem) 0 0;
-  font-size: var(--font-size-small);
+  font-size: var(--font-size-support);
   font-weight: var(--font-weight-semibold);
-  line-height: 1.4;
+  line-height: 1.5;
 }
 
 .stats__sources {
@@ -249,7 +249,8 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--space-md) var(--space-2xl);
   margin-block-start: var(--space-xl);
-  font-size: var(--font-size-small);
+  font-size: var(--font-size-support);
+  line-height: 1.5;
 }
 
 .stats__sources p {
@@ -410,6 +411,7 @@
 .roadmap-item strong {
   font-size: var(--font-size-small);
   letter-spacing: 0.12em;
+  line-height: 1.35;
   text-transform: uppercase;
 }
 
@@ -803,8 +805,9 @@
   border: 1px solid var(--brand-navy);
   background: color-mix(in oklch, var(--brand-yellow) 18%, var(--brand-off-white));
   color: var(--brand-navy);
-  font-size: var(--font-size-small);
+  font-size: var(--font-size-support);
   font-weight: var(--font-weight-bold);
+  line-height: 1.5;
 }
 
 .prototype-role {
@@ -816,8 +819,9 @@
 
 .prototype-role > legend {
   padding: 0;
-  font-size: var(--font-size-small);
+  font-size: var(--font-size-support);
   font-weight: var(--font-weight-bold);
+  line-height: 1.35;
 }
 
 .prototype-role__choices {
@@ -875,8 +879,9 @@
 
 .conversion-path__note {
   margin: 0;
-  font-size: var(--font-size-small);
+  font-size: var(--font-size-support);
   font-weight: var(--font-weight-semibold);
+  line-height: 1.5;
 }
 
 .concept-footer {
@@ -896,6 +901,17 @@
   margin-inline-start: -1.5%;
   opacity: 0.2;
   transform: translateY(0);
+}
+
+@media (min-width: 82.0625rem) {
+  .site-header__inner.page-frame,
+  .concept-hero__inner.page-frame {
+    inline-size: min(100%, 79rem);
+  }
+
+  .concept-hero h1 {
+    font-size: 7.25rem;
+  }
 }
 
 @media (max-width: 64rem) {

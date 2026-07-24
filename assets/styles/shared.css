@@ -130,8 +130,9 @@ button {
   min-block-size: 2.75rem;
   align-items: center;
   padding-inline: var(--space-sm);
-  font-size: var(--font-size-small);
+  font-size: var(--font-size-support);
   font-weight: var(--font-weight-bold);
+  line-height: 1.35;
 }
 
 .page-frame {
@@ -150,8 +151,8 @@ button {
   padding-block: var(--space-2xs);
   background: var(--color-surface);
   color: var(--color-ink);
-  font-size: var(--font-size-small);
-  line-height: 1.35;
+  font-size: var(--font-size-support);
+  line-height: 1.45;
 }
 
 .crisis-bar__message {
@@ -245,9 +246,10 @@ button {
 }
 
 .field label {
-  font-size: var(--font-size-small);
+  font-size: var(--font-size-support);
   font-weight: 700;
   letter-spacing: 0.03em;
+  line-height: 1.35;
 }
 
 .field input {
@@ -258,6 +260,7 @@ button {
   border-radius: var(--radius-small);
   background: var(--color-surface);
   color: var(--color-ink);
+  line-height: 1.45;
   transition: border-color var(--duration-fast) var(--ease-out), transform var(--duration-fast) var(--ease-out);
 }
 
@@ -280,19 +283,19 @@ button {
 }
 
 .field-error {
-  min-block-size: 1.25em;
+  min-block-size: 1.45em;
   margin: 0;
   color: inherit;
-  font-size: var(--font-size-small);
+  font-size: var(--font-size-support);
   font-weight: 700;
-  line-height: 1.25;
+  line-height: 1.45;
 }
 
 .prototype-note {
   margin: 0;
   max-inline-size: var(--measure-copy);
-  font-size: var(--font-size-small);
-  line-height: 1.4;
+  font-size: var(--font-size-support);
+  line-height: 1.5;
 }
 
 .form-status {
@@ -311,6 +314,11 @@ button {
 .form-status [data-status-title] {
   font-size: clamp(1.5rem, 1.25rem + 0.8vw, 2.125rem);
   line-height: 1.05;
+}
+
+.form-status [data-status-body] {
+  font-size: var(--font-size-support);
+  line-height: 1.5;
 }
 
 .js [data-reveal] {
