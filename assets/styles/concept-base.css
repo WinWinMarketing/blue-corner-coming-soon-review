@@ -123,10 +123,12 @@
 .marker-band {
   display: inline;
   padding-inline: 0.1em;
-  background-image: linear-gradient(var(--brand-yellow), var(--brand-yellow));
-  background-repeat: no-repeat;
-  background-position: 0 92%;
-  background-size: 100% 0.82em;
+  background-image: linear-gradient(
+    to bottom,
+    transparent 0 14%,
+    var(--brand-yellow) 14% 84%,
+    transparent 84% 100%
+  );
   color: var(--brand-navy);
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
