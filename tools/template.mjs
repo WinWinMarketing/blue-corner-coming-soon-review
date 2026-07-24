@@ -33,11 +33,11 @@ const renderMemberForm = (copy) => {
   const audience = "member";
   const disclosureId = "member-prototype-disclosure";
   return `
-            <article class="conversion-path conversion-path--${audience}" data-reveal>
+            <article class="conversion-path conversion-path--${audience}" id="${audience}-form" data-reveal>
               <p class="eyebrow">${escapeHtml(copy.eyebrow)}</p>
               <h3>${escapeHtml(copy.heading)}</h3>
               <p class="prototype-disclosure" id="${disclosureId}">${escapeHtml(safetyCopy.prototypeDisclosure)}</p>
-              <form class="prototype-form" id="${audience}-form" data-prototype-form data-audience="${audience}" data-loading-label="${escapeHtml(safetyCopy.prototypeLoading)}" data-success-title="${escapeHtml(safetyCopy.prototypeSuccessTitle)}" data-success-body="${escapeHtml(safetyCopy.prototypeSuccessBody)}" method="post" autocomplete="off" aria-describedby="${disclosureId}" novalidate>
+              <form class="prototype-form" data-prototype-form data-audience="${audience}" data-loading-label="${escapeHtml(safetyCopy.prototypeLoading)}" data-success-title="${escapeHtml(safetyCopy.prototypeSuccessTitle)}" data-success-body="${escapeHtml(safetyCopy.prototypeSuccessBody)}" method="post" autocomplete="off" aria-describedby="${disclosureId}" novalidate>
                 <fieldset data-form-fields>
                   <legend class="sr-only">Men's early-access interest</legend>
                   <div class="field-grid">${renderFields(audience)}
@@ -69,6 +69,16 @@ const renderChoiceGroup = ({ legend, name, values }) => {
                 </div>
               </fieldset>`;
 };
+
+const renderCheckboxList = ({ name, values, dataAttribute }) => values.map((value, index) => {
+  const id = `${name}-${index + 1}`;
+  const dataHook = dataAttribute ? ` ${dataAttribute}` : "";
+  return `
+                  <label class="concept-addition__choice" for="${id}">
+                    <input id="${id}" name="${escapeHtml(name)}" type="checkbox" value="${escapeHtml(value)}" autocomplete="off"${dataHook}>
+                    <span>${escapeHtml(value)}</span>
+                  </label>`;
+}).join("");
 
 const renderSentenceStarter = (addition) => {
   const choices = addition.starters.map((starter, index) => {
@@ -224,12 +234,157 @@ ${renderChoiceGroup({ legend: "What would help?", name: "consent-help", values: 
             <p class="concept-addition__status" data-module-status role="status" aria-live="polite">Choose one option in each group to draft an invitation.</p>
           </form>`;
 
+const renderReadinessCheck = (addition) => {
+  const prompts = addition.prompts.map((prompt) => renderChoiceGroup({
+    legend: prompt.legend,
+    name: `readiness-${prompt.key}`,
+    values: prompt.options,
+  })).join("");
+  return `
+          <form class="concept-addition__workspace" data-readiness-form>${prompts}
+            <div class="concept-addition__controls" data-js-controls hidden>
+              <button class="button button--signal" type="button" data-action="review" disabled>Review my choices</button>
+              <button class="button button--ghost" type="reset">Clear</button>
+            </div>
+            <div class="concept-addition__preview" data-readiness-preview hidden>
+              <h3>Your private reflection</h3>
+              <ul data-readiness-summary></ul>
+              <p>No score or diagnosis is created.</p>
+            </div>
+            <p class="concept-addition__warning">${escapeHtml(addition.note)}</p>
+            <p class="concept-addition__status" data-module-status role="status" aria-live="polite">Choose any answer to begin. There is no preferred result.</p>
+          </form>`;
+};
+
+const renderResetCard = (addition) => {
+  const steps = addition.steps.map((step, index) => `
+              <li class="concept-addition__reset-step" data-reset-step>
+                <span aria-hidden="true">${String(index + 1).padStart(2, "0")}</span>
+                <div>
+                  <h3>${escapeHtml(step.heading)}</h3>
+                  <p>${escapeHtml(step.body)}</p>
+                </div>
+              </li>`).join("");
+  return `
+          <div class="concept-addition__workspace" data-reset-card>
+            <ol class="concept-addition__reset-list">${steps}
+            </ol>
+            <div class="concept-addition__controls" data-js-controls hidden>
+              <button class="button button--signal" type="button" data-action="next">Start the reset</button>
+              <button class="button button--ghost" type="button" data-action="show-all">Show all steps</button>
+              <button class="button button--ghost" type="button" data-action="reset" disabled>Reset</button>
+            </div>
+            <p class="concept-addition__warning">${escapeHtml(addition.note)}</p>
+            <p class="concept-addition__status" data-module-status role="status" aria-live="polite">All three steps are available. Start when you want.</p>
+          </div>`;
+};
+
+const renderSupportRequest = (addition) => `
+          <form class="concept-addition__workspace" data-support-form>
+${renderChoiceGroup({ legend: "Who do you want to ask?", name: "support-person", values: addition.people })}
+${renderChoiceGroup({ legend: "What would help?", name: "support-ask", values: addition.asks })}
+            <div class="concept-addition__field">
+              <label for="support-detail">Optional detail</label>
+              <p id="support-detail-hint">Add a time, place, or boundary if it would make the ask clearer.</p>
+              <textarea id="support-detail" data-support-detail rows="3" maxlength="240" autocomplete="off" aria-describedby="support-detail-hint"></textarea>
+            </div>
+            <div class="concept-addition__controls" data-js-controls hidden>
+              <button class="button button--signal" type="button" data-action="generate" disabled>Draft request</button>
+              <button class="button button--ghost" type="reset">Reset</button>
+            </div>
+            <div class="concept-addition__preview" data-support-preview hidden>
+              <div class="concept-addition__field">
+                <label for="support-request-editor">Your request</label>
+                <p id="support-request-hint">Edit it before sharing it yourself. Nothing sends from this page.</p>
+                <textarea id="support-request-editor" data-support-editor rows="6" maxlength="600" autocomplete="off" aria-describedby="support-request-hint"></textarea>
+              </div>
+              <button class="button button--ghost" type="button" data-action="copy" disabled>Copy request</button>
+            </div>
+            <p class="concept-addition__warning">Nothing is sent or saved. Copying puts the request on your device clipboard.</p>
+            <p class="concept-addition__status" data-module-status role="status" aria-live="polite">Choose a person and a specific ask to draft a request.</p>
+          </form>`;
+
+const renderWorkdayBoundary = (addition) => `
+          <form class="concept-addition__workspace" data-workday-form>
+${renderChoiceGroup({ legend: "Where is the boundary needed?", name: "workday-context", values: addition.contexts })}
+${renderChoiceGroup({ legend: "Choose a starting line", name: "workday-boundary", values: addition.boundaries })}
+            <div class="concept-addition__field">
+              <label for="workday-detail">Optional detail</label>
+              <p id="workday-detail-hint">Add a time or practical next step without sharing more than you want.</p>
+              <textarea id="workday-detail" data-workday-detail rows="3" maxlength="240" autocomplete="off" aria-describedby="workday-detail-hint"></textarea>
+            </div>
+            <div class="concept-addition__controls" data-js-controls hidden>
+              <button class="button button--signal" type="button" data-action="generate" disabled>Draft boundary</button>
+              <button class="button button--ghost" type="reset">Reset</button>
+            </div>
+            <div class="concept-addition__preview" data-workday-preview hidden>
+              <div class="concept-addition__field">
+                <label for="workday-boundary-editor">Your boundary</label>
+                <p id="workday-boundary-hint">Edit it to fit your workplace and share it yourself.</p>
+                <textarea id="workday-boundary-editor" data-workday-editor rows="6" maxlength="600" autocomplete="off" aria-describedby="workday-boundary-hint"></textarea>
+              </div>
+              <button class="button button--ghost" type="button" data-action="copy" disabled>Copy boundary</button>
+            </div>
+            <p class="concept-addition__warning">${escapeHtml(addition.note)}</p>
+            <p class="concept-addition__status" data-module-status role="status" aria-live="polite">Choose a context and starting line to draft a boundary.</p>
+          </form>`;
+
+const renderBodySignal = (addition) => `
+          <form class="concept-addition__workspace" data-body-form>
+            <fieldset class="concept-addition__fieldset">
+              <legend>What do you notice?</legend>
+              <div class="concept-addition__choices">${renderCheckboxList({ name: "body-signal", values: addition.signals, dataAttribute: "data-body-signal" })}
+              </div>
+            </fieldset>
+            <fieldset class="concept-addition__fieldset">
+              <legend>What response might help?</legend>
+              <div class="concept-addition__choices">${renderCheckboxList({ name: "body-response", values: addition.responses, dataAttribute: "data-body-response" })}
+              </div>
+            </fieldset>
+            <div class="concept-addition__controls" data-js-controls hidden>
+              <button class="button button--signal" type="button" data-action="review" disabled>Review check-in</button>
+              <button class="button button--ghost" type="reset">Clear</button>
+            </div>
+            <div class="concept-addition__preview" data-body-preview hidden>
+              <h3>Your check-in, not a diagnosis</h3>
+              <p data-body-output></p>
+            </div>
+            <p class="concept-addition__warning">${escapeHtml(addition.note)}</p>
+            <p class="concept-addition__status" data-module-status role="status" aria-live="polite">Choose a signal and a possible response to review the check-in.</p>
+          </form>`;
+
+const renderBookingQuestions = (addition) => `
+          <form class="concept-addition__workspace" data-booking-form>
+            <fieldset class="concept-addition__fieldset">
+              <legend>Select questions to keep</legend>
+              <div class="concept-addition__choices">${renderCheckboxList({ name: "booking-question", values: addition.questions, dataAttribute: "data-booking-question" })}
+              </div>
+            </fieldset>
+            <div class="concept-addition__controls" data-js-controls hidden>
+              <button class="button button--signal" type="button" data-action="copy" disabled>Copy selected questions</button>
+              <button class="button button--ghost" type="button" data-action="select-all">Select all</button>
+              <button class="button button--ghost" type="reset">Clear</button>
+            </div>
+            <div class="concept-addition__field" data-copy-fallback hidden>
+              <label for="booking-copy-fallback">Copy the questions manually</label>
+              <textarea id="booking-copy-fallback" rows="10" autocomplete="off" readonly></textarea>
+            </div>
+            <p class="concept-addition__warning">${escapeHtml(addition.note)}</p>
+            <p class="concept-addition__status" data-module-status role="status" aria-live="polite">Select one or more questions to copy.</p>
+          </form>`;
+
 const additionRenderers = Object.freeze({
   "sentence-starter": renderSentenceStarter,
   "first-ten-minutes": renderFirstTenMinutes,
   "corner-standard": renderCornerStandard,
   "between-round-plan": renderBetweenRoundPlan,
   "consent-invite": renderConsentInvite,
+  "readiness-check": renderReadinessCheck,
+  "reset-card": renderResetCard,
+  "support-request": renderSupportRequest,
+  "workday-boundary": renderWorkdayBoundary,
+  "body-signal": renderBodySignal,
+  "booking-questions": renderBookingQuestions,
 });
 
 const renderConceptAddition = (concept) => {
@@ -311,16 +466,19 @@ export const renderConceptPage = (concept) => {
           <div class="concept-hero__copy" data-reveal>
             <p class="eyebrow">${escapeHtml(sourceCopy.hero.eyebrow)}</p>
             <h1 id="hero-title" aria-label="${escapeHtml(sourceCopy.hero.heading)}"><span class="concept-hero__headline-line" aria-hidden="true">Nobody</span><span class="concept-hero__headline-line" aria-hidden="true">fights alone.</span></h1>
-            <p class="concept-hero__lead">${escapeHtml(sourceCopy.hero.lead)}</p>
+          </div>
+          <figure class="concept-hero__media image-frame" data-image-frame data-image-fallback-label="Blue Corner hero image">
+            <img class="concept-hero__image" src="../../assets/art/${escapeHtml(referenceHero.image)}" width="${escapeHtml(referenceHero.width)}" height="${escapeHtml(referenceHero.height)}" alt="${escapeHtml(referenceHero.alt)}" fetchpriority="high" data-fallback-image>
+            <span class="concept-hero__corner" aria-hidden="true"></span>
+          </figure>
+          <p class="concept-hero__lead" data-reveal>${escapeHtml(sourceCopy.hero.lead)}</p>
+          <div class="concept-hero__details" data-reveal>
             <p class="concept-hero__body">${escapeHtml(sourceCopy.hero.body)}</p>
             <div class="concept-hero__actions">
               <a class="button button--signal" href="#member-form" data-scroll-link>${escapeHtml(sourceCopy.hero.memberCta)}</a>
               <a class="button button--ghost" href="#roadmap-title" data-scroll-link>${escapeHtml(sourceCopy.hero.therapistCta)}</a>
             </div>
           </div>
-          <figure class="concept-hero__media image-frame" data-image-frame data-image-fallback-label="Blue Corner hero image">
-            <img class="concept-hero__image" src="../../assets/art/${escapeHtml(referenceHero.image)}" width="${escapeHtml(referenceHero.width)}" height="${escapeHtml(referenceHero.height)}" alt="${escapeHtml(referenceHero.alt)}" fetchpriority="high" data-fallback-image>
-          </figure>
         </div>
       </section>
 
@@ -328,7 +486,7 @@ export const renderConceptPage = (concept) => {
         <div class="stats__inner page-frame">
           <header class="section-heading stats__heading" data-reveal>
             <p class="eyebrow">${escapeHtml(sourceCopy.stats.eyebrow)}</p>
-            <h2 id="stats-title">${escapeHtml(sourceCopy.stats.heading)}</h2>
+            <h2 id="stats-title" aria-label="${escapeHtml(sourceCopy.stats.heading)}"><span aria-hidden="true">It isn’t just bad.</span><span aria-hidden="true">It’s getting worse.</span></h2>
           </header>
           <div class="stats__grid" data-reveal>${stats}
           </div>
@@ -343,7 +501,7 @@ export const renderConceptPage = (concept) => {
       <section class="symptoms page-frame" aria-labelledby="symptoms-title">
         <header class="section-heading symptoms__heading" data-reveal>
           <p class="eyebrow">${escapeHtml(sourceCopy.symptoms.eyebrow)}</p>
-          <h2 id="symptoms-title">${escapeHtml(sourceCopy.symptoms.heading)}</h2>
+          <h2 id="symptoms-title" aria-label="${escapeHtml(sourceCopy.symptoms.heading)}"><span aria-hidden="true">It looks</span><span aria-hidden="true">like this.</span></h2>
         </header>
         <div class="symptoms__grid">${symptoms}
         </div>
@@ -365,7 +523,7 @@ export const renderConceptPage = (concept) => {
       <section class="roadmap page-frame" aria-labelledby="roadmap-title">
         <header class="section-heading roadmap__heading" data-reveal>
           <p class="eyebrow">${escapeHtml(sourceCopy.roadmap.eyebrow)}</p>
-          <h2 id="roadmap-title">${escapeHtml(sourceCopy.roadmap.heading)}</h2>
+          <h2 id="roadmap-title" aria-label="${escapeHtml(sourceCopy.roadmap.heading)}"><span aria-hidden="true">We start with therapy. The</span><span aria-hidden="true">rest of the corner is on its way.</span></h2>
         </header>
         <ol class="roadmap__list" data-reveal>${roadmap}
         </ol>
@@ -376,7 +534,7 @@ ${renderConceptAddition(concept)}
         <div class="conversion__inner page-frame">
           <header class="section-heading conversion__heading" data-reveal>
             <p class="eyebrow">${escapeHtml(sourceCopy.conversion.eyebrow)}</p>
-            <h2 id="conversion-title">${escapeHtml(sourceCopy.conversion.heading)}</h2>
+            <h2 id="conversion-title" aria-label="${escapeHtml(sourceCopy.conversion.heading)}"><span aria-hidden="true">Be one of</span><span aria-hidden="true">the first in</span><span aria-hidden="true">the corner.</span></h2>
             <p>${escapeHtml(sourceCopy.conversion.body)}</p>
           </header>
           <div class="conversion__forms">${renderMemberForm(sourceCopy.conversion.member)}
@@ -386,26 +544,13 @@ ${renderConceptAddition(concept)}
     </main>
 
     <footer class="concept-footer">
-      <div class="concept-footer__inner page-frame">
-        <div class="concept-footer__brand">
-          <img src="../../assets/brand/logo-horizontal-blue.png" width="1655" height="170" alt="${escapeHtml(sourceCopy.footer.name)}">
-          <p>${escapeHtml(sourceCopy.footer.promise)}</p>
-        </div>
-        <div class="concept-footer__meta">
-          <p>${escapeHtml(sourceCopy.footer.name)}</p>
-          <p>${escapeHtml(sourceCopy.footer.category)}</p>
-          <a href="https://${escapeHtml(sourceCopy.footer.domain)}">${escapeHtml(sourceCopy.footer.domain)}</a>
-        </div>
-        <div class="concept-footer__safety">
-          <p>Blue Corner is not an emergency service.</p>
-          <div class="concept-footer__help">
-            <a href="tel:988">Call 9-8-8</a>
-            <a href="sms:988">Text 9-8-8</a>
-            <a href="https://www.canada.ca/en/public-health/services/mental-health-services/mental-health-get-help.html" target="_blank" rel="noopener noreferrer">Crisis resources</a>
-          </div>
-          <p>Call <a href="tel:911">9-1-1</a> for immediate danger.</p>
-        </div>
-      </div>
+      <img class="concept-footer__wordmark" src="../../assets/brand/logo-horizontal-blue.png" width="1655" height="170" alt="${escapeHtml(sourceCopy.footer.name)}">
+      <nav class="concept-footer__support" aria-label="Crisis support">
+        <a href="tel:988">Call 9-8-8</a>
+        <a href="sms:988">Text 9-8-8</a>
+        <a href="https://www.canada.ca/en/public-health/services/mental-health-services/mental-health-get-help.html" target="_blank" rel="noopener noreferrer">Crisis resources</a>
+        <a href="tel:911">Call 9-1-1 for immediate danger</a>
+      </nav>
     </footer>
   </body>
 </html>
@@ -437,10 +582,10 @@ export const renderGallery = (concepts) => {
     <meta name="referrer" content="no-referrer">
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'none'; form-action 'none'; object-src 'none'; base-uri 'none'; media-src 'none'; worker-src 'none'; upgrade-insecure-requests">
     <title>The Blue Corner — Coming-soon concepts</title>
-    <meta name="description" content="Six reference-led directions for The Blue Corner's Canadian men's mental-health coming-soon experience.">
+    <meta name="description" content="Twelve reference-led directions for The Blue Corner's Canadian men's mental-health coming-soon experience.">
     <meta name="theme-color" content="#197CE3">
-    <meta property="og:title" content="Blue Corner — Six coming-soon concepts">
-    <meta property="og:description" content="Six distinctive, responsive directions for Blue Corner's therapy-first launch.">
+    <meta property="og:title" content="Blue Corner — Twelve coming-soon concepts">
+    <meta property="og:description" content="Twelve responsive directions for Blue Corner's therapy-first launch.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://winwinmarketing.github.io/blue-corner-coming-soon-review/">
     <meta property="og:image" content="https://winwinmarketing.github.io/blue-corner-coming-soon-review/assets/social-preview.jpg">
@@ -464,11 +609,11 @@ ${renderCrisisUtility()}
         </div>
         <div class="gallery-hero__copy">
           <p class="eyebrow">Coming-soon direction study</p>
-          <h1>Six ways into<br>the corner.</h1>
-          <p>One exact reference page. Five useful additions, each tested without changing the base.</p>
+          <h1>Twelve ways into<br>the corner.</h1>
+          <p>One exact reference page. Eleven useful additions, each tested without changing the base.</p>
         </div>
         <a class="gallery-down" href="#main" data-scroll-link>
-          <span>Explore all six</span>
+          <span>Explore all twelve</span>
           <span aria-hidden="true">↓</span>
         </a>
       </div>
@@ -479,7 +624,7 @@ ${renderCrisisUtility()}
         <div class="gallery-intro" data-reveal>
           <p class="eyebrow">Choose a direction</p>
           <h2 id="gallery-title">The base stays fixed.</h2>
-          <p>Concept 01 is the supplied reference. Concepts 02–06 preserve it exactly and insert one clearly labeled, practical module before signup.</p>
+          <p>Concept 01 is the supplied reference. Concepts 02–12 preserve it exactly and insert one clearly labeled, practical module before signup.</p>
         </div>
         <aside class="editorial-note" aria-label="Editorial verification note" data-reveal>
           <strong>Before production launch</strong>

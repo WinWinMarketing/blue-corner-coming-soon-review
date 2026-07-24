@@ -1,8 +1,8 @@
 export const referenceHero = Object.freeze({
-  image: "blue-corner-stool-hero.webp",
+  image: "blue-corner-reference-ring.webp",
   width: 1774,
   height: 887,
-  alt: "A worn wooden stool with blue hand wraps sits beside an empty boxing ring lit by warm window light.",
+  alt: "An empty black boxing-ring corner with white ropes and a single wooden stool.",
 });
 
 export const concepts = Object.freeze([
@@ -47,5 +47,47 @@ export const concepts = Object.freeze([
     title: "Bring someone into your corner",
     descriptor: "An optional, consent-led support path",
     additionKey: "trustedPerson",
+  }),
+  Object.freeze({
+    ordinal: "07",
+    slug: "01-ringside-signal",
+    title: "Private readiness check",
+    descriptor: "A private reflection with no score or diagnosis",
+    additionKey: "readinessCheck",
+  }),
+  Object.freeze({
+    ordinal: "08",
+    slug: "02-between-rounds",
+    title: "Between-round reset",
+    descriptor: "A short grounding card for the next minute",
+    additionKey: "resetCard",
+  }),
+  Object.freeze({
+    ordinal: "09",
+    slug: "05-someone-in-your-corner",
+    title: "Ask for support",
+    descriptor: "A plain-language support-request builder",
+    additionKey: "supportRequest",
+  }),
+  Object.freeze({
+    ordinal: "10",
+    slug: "07-workday-pause",
+    title: "Workday boundary",
+    descriptor: "A workplace boundary script you control",
+    additionKey: "workdayBoundary",
+  }),
+  Object.freeze({
+    ordinal: "11",
+    slug: "08-what-hands-say",
+    title: "Body-signal check-in",
+    descriptor: "Notice a body signal without diagnosing it",
+    additionKey: "bodySignal",
+  }),
+  Object.freeze({
+    ordinal: "12",
+    slug: "10-blue-margin",
+    title: "Questions before booking",
+    descriptor: "A private checklist for a first fit conversation",
+    additionKey: "bookingQuestions",
   }),
 ]);

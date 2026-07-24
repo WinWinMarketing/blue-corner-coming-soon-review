@@ -155,130 +155,73 @@
         </ol>
       </section>
 
-      <section class="concept-addition" data-module="corner-standard" data-state="idle" aria-labelledby="concept-addition-title">
+      <section class="concept-addition" data-module="workday-boundary" data-state="idle" aria-labelledby="concept-addition-title">
         <div class="concept-addition__inner page-frame">
           <header class="concept-addition__heading" data-reveal>
             <p class="eyebrow">Concept add-on</p>
-            <h2 id="concept-addition-title">The Corner Standard</h2>
-            <p>Trust should be visible before a member shares anything personal. These are the basics Blue Corner expects.</p>
+            <h2 id="concept-addition-title">Workday boundary</h2>
+            <p>A workplace boundary can be clear without sharing personal details. Adjust the language to fit your role and situation.</p>
           </header>
 
-          <div class="concept-addition__workspace" data-corner-standard>
-            <div class="concept-addition__standards">
-              <details class="concept-addition__standard">
-                <summary>Registered, insured, and in good standing</summary>
-                <dl>
-                  <div>
-                    <dt>Evidence to look for</dt>
-                    <dd>A current public registry entry and professional-liability coverage.</dd>
-                  </div>
-                  <div>
-                    <dt>How to verify it</dt>
-                    <dd>Check the relevant provincial regulator&#39;s public register.</dd>
-                  </div>
-                  <div>
-                    <dt>Current verification</dt>
-                    <dd>Not yet verified in this design-review prototype.</dd>
-                  </div>
-                </dl>
-                <label class="concept-addition__review" for="corner-standard-review-1">
-                  <input id="corner-standard-review-1" type="checkbox" data-review-check autocomplete="off">
-                  <span>Reviewed here</span>
-                </label>
-              </details>
-              <details class="concept-addition__standard">
-                <summary>Experienced without stereotypes or shame</summary>
-                <dl>
-                  <div>
-                    <dt>Evidence to look for</dt>
-                    <dd>Relevant training and examples of supporting men&#39;s mental health without forcing one idea of masculinity.</dd>
-                  </div>
-                  <div>
-                    <dt>How to verify it</dt>
-                    <dd>Ask the therapist how their experience applies to the support you want.</dd>
-                  </div>
-                  <div>
-                    <dt>Current verification</dt>
-                    <dd>Not yet verified in this design-review prototype.</dd>
-                  </div>
-                </dl>
-                <label class="concept-addition__review" for="corner-standard-review-2">
-                  <input id="corner-standard-review-2" type="checkbox" data-review-check autocomplete="off">
-                  <span>Reviewed here</span>
-                </label>
-              </details>
-              <details class="concept-addition__standard">
-                <summary>Clear about scope, privacy, fees, and next steps</summary>
-                <dl>
-                  <div>
-                    <dt>Evidence to look for</dt>
-                    <dd>Plain-language intake information available before care begins.</dd>
-                  </div>
-                  <div>
-                    <dt>How to verify it</dt>
-                    <dd>Review the therapist&#39;s written policies and ask questions before agreeing.</dd>
-                  </div>
-                  <div>
-                    <dt>Current verification</dt>
-                    <dd>Not yet verified in this design-review prototype.</dd>
-                  </div>
-                </dl>
-                <label class="concept-addition__review" for="corner-standard-review-3">
-                  <input id="corner-standard-review-3" type="checkbox" data-review-check autocomplete="off">
-                  <span>Reviewed here</span>
-                </label>
-              </details>
-              <details class="concept-addition__standard">
-                <summary>Trauma-informed, culturally humble, and consent-led</summary>
-                <dl>
-                  <div>
-                    <dt>Evidence to look for</dt>
-                    <dd>A clear explanation of choice, boundaries, and how consent can change during care.</dd>
-                  </div>
-                  <div>
-                    <dt>How to verify it</dt>
-                    <dd>Ask how the therapist handles consent, identity, culture, and difficult disclosures.</dd>
-                  </div>
-                  <div>
-                    <dt>Current verification</dt>
-                    <dd>Not yet verified in this design-review prototype.</dd>
-                  </div>
-                </dl>
-                <label class="concept-addition__review" for="corner-standard-review-4">
-                  <input id="corner-standard-review-4" type="checkbox" data-review-check autocomplete="off">
-                  <span>Reviewed here</span>
-                </label>
-              </details>
-              <details class="concept-addition__standard">
-                <summary>Open to a fit check and a member&#39;s no</summary>
-                <dl>
-                  <div>
-                    <dt>Evidence to look for</dt>
-                    <dd>A fit conversation that does not pressure a member to continue.</dd>
-                  </div>
-                  <div>
-                    <dt>How to verify it</dt>
-                    <dd>Ask what happens when the fit does not feel right or a referral is needed.</dd>
-                  </div>
-                  <div>
-                    <dt>Current verification</dt>
-                    <dd>Not yet verified in this design-review prototype.</dd>
-                  </div>
-                </dl>
-                <label class="concept-addition__review" for="corner-standard-review-5">
-                  <input id="corner-standard-review-5" type="checkbox" data-review-check autocomplete="off">
-                  <span>Reviewed here</span>
-                </label>
-              </details>
+          <form class="concept-addition__workspace" data-workday-form>
+
+              <fieldset class="concept-addition__fieldset">
+                <legend>Where is the boundary needed?</legend>
+                <div class="concept-addition__choices">
+                  <label class="concept-addition__choice" for="workday-context-1">
+                    <input id="workday-context-1" name="workday-context" type="radio" value="a meeting or call" autocomplete="off">
+                    <span>a meeting or call</span>
+                  </label>
+                  <label class="concept-addition__choice" for="workday-context-2">
+                    <input id="workday-context-2" name="workday-context" type="radio" value="a deadline or workload" autocomplete="off">
+                    <span>a deadline or workload</span>
+                  </label>
+                  <label class="concept-addition__choice" for="workday-context-3">
+                    <input id="workday-context-3" name="workday-context" type="radio" value="messages outside work hours" autocomplete="off">
+                    <span>messages outside work hours</span>
+                  </label>
+                </div>
+              </fieldset>
+
+              <fieldset class="concept-addition__fieldset">
+                <legend>Choose a starting line</legend>
+                <div class="concept-addition__choices">
+                  <label class="concept-addition__choice" for="workday-boundary-1">
+                    <input id="workday-boundary-1" name="workday-boundary" type="radio" value="I need a short pause before I respond." autocomplete="off">
+                    <span>I need a short pause before I respond.</span>
+                  </label>
+                  <label class="concept-addition__choice" for="workday-boundary-2">
+                    <input id="workday-boundary-2" name="workday-boundary" type="radio" value="I need us to reset the priority and timing." autocomplete="off">
+                    <span>I need us to reset the priority and timing.</span>
+                  </label>
+                  <label class="concept-addition__choice" for="workday-boundary-3">
+                    <input id="workday-boundary-3" name="workday-boundary" type="radio" value="I will pick this up during my next work block." autocomplete="off">
+                    <span>I will pick this up during my next work block.</span>
+                  </label>
+                </div>
+              </fieldset>
+            <div class="concept-addition__field">
+              <label for="workday-detail">Optional detail</label>
+              <p id="workday-detail-hint">Add a time or practical next step without sharing more than you want.</p>
+              <textarea id="workday-detail" data-workday-detail rows="3" maxlength="240" autocomplete="off" aria-describedby="workday-detail-hint"></textarea>
             </div>
             <div class="concept-addition__controls" data-js-controls hidden>
-              <button class="button button--ghost" type="button" data-action="clear-review" disabled>Clear reviewed indicators</button>
+              <button class="button button--signal" type="button" data-action="generate" disabled>Draft boundary</button>
+              <button class="button button--ghost" type="reset">Reset</button>
             </div>
-            <p class="concept-addition__warning">“Reviewed here” is a local reading aid, not a credential check or certification. It is not saved.</p>
-            <p class="concept-addition__status" data-module-status role="status" aria-live="polite">0 of 5 standards reviewed here.</p>
-          </div>
+            <div class="concept-addition__preview" data-workday-preview hidden>
+              <div class="concept-addition__field">
+                <label for="workday-boundary-editor">Your boundary</label>
+                <p id="workday-boundary-hint">Edit it to fit your workplace and share it yourself.</p>
+                <textarea id="workday-boundary-editor" data-workday-editor rows="6" maxlength="600" autocomplete="off" aria-describedby="workday-boundary-hint"></textarea>
+              </div>
+              <button class="button button--ghost" type="button" data-action="copy" disabled>Copy boundary</button>
+            </div>
+            <p class="concept-addition__warning">This is a drafting aid, not legal, medical, or workplace-policy advice. Nothing sends from this page.</p>
+            <p class="concept-addition__status" data-module-status role="status" aria-live="polite">Choose a context and starting line to draft a boundary.</p>
+          </form>
           <noscript>
-            <p class="concept-addition__fallback">JavaScript is optional. Open any standard to read its evidence, verifier, and current verification note.</p>
+            <p class="concept-addition__fallback">JavaScript is optional. Combine one context with one boundary, then adapt it to your workplace and policies.</p>
           </noscript>
         </div>
       </section>

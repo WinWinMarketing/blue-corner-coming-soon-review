@@ -117,6 +117,9 @@
     return selected instanceof HTMLInputElement ? selected.value : "";
   };
 
+  const checkedValues = (form, name) => [...form.querySelectorAll(`input[name="${name}"]:checked`)]
+    .map((input) => input.value);
+
   const enableModuleControls = (module) => {
     module.querySelectorAll("[data-js-controls]").forEach((controls) => {
       controls.hidden = false;
@@ -374,6 +377,213 @@
     };
   };
 
+  const initializeReadinessCheck = (module) => {
+    const form = module.querySelector("[data-readiness-form]");
+    const reviewButton = form?.querySelector("[data-action='review']");
+    const preview = form?.querySelector("[data-readiness-preview]");
+    const summary = form?.querySelector("[data-readiness-summary]");
+    const status = module.querySelector("[data-module-status]");
+    if (!(form instanceof HTMLFormElement) || !(reviewButton instanceof HTMLButtonElement) || !preview || !summary) return;
+
+    enableModuleControls(module);
+    const update = () => {
+      const choices = [...form.querySelectorAll("input[type='radio']:checked")];
+      reviewButton.disabled = choices.length === 0;
+      preview.hidden = true;
+      summary.replaceChildren();
+      setModuleState(module, choices.length ? "active" : "idle", status, choices.length ? `${choices.length} of 3 prompts answered. Review whenever you want.` : "Choose any answer to begin. There is no preferred result.");
+    };
+    form.querySelectorAll("input[type='radio']").forEach((input) => input.addEventListener("change", update));
+    reviewButton.addEventListener("click", () => {
+      const choices = [...form.querySelectorAll("input[type='radio']:checked")];
+      if (!choices.length) {
+        setModuleState(module, "error", status, "Choose at least one answer before reviewing.");
+        return;
+      }
+      choices.forEach((choice) => {
+        const item = document.createElement("li");
+        const legend = choice.closest("fieldset")?.querySelector("legend")?.textContent.trim() || "Prompt";
+        item.textContent = `${legend}: ${choice.value}`;
+        summary.append(item);
+      });
+      preview.hidden = false;
+      setModuleState(module, "ready", status, "Your private reflection is ready. It has no score or diagnosis.");
+    });
+    form.addEventListener("reset", () => window.setTimeout(update, 0));
+    return () => {
+      form.reset();
+      update();
+    };
+  };
+
+  const initializeResetCard = (module) => {
+    const workspace = module.querySelector("[data-reset-card]");
+    const steps = [...(workspace?.querySelectorAll("[data-reset-step]") || [])];
+    const nextButton = workspace?.querySelector("[data-action='next']");
+    const showAllButton = workspace?.querySelector("[data-action='show-all']");
+    const resetButton = workspace?.querySelector("[data-action='reset']");
+    const status = module.querySelector("[data-module-status]");
+    if (!workspace || !steps.length || !(nextButton instanceof HTMLButtonElement) || !(showAllButton instanceof HTMLButtonElement) || !(resetButton instanceof HTMLButtonElement)) return;
+
+    enableModuleControls(module);
+    let visibleSteps = 0;
+    const render = () => {
+      steps.forEach((step, index) => {
+        step.hidden = index >= visibleSteps;
+      });
+      const complete = visibleSteps === steps.length;
+      nextButton.disabled = complete;
+      nextButton.textContent = visibleSteps === 0 ? "Start the reset" : complete ? "Reset complete" : "Show next step";
+      showAllButton.disabled = complete;
+      resetButton.disabled = visibleSteps === 0;
+      setModuleState(module, complete ? "ready" : visibleSteps ? "active" : "idle", status, complete ? "All three steps are visible. Take the time you need." : visibleSteps ? `${visibleSteps} of ${steps.length} steps visible.` : "All three steps are available. Start when you want.");
+    };
+    nextButton.addEventListener("click", () => {
+      visibleSteps = Math.min(visibleSteps + 1, steps.length);
+      render();
+    });
+    showAllButton.addEventListener("click", () => {
+      visibleSteps = steps.length;
+      render();
+    });
+    resetButton.addEventListener("click", () => {
+      visibleSteps = 0;
+      render();
+    });
+    render();
+    return () => {
+      visibleSteps = 0;
+      render();
+    };
+  };
+
+  const initializeScriptBuilder = (module, options) => {
+    const form = module.querySelector(options.formSelector);
+    const generateButton = form?.querySelector("[data-action='generate']");
+    const copyButton = form?.querySelector("[data-action='copy']");
+    const preview = form?.querySelector(options.previewSelector);
+    const editor = form?.querySelector(options.editorSelector);
+    const detail = form?.querySelector(options.detailSelector);
+    const status = module.querySelector("[data-module-status]");
+    if (!(form instanceof HTMLFormElement) || !(generateButton instanceof HTMLButtonElement) || !(copyButton instanceof HTMLButtonElement) || !preview || !(editor instanceof HTMLTextAreaElement) || !(detail instanceof HTMLTextAreaElement)) return;
+
+    enableModuleControls(module);
+    const selections = () => options.names.map((name) => selectedValue(form, name));
+    const update = () => {
+      const values = selections();
+      const ready = values.every(Boolean);
+      generateButton.disabled = !ready;
+      preview.hidden = true;
+      editor.value = "";
+      copyButton.disabled = true;
+      setModuleState(module, ready ? "active" : values.some(Boolean) || detail.value.trim() ? "active" : "idle", status, ready ? options.readyMessage : options.idleMessage);
+    };
+    form.querySelectorAll("input[type='radio']").forEach((input) => input.addEventListener("change", update));
+    detail.addEventListener("input", update);
+    generateButton.addEventListener("click", () => {
+      const values = selections();
+      if (!values.every(Boolean)) {
+        setModuleState(module, "error", status, options.errorMessage);
+        return;
+      }
+      editor.value = options.build(values, detail.value.trim());
+      preview.hidden = false;
+      copyButton.disabled = false;
+      setModuleState(module, "ready", status, options.generatedMessage);
+      editor.focus();
+    });
+    editor.addEventListener("input", () => {
+      const hasText = Boolean(editor.value.trim());
+      copyButton.disabled = !hasText;
+      setModuleState(module, hasText ? "ready" : "active", status, hasText ? options.editMessage : options.readyMessage);
+    });
+    copyButton.addEventListener("click", () => {
+      const text = editor.value.trim();
+      if (text) copyModuleText(module, text, status, options.copiedMessage, editor);
+    });
+    form.addEventListener("reset", () => window.setTimeout(update, 0));
+    return () => {
+      form.reset();
+      detail.value = "";
+      editor.value = "";
+      update();
+    };
+  };
+
+  const initializeBodySignal = (module) => {
+    const form = module.querySelector("[data-body-form]");
+    const reviewButton = form?.querySelector("[data-action='review']");
+    const preview = form?.querySelector("[data-body-preview]");
+    const output = form?.querySelector("[data-body-output]");
+    const status = module.querySelector("[data-module-status]");
+    if (!(form instanceof HTMLFormElement) || !(reviewButton instanceof HTMLButtonElement) || !preview || !output) return;
+
+    enableModuleControls(module);
+    const update = () => {
+      const signals = checkedValues(form, "body-signal");
+      const responses = checkedValues(form, "body-response");
+      const ready = signals.length > 0 && responses.length > 0;
+      reviewButton.disabled = !ready;
+      preview.hidden = true;
+      output.textContent = "";
+      setModuleState(module, ready ? "active" : signals.length || responses.length ? "active" : "idle", status, ready ? "A signal and possible response are selected." : "Choose a signal and a possible response to review the check-in.");
+    };
+    form.querySelectorAll("input[type='checkbox']").forEach((input) => input.addEventListener("change", update));
+    reviewButton.addEventListener("click", () => {
+      const signals = checkedValues(form, "body-signal");
+      const responses = checkedValues(form, "body-response");
+      if (!signals.length || !responses.length) {
+        setModuleState(module, "error", status, "Choose at least one signal and one possible response.");
+        return;
+      }
+      output.textContent = `I notice: ${signals.join(" ")} A response I could choose: ${responses.join("; ")}.`;
+      preview.hidden = false;
+      setModuleState(module, "ready", status, "Your check-in is ready. It does not identify a condition.");
+    });
+    form.addEventListener("reset", () => window.setTimeout(update, 0));
+    return () => {
+      form.reset();
+      update();
+    };
+  };
+
+  const initializeBookingQuestions = (module) => {
+    const form = module.querySelector("[data-booking-form]");
+    const copyButton = form?.querySelector("[data-action='copy']");
+    const selectAllButton = form?.querySelector("[data-action='select-all']");
+    const questions = [...(form?.querySelectorAll("[data-booking-question]") || [])];
+    const status = module.querySelector("[data-module-status]");
+    if (!(form instanceof HTMLFormElement) || !(copyButton instanceof HTMLButtonElement) || !(selectAllButton instanceof HTMLButtonElement) || !questions.length) return;
+
+    enableModuleControls(module);
+    const update = () => {
+      const selected = questions.filter((question) => question.checked);
+      copyButton.disabled = selected.length === 0;
+      selectAllButton.disabled = selected.length === questions.length;
+      const fallback = form.querySelector("[data-copy-fallback]");
+      const fallbackField = fallback?.querySelector("textarea");
+      if (fallback) fallback.hidden = true;
+      if (fallbackField instanceof HTMLTextAreaElement) fallbackField.value = "";
+      setModuleState(module, selected.length ? "active" : "idle", status, selected.length ? `${selected.length} of ${questions.length} questions selected.` : "Select one or more questions to copy.");
+    };
+    questions.forEach((question) => question.addEventListener("change", update));
+    selectAllButton.addEventListener("click", () => {
+      questions.forEach((question) => {
+        question.checked = true;
+      });
+      update();
+    });
+    copyButton.addEventListener("click", () => {
+      const text = questions.filter((question) => question.checked).map((question) => `• ${question.value}`).join("\n");
+      if (text) copyModuleText(module, text, status, "Selected questions copied to your clipboard.");
+    });
+    form.addEventListener("reset", () => window.setTimeout(update, 0));
+    return () => {
+      form.reset();
+      update();
+    };
+  };
+
   const moduleResetters = [];
   document.querySelectorAll(".concept-addition[data-module]").forEach((module) => {
     let resetModule;
@@ -382,6 +592,38 @@
     if (module.dataset.module === "corner-standard") resetModule = initializeCornerStandard(module);
     if (module.dataset.module === "between-round-plan") resetModule = initializePlan(module);
     if (module.dataset.module === "consent-invite") resetModule = initializeConsentInvite(module);
+    if (module.dataset.module === "readiness-check") resetModule = initializeReadinessCheck(module);
+    if (module.dataset.module === "reset-card") resetModule = initializeResetCard(module);
+    if (module.dataset.module === "support-request") resetModule = initializeScriptBuilder(module, {
+      formSelector: "[data-support-form]",
+      previewSelector: "[data-support-preview]",
+      editorSelector: "[data-support-editor]",
+      detailSelector: "[data-support-detail]",
+      names: ["support-person", "support-ask"],
+      idleMessage: "Choose a person and a specific ask to draft a request.",
+      readyMessage: "Both choices are set. Draft the request when ready.",
+      errorMessage: "Choose a person and a specific ask first.",
+      generatedMessage: "Request drafted. Edit it before sharing it yourself.",
+      editMessage: "Request is ready to copy.",
+      copiedMessage: "Request copied to your clipboard.",
+      build: ([person, ask], detail) => `Hey — I'm reaching out to ${person}. Could you ${ask}?${detail ? ` ${detail}` : ""}`,
+    });
+    if (module.dataset.module === "workday-boundary") resetModule = initializeScriptBuilder(module, {
+      formSelector: "[data-workday-form]",
+      previewSelector: "[data-workday-preview]",
+      editorSelector: "[data-workday-editor]",
+      detailSelector: "[data-workday-detail]",
+      names: ["workday-context", "workday-boundary"],
+      idleMessage: "Choose a context and starting line to draft a boundary.",
+      readyMessage: "Both choices are set. Draft the boundary when ready.",
+      errorMessage: "Choose a context and starting line first.",
+      generatedMessage: "Boundary drafted. Edit it to fit your workplace.",
+      editMessage: "Boundary is ready to copy.",
+      copiedMessage: "Boundary copied to your clipboard.",
+      build: ([context, boundary], detail) => `About ${context}: ${boundary}${detail ? ` ${detail}` : ""}`,
+    });
+    if (module.dataset.module === "body-signal") resetModule = initializeBodySignal(module);
+    if (module.dataset.module === "booking-questions") resetModule = initializeBookingQuestions(module);
     if (typeof resetModule === "function") moduleResetters.push(resetModule);
   });
 

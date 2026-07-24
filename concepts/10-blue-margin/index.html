@@ -155,130 +155,58 @@
         </ol>
       </section>
 
-      <section class="concept-addition" data-module="corner-standard" data-state="idle" aria-labelledby="concept-addition-title">
+      <section class="concept-addition" data-module="booking-questions" data-state="idle" aria-labelledby="concept-addition-title">
         <div class="concept-addition__inner page-frame">
           <header class="concept-addition__heading" data-reveal>
             <p class="eyebrow">Concept add-on</p>
-            <h2 id="concept-addition-title">The Corner Standard</h2>
-            <p>Trust should be visible before a member shares anything personal. These are the basics Blue Corner expects.</p>
+            <h2 id="concept-addition-title">Questions before booking</h2>
+            <p>A first fit conversation is also your chance to ask how support will work. Keep the questions that matter to you.</p>
           </header>
 
-          <div class="concept-addition__workspace" data-corner-standard>
-            <div class="concept-addition__standards">
-              <details class="concept-addition__standard">
-                <summary>Registered, insured, and in good standing</summary>
-                <dl>
-                  <div>
-                    <dt>Evidence to look for</dt>
-                    <dd>A current public registry entry and professional-liability coverage.</dd>
-                  </div>
-                  <div>
-                    <dt>How to verify it</dt>
-                    <dd>Check the relevant provincial regulator&#39;s public register.</dd>
-                  </div>
-                  <div>
-                    <dt>Current verification</dt>
-                    <dd>Not yet verified in this design-review prototype.</dd>
-                  </div>
-                </dl>
-                <label class="concept-addition__review" for="corner-standard-review-1">
-                  <input id="corner-standard-review-1" type="checkbox" data-review-check autocomplete="off">
-                  <span>Reviewed here</span>
-                </label>
-              </details>
-              <details class="concept-addition__standard">
-                <summary>Experienced without stereotypes or shame</summary>
-                <dl>
-                  <div>
-                    <dt>Evidence to look for</dt>
-                    <dd>Relevant training and examples of supporting men&#39;s mental health without forcing one idea of masculinity.</dd>
-                  </div>
-                  <div>
-                    <dt>How to verify it</dt>
-                    <dd>Ask the therapist how their experience applies to the support you want.</dd>
-                  </div>
-                  <div>
-                    <dt>Current verification</dt>
-                    <dd>Not yet verified in this design-review prototype.</dd>
-                  </div>
-                </dl>
-                <label class="concept-addition__review" for="corner-standard-review-2">
-                  <input id="corner-standard-review-2" type="checkbox" data-review-check autocomplete="off">
-                  <span>Reviewed here</span>
-                </label>
-              </details>
-              <details class="concept-addition__standard">
-                <summary>Clear about scope, privacy, fees, and next steps</summary>
-                <dl>
-                  <div>
-                    <dt>Evidence to look for</dt>
-                    <dd>Plain-language intake information available before care begins.</dd>
-                  </div>
-                  <div>
-                    <dt>How to verify it</dt>
-                    <dd>Review the therapist&#39;s written policies and ask questions before agreeing.</dd>
-                  </div>
-                  <div>
-                    <dt>Current verification</dt>
-                    <dd>Not yet verified in this design-review prototype.</dd>
-                  </div>
-                </dl>
-                <label class="concept-addition__review" for="corner-standard-review-3">
-                  <input id="corner-standard-review-3" type="checkbox" data-review-check autocomplete="off">
-                  <span>Reviewed here</span>
-                </label>
-              </details>
-              <details class="concept-addition__standard">
-                <summary>Trauma-informed, culturally humble, and consent-led</summary>
-                <dl>
-                  <div>
-                    <dt>Evidence to look for</dt>
-                    <dd>A clear explanation of choice, boundaries, and how consent can change during care.</dd>
-                  </div>
-                  <div>
-                    <dt>How to verify it</dt>
-                    <dd>Ask how the therapist handles consent, identity, culture, and difficult disclosures.</dd>
-                  </div>
-                  <div>
-                    <dt>Current verification</dt>
-                    <dd>Not yet verified in this design-review prototype.</dd>
-                  </div>
-                </dl>
-                <label class="concept-addition__review" for="corner-standard-review-4">
-                  <input id="corner-standard-review-4" type="checkbox" data-review-check autocomplete="off">
-                  <span>Reviewed here</span>
-                </label>
-              </details>
-              <details class="concept-addition__standard">
-                <summary>Open to a fit check and a member&#39;s no</summary>
-                <dl>
-                  <div>
-                    <dt>Evidence to look for</dt>
-                    <dd>A fit conversation that does not pressure a member to continue.</dd>
-                  </div>
-                  <div>
-                    <dt>How to verify it</dt>
-                    <dd>Ask what happens when the fit does not feel right or a referral is needed.</dd>
-                  </div>
-                  <div>
-                    <dt>Current verification</dt>
-                    <dd>Not yet verified in this design-review prototype.</dd>
-                  </div>
-                </dl>
-                <label class="concept-addition__review" for="corner-standard-review-5">
-                  <input id="corner-standard-review-5" type="checkbox" data-review-check autocomplete="off">
-                  <span>Reviewed here</span>
-                </label>
-              </details>
-            </div>
+          <form class="concept-addition__workspace" data-booking-form>
+            <fieldset class="concept-addition__fieldset">
+              <legend>Select questions to keep</legend>
+              <div class="concept-addition__choices">
+                  <label class="concept-addition__choice" for="booking-question-1">
+                    <input id="booking-question-1" name="booking-question" type="checkbox" value="What experience do you have with the concern I want to discuss?" autocomplete="off" data-booking-question>
+                    <span>What experience do you have with the concern I want to discuss?</span>
+                  </label>
+                  <label class="concept-addition__choice" for="booking-question-2">
+                    <input id="booking-question-2" name="booking-question" type="checkbox" value="How do you explain privacy, its limits, and record keeping?" autocomplete="off" data-booking-question>
+                    <span>How do you explain privacy, its limits, and record keeping?</span>
+                  </label>
+                  <label class="concept-addition__choice" for="booking-question-3">
+                    <input id="booking-question-3" name="booking-question" type="checkbox" value="What happens in a first session, and what choices do I have?" autocomplete="off" data-booking-question>
+                    <span>What happens in a first session, and what choices do I have?</span>
+                  </label>
+                  <label class="concept-addition__choice" for="booking-question-4">
+                    <input id="booking-question-4" name="booking-question" type="checkbox" value="What are the fees, cancellation terms, and available formats?" autocomplete="off" data-booking-question>
+                    <span>What are the fees, cancellation terms, and available formats?</span>
+                  </label>
+                  <label class="concept-addition__choice" for="booking-question-5">
+                    <input id="booking-question-5" name="booking-question" type="checkbox" value="How do we check whether the fit is working?" autocomplete="off" data-booking-question>
+                    <span>How do we check whether the fit is working?</span>
+                  </label>
+                  <label class="concept-addition__choice" for="booking-question-6">
+                    <input id="booking-question-6" name="booking-question" type="checkbox" value="What happens if I want a referral or decide not to continue?" autocomplete="off" data-booking-question>
+                    <span>What happens if I want a referral or decide not to continue?</span>
+                  </label>
+              </div>
+            </fieldset>
             <div class="concept-addition__controls" data-js-controls hidden>
-              <button class="button button--ghost" type="button" data-action="clear-review" disabled>Clear reviewed indicators</button>
+              <button class="button button--signal" type="button" data-action="copy" disabled>Copy selected questions</button>
+              <button class="button button--ghost" type="button" data-action="select-all">Select all</button>
+              <button class="button button--ghost" type="reset">Clear</button>
             </div>
-            <p class="concept-addition__warning">“Reviewed here” is a local reading aid, not a credential check or certification. It is not saved.</p>
-            <p class="concept-addition__status" data-module-status role="status" aria-live="polite">0 of 5 standards reviewed here.</p>
-          </div>
+            <div class="concept-addition__field" data-copy-fallback hidden>
+              <label for="booking-copy-fallback">Copy the questions manually</label>
+              <textarea id="booking-copy-fallback" rows="10" autocomplete="off" readonly></textarea>
+            </div>
+            <p class="concept-addition__warning">Copy only the questions you select. Your checklist is not saved or sent from this page.</p>
+            <p class="concept-addition__status" data-module-status role="status" aria-live="polite">Select one or more questions to copy.</p>
+          </form>
           <noscript>
-            <p class="concept-addition__fallback">JavaScript is optional. Open any standard to read its evidence, verifier, and current verification note.</p>
+            <p class="concept-addition__fallback">JavaScript is optional. All booking questions are visible below for manual copying.</p>
           </noscript>
         </div>
       </section>

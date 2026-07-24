@@ -155,130 +155,81 @@
         </ol>
       </section>
 
-      <section class="concept-addition" data-module="corner-standard" data-state="idle" aria-labelledby="concept-addition-title">
+      <section class="concept-addition" data-module="support-request" data-state="idle" aria-labelledby="concept-addition-title">
         <div class="concept-addition__inner page-frame">
           <header class="concept-addition__heading" data-reveal>
             <p class="eyebrow">Concept add-on</p>
-            <h2 id="concept-addition-title">The Corner Standard</h2>
-            <p>Trust should be visible before a member shares anything personal. These are the basics Blue Corner expects.</p>
+            <h2 id="concept-addition-title">Ask for support</h2>
+            <p>A direct request can make it easier for someone to show up without guessing. You control the person, the ask, and the details.</p>
           </header>
 
-          <div class="concept-addition__workspace" data-corner-standard>
-            <div class="concept-addition__standards">
-              <details class="concept-addition__standard">
-                <summary>Registered, insured, and in good standing</summary>
-                <dl>
-                  <div>
-                    <dt>Evidence to look for</dt>
-                    <dd>A current public registry entry and professional-liability coverage.</dd>
-                  </div>
-                  <div>
-                    <dt>How to verify it</dt>
-                    <dd>Check the relevant provincial regulator&#39;s public register.</dd>
-                  </div>
-                  <div>
-                    <dt>Current verification</dt>
-                    <dd>Not yet verified in this design-review prototype.</dd>
-                  </div>
-                </dl>
-                <label class="concept-addition__review" for="corner-standard-review-1">
-                  <input id="corner-standard-review-1" type="checkbox" data-review-check autocomplete="off">
-                  <span>Reviewed here</span>
-                </label>
-              </details>
-              <details class="concept-addition__standard">
-                <summary>Experienced without stereotypes or shame</summary>
-                <dl>
-                  <div>
-                    <dt>Evidence to look for</dt>
-                    <dd>Relevant training and examples of supporting men&#39;s mental health without forcing one idea of masculinity.</dd>
-                  </div>
-                  <div>
-                    <dt>How to verify it</dt>
-                    <dd>Ask the therapist how their experience applies to the support you want.</dd>
-                  </div>
-                  <div>
-                    <dt>Current verification</dt>
-                    <dd>Not yet verified in this design-review prototype.</dd>
-                  </div>
-                </dl>
-                <label class="concept-addition__review" for="corner-standard-review-2">
-                  <input id="corner-standard-review-2" type="checkbox" data-review-check autocomplete="off">
-                  <span>Reviewed here</span>
-                </label>
-              </details>
-              <details class="concept-addition__standard">
-                <summary>Clear about scope, privacy, fees, and next steps</summary>
-                <dl>
-                  <div>
-                    <dt>Evidence to look for</dt>
-                    <dd>Plain-language intake information available before care begins.</dd>
-                  </div>
-                  <div>
-                    <dt>How to verify it</dt>
-                    <dd>Review the therapist&#39;s written policies and ask questions before agreeing.</dd>
-                  </div>
-                  <div>
-                    <dt>Current verification</dt>
-                    <dd>Not yet verified in this design-review prototype.</dd>
-                  </div>
-                </dl>
-                <label class="concept-addition__review" for="corner-standard-review-3">
-                  <input id="corner-standard-review-3" type="checkbox" data-review-check autocomplete="off">
-                  <span>Reviewed here</span>
-                </label>
-              </details>
-              <details class="concept-addition__standard">
-                <summary>Trauma-informed, culturally humble, and consent-led</summary>
-                <dl>
-                  <div>
-                    <dt>Evidence to look for</dt>
-                    <dd>A clear explanation of choice, boundaries, and how consent can change during care.</dd>
-                  </div>
-                  <div>
-                    <dt>How to verify it</dt>
-                    <dd>Ask how the therapist handles consent, identity, culture, and difficult disclosures.</dd>
-                  </div>
-                  <div>
-                    <dt>Current verification</dt>
-                    <dd>Not yet verified in this design-review prototype.</dd>
-                  </div>
-                </dl>
-                <label class="concept-addition__review" for="corner-standard-review-4">
-                  <input id="corner-standard-review-4" type="checkbox" data-review-check autocomplete="off">
-                  <span>Reviewed here</span>
-                </label>
-              </details>
-              <details class="concept-addition__standard">
-                <summary>Open to a fit check and a member&#39;s no</summary>
-                <dl>
-                  <div>
-                    <dt>Evidence to look for</dt>
-                    <dd>A fit conversation that does not pressure a member to continue.</dd>
-                  </div>
-                  <div>
-                    <dt>How to verify it</dt>
-                    <dd>Ask what happens when the fit does not feel right or a referral is needed.</dd>
-                  </div>
-                  <div>
-                    <dt>Current verification</dt>
-                    <dd>Not yet verified in this design-review prototype.</dd>
-                  </div>
-                </dl>
-                <label class="concept-addition__review" for="corner-standard-review-5">
-                  <input id="corner-standard-review-5" type="checkbox" data-review-check autocomplete="off">
-                  <span>Reviewed here</span>
-                </label>
-              </details>
+          <form class="concept-addition__workspace" data-support-form>
+
+              <fieldset class="concept-addition__fieldset">
+                <legend>Who do you want to ask?</legend>
+                <div class="concept-addition__choices">
+                  <label class="concept-addition__choice" for="support-person-1">
+                    <input id="support-person-1" name="support-person" type="radio" value="a friend" autocomplete="off">
+                    <span>a friend</span>
+                  </label>
+                  <label class="concept-addition__choice" for="support-person-2">
+                    <input id="support-person-2" name="support-person" type="radio" value="my partner" autocomplete="off">
+                    <span>my partner</span>
+                  </label>
+                  <label class="concept-addition__choice" for="support-person-3">
+                    <input id="support-person-3" name="support-person" type="radio" value="a family member" autocomplete="off">
+                    <span>a family member</span>
+                  </label>
+                  <label class="concept-addition__choice" for="support-person-4">
+                    <input id="support-person-4" name="support-person" type="radio" value="a coworker or manager" autocomplete="off">
+                    <span>a coworker or manager</span>
+                  </label>
+                </div>
+              </fieldset>
+
+              <fieldset class="concept-addition__fieldset">
+                <legend>What would help?</legend>
+                <div class="concept-addition__choices">
+                  <label class="concept-addition__choice" for="support-ask-1">
+                    <input id="support-ask-1" name="support-ask" type="radio" value="listen for ten minutes" autocomplete="off">
+                    <span>listen for ten minutes</span>
+                  </label>
+                  <label class="concept-addition__choice" for="support-ask-2">
+                    <input id="support-ask-2" name="support-ask" type="radio" value="check in with me tomorrow" autocomplete="off">
+                    <span>check in with me tomorrow</span>
+                  </label>
+                  <label class="concept-addition__choice" for="support-ask-3">
+                    <input id="support-ask-3" name="support-ask" type="radio" value="help me protect some time" autocomplete="off">
+                    <span>help me protect some time</span>
+                  </label>
+                  <label class="concept-addition__choice" for="support-ask-4">
+                    <input id="support-ask-4" name="support-ask" type="radio" value="help me find a support option" autocomplete="off">
+                    <span>help me find a support option</span>
+                  </label>
+                </div>
+              </fieldset>
+            <div class="concept-addition__field">
+              <label for="support-detail">Optional detail</label>
+              <p id="support-detail-hint">Add a time, place, or boundary if it would make the ask clearer.</p>
+              <textarea id="support-detail" data-support-detail rows="3" maxlength="240" autocomplete="off" aria-describedby="support-detail-hint"></textarea>
             </div>
             <div class="concept-addition__controls" data-js-controls hidden>
-              <button class="button button--ghost" type="button" data-action="clear-review" disabled>Clear reviewed indicators</button>
+              <button class="button button--signal" type="button" data-action="generate" disabled>Draft request</button>
+              <button class="button button--ghost" type="reset">Reset</button>
             </div>
-            <p class="concept-addition__warning">“Reviewed here” is a local reading aid, not a credential check or certification. It is not saved.</p>
-            <p class="concept-addition__status" data-module-status role="status" aria-live="polite">0 of 5 standards reviewed here.</p>
-          </div>
+            <div class="concept-addition__preview" data-support-preview hidden>
+              <div class="concept-addition__field">
+                <label for="support-request-editor">Your request</label>
+                <p id="support-request-hint">Edit it before sharing it yourself. Nothing sends from this page.</p>
+                <textarea id="support-request-editor" data-support-editor rows="6" maxlength="600" autocomplete="off" aria-describedby="support-request-hint"></textarea>
+              </div>
+              <button class="button button--ghost" type="button" data-action="copy" disabled>Copy request</button>
+            </div>
+            <p class="concept-addition__warning">Nothing is sent or saved. Copying puts the request on your device clipboard.</p>
+            <p class="concept-addition__status" data-module-status role="status" aria-live="polite">Choose a person and a specific ask to draft a request.</p>
+          </form>
           <noscript>
-            <p class="concept-addition__fallback">JavaScript is optional. Open any standard to read its evidence, verifier, and current verification note.</p>
+            <p class="concept-addition__fallback">JavaScript is optional. Pick one person and one specific ask, then write the request in your own words. Nothing sends.</p>
           </noscript>
         </div>
       </section>

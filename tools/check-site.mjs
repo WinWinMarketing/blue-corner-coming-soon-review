@@ -4,6 +4,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { concepts, referenceHero } from "./concepts.mjs";
 import { conceptAdditions, sourceCopy } from "./source-copy.mjs";
+import { renderConceptPage, renderGallery } from "./template.mjs";
 
 const toolsDirectory = path.dirname(fileURLToPath(import.meta.url));
 const rootDirectory = path.resolve(toolsDirectory, "..");
@@ -11,6 +12,17 @@ const failures = [];
 const warnings = [];
 const strictImages = process.argv.includes("--strict-images");
 const approvedCornerSha256 = "e3209fe0d7cdd29e4f17cbbea3c19325a783a3a1d2a5cb8d2c66e2e1db27c758";
+const approvedHeroSha256 = "22bbe8a535d1707c6d7724f9a2d71ea9f1ff8e924d50ea690d2a251062cd07f2";
+const approvedMasterSha256 = "492863f992b7176c3d291bd9a2657eb2cd391db774eff9b4883391210e4ad023";
+const approvedGallerySha256 = "4d52e3fd4bbb1dbbaf0aadc46d2e5616cf97566a8bb26411c919ade1224b7320";
+const approvedSharedVisualHashes = Object.freeze({
+  "assets/styles/brand.css": "52fe13ced84328b10037e8c4b6d2ccd6b40b12d41a827925c4a43a93b6bc1f40",
+  "assets/styles/concept-base.css": "e8706d7d225c5e0baa9a97b7e049d8b84d9295e9acb7dcfad195c5bc4df73045",
+  "assets/styles/shared.css": "6e43251497390a25cdee9bf44bc4680af93bf94eb68c3f67c845e9818a83f0aa",
+  "assets/scripts/shared.js": "aa2185bc6286dc5bf2361d4c81b70d0d7db74f95dfe8737a73cb2d76746ba529",
+  "assets/brand/logo-horizontal-white.png": "34ff2dae53d8b9911cf1aafe708bca41cc5e22469d5847cb99fdf1a93936545b",
+  "assets/brand/logo-horizontal-blue.png": "c70f50961a611cf0e357cdb08ec71f241c86b7afcceb9a486180eccf4b60bed3",
+});
 
 const fail = (message) => failures.push(message);
 const warn = (message) => warnings.push(message);
@@ -30,6 +42,12 @@ const expectedRouteOrder = [
   "09-listening-room",
   "11-on-the-other-end",
   "12-two-ways-in",
+  "01-ringside-signal",
+  "02-between-rounds",
+  "05-someone-in-your-corner",
+  "07-workday-pause",
+  "08-what-hands-say",
+  "10-blue-margin",
 ];
 const expectedAdditionTitles = [
   null,
@@ -38,6 +56,12 @@ const expectedAdditionTitles = [
   "The Corner Standard",
   "Between-round plan",
   "Bring someone into your corner",
+  "Private readiness check",
+  "Between-round reset",
+  "Ask for support",
+  "Workday boundary",
+  "Body-signal check-in",
+  "Questions before booking",
 ];
 const expectedModuleTypes = [
   null,
@@ -46,6 +70,12 @@ const expectedModuleTypes = [
   "corner-standard",
   "between-round-plan",
   "consent-invite",
+  "readiness-check",
+  "reset-card",
+  "support-request",
+  "workday-boundary",
+  "body-signal",
+  "booking-questions",
 ];
 const coreSectionClasses = ["concept-hero", "stats", "symptoms", "meaning", "roadmap", "conversion"];
 const extractSection = (html, className) => html.match(new RegExp(`<section class="${className}"[\\s\\S]*?<\\/section>`))?.[0] ?? "";
@@ -75,7 +105,7 @@ const visibleSourceStrings = [
   sourceCopy.conversion.body,
   ...Object.values(sourceCopy.conversion.member),
   ...sourceCopy.conversion.fields.flatMap((field) => [field.label, field.placeholder]),
-  ...Object.values(sourceCopy.footer),
+  sourceCopy.footer.name,
 ];
 
 const htmlEscape = (value) => String(value)
@@ -98,6 +128,16 @@ const additionSourceStrings = (addition) => {
     return [...common, addition.safety, ...addition.prompts.flatMap((prompt) => [prompt.label, prompt.hint, prompt.maxLength])];
   }
   if (addition.type === "consent-invite") return [...common, ...addition.roles, ...addition.boundaries, ...addition.help];
+  if (addition.type === "readiness-check") {
+    return [...common, addition.note, ...addition.prompts.flatMap((prompt) => [prompt.legend, ...prompt.options])];
+  }
+  if (addition.type === "reset-card") {
+    return [...common, addition.note, ...addition.steps.flatMap((step) => [step.heading, step.body])];
+  }
+  if (addition.type === "support-request") return [...common, ...addition.people, ...addition.asks];
+  if (addition.type === "workday-boundary") return [...common, addition.note, ...addition.contexts, ...addition.boundaries];
+  if (addition.type === "body-signal") return [...common, addition.note, ...addition.signals, ...addition.responses];
+  if (addition.type === "booking-questions") return [...common, addition.note, ...addition.questions];
   return common;
 };
 
@@ -133,13 +173,30 @@ if (approvedCornerHash !== approvedCornerSha256) {
   fail("assets/brand/corner-off-white.png does not match the approved Asset_84x-8.png");
 }
 
-if (concepts.length !== 6) fail(`Concept configuration has ${concepts.length} entries; expected exactly 6`);
+const approvedHeroPath = path.join(rootDirectory, "assets", "art", referenceHero.image);
+const approvedHeroBytes = await readFile(approvedHeroPath);
+const approvedHeroHash = createHash("sha256").update(approvedHeroBytes).digest("hex");
+if (approvedHeroHash !== approvedHeroSha256) {
+  fail(`${referenceHero.image} does not match the approved optimized ring image`);
+}
+for (const [relativePath, expectedHash] of Object.entries(approvedSharedVisualHashes)) {
+  const bytes = await readFile(path.join(rootDirectory, relativePath));
+  const receivedHash = createHash("sha256").update(bytes).digest("hex");
+  if (receivedHash !== expectedHash) {
+    fail(`${relativePath} changed from the browser-approved visual baseline: expected ${expectedHash}, received ${receivedHash}`);
+  }
+}
+
+if (concepts.length !== 12) fail(`Concept configuration has ${concepts.length} entries; expected exactly 12`);
 if (conceptAdditions.openingLines.starters.length !== 3) fail("No perfect words needed must contain exactly three opening lines");
 if (conceptAdditions.firstTenMinutes.steps.map((step) => step.minute).join("|") !== "0|2|5|10") {
   fail("The first ten minutes must preserve the semantic 0, 2, 5, and 10-minute sequence");
 }
 if (conceptAdditions.cornerStandard.standards.length !== 5) fail("The Corner Standard must contain exactly five standards");
 if (conceptAdditions.betweenRoundPlan.prompts.length !== 4) fail("Between-round plan must contain exactly four prompts");
+if (conceptAdditions.readinessCheck.prompts.length !== 3) fail("Private readiness check must contain exactly three unscored prompts");
+if (conceptAdditions.resetCard.steps.length !== 3) fail("Between-round reset must contain exactly three steps");
+if (conceptAdditions.bookingQuestions.questions.length !== 6) fail("Booking questions must contain exactly six questions");
 if (concepts.map((concept) => concept.slug).join("|") !== expectedRouteOrder.join("|")) {
   fail(`Concept route order must be ${expectedRouteOrder.join(", ")}`);
 }
@@ -178,6 +235,8 @@ for (const [index, concept] of concepts.entries()) {
   if (!(await exists(stylePath))) fail(`${concept.slug}: style.css is missing`);
 
   const html = await readFile(htmlPath, "utf8");
+  const renderedHtml = renderConceptPage(concept);
+  if (html !== renderedHtml) fail(`${concept.slug}: generated index.html is stale; run node tools/generate.mjs`);
   if (!html.includes("noindex, nofollow, noarchive")) fail(`${concept.slug}: noindex metadata is missing`);
   if (!/<meta name="theme-color" content="#197CE3">/i.test(html)) fail(`${concept.slug}: theme-color must use the primary light blue #197CE3`);
   if (!html.includes("Content-Security-Policy")) fail(`${concept.slug}: CSP metadata is missing`);
@@ -204,7 +263,32 @@ for (const [index, concept] of concepts.entries()) {
   if (!html.includes('<span class="concept-hero__headline-line" aria-hidden="true">Nobody</span><span class="concept-hero__headline-line" aria-hidden="true">fights alone.</span>')) {
     fail(`${concept.slug}: hero headline must render as the two reference lines "Nobody" and "fights alone."`);
   }
-  if (html.includes('class="site-header__review"') || /Concept \d{2} of 06/.test(html) || html.includes("<figcaption")) {
+  for (const lockedHeading of [
+    '<span aria-hidden="true">It isn’t just bad.</span><span aria-hidden="true">It’s getting worse.</span>',
+    '<span aria-hidden="true">It looks</span><span aria-hidden="true">like this.</span>',
+    '<span aria-hidden="true">We start with therapy. The</span><span aria-hidden="true">rest of the corner is on its way.</span>',
+    '<span aria-hidden="true">Be one of</span><span aria-hidden="true">the first in</span><span aria-hidden="true">the corner.</span>',
+  ]) {
+    if (!html.includes(lockedHeading)) fail(`${concept.slug}: locked core heading line break is missing`);
+  }
+  for (const [headingId, expectedLines] of [
+    ["stats-title", 2],
+    ["symptoms-title", 2],
+    ["meaning-title", 1],
+    ["roadmap-title", 2],
+    ["conversion-title", 3],
+  ]) {
+    const headingBody = html.match(new RegExp(`<h2 id="${headingId}"[^>]*>([\\s\\S]*?)<\\/h2>`))?.[1] ?? "";
+    const lockedSpans = count(headingBody, '<span aria-hidden="true">');
+    const sourceLines = lockedSpans || (headingBody ? 1 : 0);
+    if (sourceLines !== expectedLines || /<br\b/i.test(headingBody)) {
+      fail(`${concept.slug}: ${headingId} must preserve exactly ${expectedLines} source-locked line(s)`);
+    }
+  }
+  if (!heroSection.includes('class="concept-hero__corner" aria-hidden="true"')) {
+    fail(`${concept.slug}: hero must include the DOM-rendered Blue Corner glyph`);
+  }
+  if (html.includes('class="site-header__review"') || /Concept \d{2} of \d{2}/.test(html) || html.includes("<figcaption")) {
     fail(`${concept.slug}: concept labels or review chrome must not appear inside the reference page`);
   }
   if (html.includes('class="crisis-bar')) fail(`${concept.slug}: crisis access must be in the footer, not top chrome`);
@@ -234,6 +318,7 @@ for (const [index, concept] of concepts.entries()) {
       fail(`${concept.slug}: add-on must provide its useful no-JavaScript fallback`);
     }
     if (/<script\b/i.test(additionMarkup)) fail(`${concept.slug}: add-on must use only the shared external script`);
+    if (count(additionMarkup, "<section") !== 1) fail(`${concept.slug}: add-on must not contain a nested section`);
     if (!additionMarkup.includes("data-js-controls hidden")) fail(`${concept.slug}: add-on must hide JavaScript-only controls until initialization`);
     for (const control of additionMarkup.matchAll(/<div class="concept-addition__controls"([^>]*)>/g)) {
       if (!/\bdata-js-controls\b/.test(control[1]) || !/\bhidden\b/.test(control[1])) {
@@ -309,6 +394,51 @@ for (const [index, concept] of concepts.entries()) {
       if (!additionMarkup.includes("Nothing sends from this page")) fail(`${concept.slug}: consent invitation must clearly state that nothing sends`);
       if (!/data-invite-preview hidden/.test(additionMarkup)) fail(`${concept.slug}: invitation preview must start hidden without JavaScript`);
     }
+    if (expectedModuleType === "readiness-check") {
+      if (count(additionMarkup, '<fieldset class="concept-addition__fieldset">') !== 3) fail(`${concept.slug}: readiness check must use three native fieldsets`);
+      if (!additionMarkup.includes("There is no score, result, or diagnosis") || !additionMarkup.includes("No score or diagnosis is created.")) {
+        fail(`${concept.slug}: readiness check must explicitly avoid scoring and diagnosis`);
+      }
+      if (!/data-readiness-preview hidden/.test(additionMarkup)) fail(`${concept.slug}: readiness reflection must start hidden`);
+    }
+    if (expectedModuleType === "reset-card") {
+      if (count(additionMarkup, "data-reset-step") !== 3) fail(`${concept.slug}: reset card must contain exactly three steps`);
+      if (/data-reset-step[^>]*hidden/.test(additionMarkup)) fail(`${concept.slug}: reset steps must remain readable without JavaScript`);
+      if (!additionMarkup.includes("not therapy, medical advice, or a substitute for crisis support")) {
+        fail(`${concept.slug}: reset card must state its clinical and crisis limits`);
+      }
+    }
+    if (expectedModuleType === "support-request") {
+      for (const name of ["support-person", "support-ask"]) {
+        if (!additionMarkup.includes(`name="${name}"`)) fail(`${concept.slug}: support builder is missing ${name}`);
+      }
+      if (!/data-support-editor[^>]*maxlength="600"/.test(additionMarkup) || !additionMarkup.includes("Nothing sends from this page")) {
+        fail(`${concept.slug}: support request requires a capped editable local-only preview`);
+      }
+    }
+    if (expectedModuleType === "workday-boundary") {
+      for (const name of ["workday-context", "workday-boundary"]) {
+        if (!additionMarkup.includes(`name="${name}"`)) fail(`${concept.slug}: workday builder is missing ${name}`);
+      }
+      if (!/data-workday-editor[^>]*maxlength="600"/.test(additionMarkup) || !additionMarkup.includes("not legal, medical, or workplace-policy advice")) {
+        fail(`${concept.slug}: workday boundary requires a capped editable preview and scope warning`);
+      }
+    }
+    if (expectedModuleType === "body-signal") {
+      if (count(additionMarkup, "data-body-signal") !== 4 || count(additionMarkup, "data-body-response") !== 4) {
+        fail(`${concept.slug}: body check-in must provide four signals and four possible responses`);
+      }
+      if (!additionMarkup.includes("does not identify a condition") || !/data-body-preview hidden/.test(additionMarkup)) {
+        fail(`${concept.slug}: body check-in must avoid diagnosis and hide its generated reflection initially`);
+      }
+    }
+    if (expectedModuleType === "booking-questions") {
+      if (count(additionMarkup, "data-booking-question") !== 6) fail(`${concept.slug}: booking checklist must contain six selectable questions`);
+      for (const action of ["copy", "select-all"]) {
+        if (!additionMarkup.includes(`data-action="${action}"`)) fail(`${concept.slug}: booking checklist is missing ${action} control`);
+      }
+      if (!additionMarkup.includes("data-copy-fallback hidden")) fail(`${concept.slug}: booking checklist needs a manual copy fallback`);
+    }
   }
   if (count(html, "../../assets/scripts/shared.js") !== 1) fail(`${concept.slug}: expected exactly one shared interaction script reference`);
 
@@ -336,6 +466,12 @@ for (const [index, concept] of concepts.entries()) {
     }
     if (/logo-horizontal-white\.png|mark-(?:white|blue)\.png/.test(conceptFooter)) {
       fail(`${concept.slug}: footer must not use a white or decorative mark asset`);
+    }
+    if (!conceptFooter.includes('class="concept-footer__wordmark"') || /concept-footer__(?:meta|brand|safety)/.test(conceptFooter)) {
+      fail(`${concept.slug}: footer must contain only the oversized wordmark and focus-revealed crisis access`);
+    }
+    if (!conceptFooter.includes('class="concept-footer__support"') || conceptFooter.includes('class="sr-only"')) {
+      fail(`${concept.slug}: footer crisis links must use the sighted-keyboard focus tray`);
     }
     for (const requiredSafetyReference of ['href="tel:988"', 'href="sms:988"', 'href="tel:911"', "mental-health-get-help.html"]) {
       if (!conceptFooter.includes(requiredSafetyReference)) fail(`${concept.slug}: footer safety access is missing ${requiredSafetyReference}`);
@@ -378,6 +514,10 @@ for (const [index, concept] of concepts.entries()) {
 }
 
 const masterPage = generatedPages[0]?.html ?? "";
+const masterHash = createHash("sha256").update(masterPage).digest("hex");
+if (masterHash !== approvedMasterSha256) {
+  fail(`04-first-bell master HTML hash changed: expected ${approvedMasterSha256}, received ${masterHash}`);
+}
 const masterMasthead = extractMasthead(masterPage);
 const normalizedMasterPage = normalizeConceptPage(masterPage);
 for (const { concept, html } of generatedPages.slice(1)) {
@@ -394,6 +534,11 @@ for (const { concept, html } of generatedPages.slice(1)) {
 
 const galleryPath = path.join(rootDirectory, "index.html");
 const gallery = await readFile(galleryPath, "utf8");
+if (gallery !== renderGallery(concepts)) fail("Gallery index.html is stale; run node tools/generate.mjs");
+const galleryHash = createHash("sha256").update(gallery).digest("hex");
+if (galleryHash !== approvedGallerySha256) {
+  fail(`Gallery HTML hash changed: expected ${approvedGallerySha256}, received ${galleryHash}`);
+}
 if (!/<meta name="theme-color" content="#197CE3">/i.test(gallery)) fail("Gallery theme-color must use the primary light blue #197CE3");
 const galleryFooter = gallery.match(/<footer class="gallery-footer">[\s\S]*?<\/footer>/)?.[0];
 if (!galleryFooter) {
@@ -441,11 +586,40 @@ for (const relativePath of cssFiles) {
 }
 
 const conceptBaseCss = cssContents.get("assets/styles/concept-base.css") ?? "";
-if (!/grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\);/.test(conceptBaseCss)) {
-  fail("assets/styles/concept-base.css: desktop hero must keep the reference 50/50 grid");
+const sharedCss = cssContents.get("assets/styles/shared.css") ?? "";
+if (/\.js\s+\[data-reveal\]\s*\{[^}]*opacity:\s*0/.test(sharedCss)) {
+  fail("assets/styles/shared.css: reveal content must be visible by default for full-page capture");
 }
-if (!/\.concept-hero__media\s*\{[\s\S]*?aspect-ratio:\s*2\s*\/\s*1;/.test(conceptBaseCss)) {
-  fail("assets/styles/concept-base.css: hero media must keep the shared wide 2:1 reference ratio");
+if (!/\.concept-footer__support:focus-within\s*\{[^}]*opacity:\s*1;[^}]*pointer-events:\s*auto;[^}]*transform:\s*translateY\(0\);/.test(sharedCss)) {
+  fail("assets/styles/shared.css: footer support tray must become visible and operable on keyboard focus");
+}
+if (!/grid-template-columns:\s*minmax\(0,\s*43fr\)\s+minmax\(0,\s*51fr\);/.test(conceptBaseCss)) {
+  fail("assets/styles/concept-base.css: desktop hero must use the measured 43/51 grid");
+}
+if (!/\.concept-hero__media\s*\{[\s\S]*?aspect-ratio:\s*3\s*\/\s*2;/.test(conceptBaseCss)) {
+  fail("assets/styles/concept-base.css: hero media must use the approved 3:2 crop");
+}
+if (!/\.section-heading\s*\{[^}]*max-inline-size:\s*none;/.test(conceptBaseCss)
+  || !/\.section-heading h2,\s*\.meaning h2\s*\{[^}]*font-size:\s*clamp\(3\.75rem,\s*6\.3889vw,\s*5\.75rem\);/.test(conceptBaseCss)) {
+  fail("assets/styles/concept-base.css: shared core h2 scale must cap at 92px with no 72rem width constraint");
+}
+if (!/@media \(min-width:\s*75rem\)\s*\{[\s\S]*?\.roadmap__heading h2 span\s*\{[^}]*white-space:\s*nowrap;/.test(conceptBaseCss)) {
+  fail("assets/styles/concept-base.css: desktop roadmap spans must preserve the approved two-line lock");
+}
+if (!/\.meaning h2\s*\{[^}]*white-space:\s*nowrap;/.test(conceptBaseCss)) {
+  fail("assets/styles/concept-base.css: manifesto heading must remain one line on the shared desktop core");
+}
+for (const measuredCoreRule of [
+  /grid-template-columns:\s*repeat\(4,\s*minmax\(0,\s*1fr\)\);/,
+  /grid-template-columns:\s*minmax\(0,\s*36fr\)\s+minmax\(0,\s*64fr\);/,
+  /grid-template-columns:\s*12\.6%\s+minmax\(0,\s*87\.4%\);/,
+  /grid-template-columns:\s*repeat\(5,\s*minmax\(0,\s*1fr\)\);/,
+  /grid-template-columns:\s*minmax\(0,\s*39fr\)\s+minmax\(0,\s*56fr\);/,
+]) {
+  if (!measuredCoreRule.test(conceptBaseCss)) fail(`assets/styles/concept-base.css: measured core grid rule is missing (${measuredCoreRule})`);
+}
+for (const responsiveToken of ["@media (max-width: 64rem)", "@media (max-width: 48rem)", "@media (max-width: 39rem)", "@media (max-width: 24.375rem)"]) {
+  if (!conceptBaseCss.includes(responsiveToken)) fail(`assets/styles/concept-base.css: responsive target is missing ${responsiveToken}`);
 }
 if (!/\.meaning\s*\{[^}]*background:\s*var\(--brand-navy\);/.test(conceptBaseCss)) {
   fail("assets/styles/concept-base.css: reference manifesto section must use the navy background");
@@ -501,7 +675,7 @@ for (const [relativePath, content] of cssContents) {
           navyAliases.has(variable[1]) || /(?:navy|ink|action)/i.test(variable[1])
         ));
       const approvedNavyReferenceSection = relativePath === "assets/styles/concept-base.css"
-        && (selector === ".meaning" || selector === ".conversion");
+        && (selector === ".meaning" || selector === ".conversion" || selector === ".concept-hero__media");
       if (usesNavySurface && !approvedNavyReferenceSection) {
         fail(`${relativePath}: ${selector} ${match[1]} cannot use navy or a navy-derived alias (${value.trim()})`);
       }
@@ -572,6 +746,18 @@ if (!sharedScript.includes('window.addEventListener("pageshow"') || !sharedScrip
 }
 if (!sharedScript.includes("controls.hidden = false")) {
   fail("shared.js must reveal progressive-enhancement controls only after module initialization");
+}
+for (const initializer of [
+  "initializeReadinessCheck",
+  "initializeResetCard",
+  "initializeScriptBuilder",
+  "initializeBodySignal",
+  "initializeBookingQuestions",
+]) {
+  if (!sharedScript.includes(`const ${initializer} =`)) fail(`shared.js is missing ${initializer}`);
+}
+for (const moduleType of ["readiness-check", "reset-card", "support-request", "workday-boundary", "body-signal", "booking-questions"]) {
+  if (!sharedScript.includes(`module.dataset.module === "${moduleType}"`)) fail(`shared.js does not initialize ${moduleType}`);
 }
 if (!sharedScript.includes('document.body.dataset.printPlan = "true"') || !sharedScript.includes('window.addEventListener("afterprint"')) {
   fail("shared.js must isolate plan printing and clear print mode after the dialog closes");
