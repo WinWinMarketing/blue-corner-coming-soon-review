@@ -9,11 +9,11 @@ const toolsDirectory = path.dirname(fileURLToPath(import.meta.url));
 const rootDirectory = path.resolve(toolsDirectory, "..");
 const failures = [];
 const strictImages = process.argv.includes("--strict-images");
-const approvedHomeSha256 = "2c0e4a829435c1089761e6e48208e80bb4e77d0b54001377b70b09068a1c7eab";
+const approvedHomeSha256 = "d8a3cff83f9b1a9d21f5268ff61943c7993f4edf81764eae2d1ffeb07cf62255";
 const approvedAssets = Object.freeze({
   "assets/styles/brand.css": "7ee7f24f04f7cc6c14ca3eaffc9c5e263342cc60b9070d3c35460e3cee5c3613",
   "assets/styles/shared.css": "30af41cf2be7a0951e4e123702da7263c9fd2bb3f5f63a791cd3065665d7dc60",
-  "assets/styles/concept-base.css": "7407f0db9204062f440999436c3516037caa6bf31374d93e4add52fd5d2d7e44",
+  "assets/styles/concept-base.css": "9f7823347ce45c7c0603d3d72abad04d2ff48598eacabf02fdc54a83cff0b557",
   "assets/scripts/shared.js": "5d77e4a770625571bd3e97257be4e2be0f1e303503cc813d5d98ded91618cd36",
   "assets/art/blue-corner-reference-ring.webp": "22bbe8a535d1707c6d7724f9a2d71ea9f1ff8e924d50ea690d2a251062cd07f2",
 });
@@ -58,6 +58,10 @@ for (const removedPath of ["assets/styles/gallery.css", "tools/concepts.mjs", "C
 
 if (!home.includes('<body class="concept-page">')) fail("Root must retain the canonical homepage body");
 if (/(?:concept-addition|data-module|data-concept-nav|gallery-|Twelve ways|Concept add-on)/i.test(home)) fail("Root homepage includes retired gallery or variant markup");
+if (home.includes("Designer review only")) fail("Root must not expose the retired editorial review note");
+if (!home.includes('class="concept-hero__lead-line">Three in four suicides in Canada are men.</span> <span class="concept-hero__lead-line">Let that sit for a second.</span>')) {
+  fail("Hero support copy must preserve the requested desktop line break with semantic text");
+}
 if (count(home, "data-prototype-form") !== 1 || /<form\b[^>]*\baction=/i.test(home)) fail("Root must retain one local-only form without an action");
 if (count(home, 'name="role" type="radio"') !== 2 || !home.includes("<legend>I'm joining as</legend>")) fail("Root form must retain exactly two named role radios");
 for (const role of ["Patient", "Therapist"]) {
@@ -80,7 +84,7 @@ if (count(home, 'href="https://use.typekit.net/ciy6txz.css"') !== 1
   || !home.includes("font-src 'self' https://use.typekit.net;")) {
   fail("Typekit stylesheet and constrained style/font CSP are required");
 }
-if (count(home, 'href="assets/styles/concept-base.css?v=7407f0db"') !== 1) {
+if (count(home, 'href="assets/styles/concept-base.css?v=9f782334"') !== 1) {
   fail("Homepage must version the corrected core stylesheet for cache refresh");
 }
 if (!home.includes(`src="assets/art/${referenceHero.image}"`) || /(?:href|src)="\/assets\//.test(home)) {

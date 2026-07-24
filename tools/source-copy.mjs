@@ -10,7 +10,8 @@ export const sourceCopy = Object.freeze({
   hero: Object.freeze({
     eyebrow: "Round one is coming",
     heading: "Nobody Fights Alone.",
-    lead: "Three in four suicides in Canada are men. Let that sit for a second.",
+    leadFirst: "Three in four suicides in Canada are men.",
+    leadSecond: "Let that sit for a second.",
     body: "The crisis isn't loud. It hides in plain sight. The guy who looks fine, says \"good\" when you ask, and is quietly running on empty. Canada's corner for men is about to open.",
     memberCta: "Get early access",
     therapistCta: "Therapists, join us",
@@ -68,7 +69,6 @@ export const sourceCopy = Object.freeze({
 });
 
 export const safetyCopy = Object.freeze({
-  editorialReview: "Designer review only — the 85%, #1 and ~300% figures require source verification before production.",
   prototypeDisclosure: "Prototype — use test details only. Nothing is transmitted or stored.",
   prototypeLoading: "Checking…",
   prototypeSuccessTitle: "Prototype complete.",

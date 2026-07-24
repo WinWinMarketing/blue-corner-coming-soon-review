@@ -93,7 +93,7 @@ export const renderHomePage = () => {
     <link rel="stylesheet" href="https://use.typekit.net/ciy6txz.css">
     <link rel="stylesheet" href="assets/styles/brand.css">
     <link rel="stylesheet" href="assets/styles/shared.css">
-    <link rel="stylesheet" href="assets/styles/concept-base.css?v=7407f0db">
+    <link rel="stylesheet" href="assets/styles/concept-base.css?v=9f782334">
     <script src="assets/scripts/shared.js" defer></script>
   </head>
   <body class="concept-page">
@@ -118,7 +118,7 @@ export const renderHomePage = () => {
             <img class="concept-hero__image" src="assets/art/${escapeHtml(referenceHero.image)}" width="${escapeHtml(referenceHero.width)}" height="${escapeHtml(referenceHero.height)}" alt="${escapeHtml(referenceHero.alt)}" fetchpriority="high" data-fallback-image>
             <span class="concept-hero__corner" aria-hidden="true"></span>
           </figure>
-          <p class="concept-hero__lead" data-reveal>${escapeHtml(sourceCopy.hero.lead)}</p>
+          <p class="concept-hero__lead" data-reveal><span class="concept-hero__lead-line">${escapeHtml(sourceCopy.hero.leadFirst)}</span> <span class="concept-hero__lead-line">${escapeHtml(sourceCopy.hero.leadSecond)}</span></p>
           <div class="concept-hero__details" data-reveal>
             <p class="concept-hero__body">${escapeHtml(sourceCopy.hero.body)}</p>
             <div class="concept-hero__actions">
@@ -141,7 +141,6 @@ export const renderHomePage = () => {
             <p>${escapeHtml(sourceCopy.stats.source)}</p>
             <p>${escapeHtml(sourceCopy.stats.gamblingSource)}</p>
           </div>
-          <p class="stats__review-notice" data-reveal>${escapeHtml(safetyCopy.editorialReview)}</p>
         </div>
       </section>
 

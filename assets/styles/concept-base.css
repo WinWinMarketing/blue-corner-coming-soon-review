@@ -105,6 +105,12 @@
   line-height: 1.2;
 }
 
+@media (min-width: 48.0625rem) {
+  .concept-hero__lead-line {
+    display: block;
+  }
+}
+
 .concept-hero__details {
   grid-area: details;
   align-self: start;
@@ -248,13 +254,6 @@
 
 .stats__sources p {
   margin: 0;
-}
-
-.stats__review-notice {
-  max-inline-size: 72ch;
-  margin: var(--space-2xl) 0 0;
-  font-size: var(--font-size-small);
-  font-weight: var(--font-weight-bold);
 }
 
 .symptoms {
@@ -884,7 +883,7 @@
   height: auto;
   margin-inline-start: -1.5%;
   opacity: 0.2;
-  transform: translateY(28%);
+  transform: translateY(0);
 }
 
 @media (max-width: 64rem) {
