@@ -9,11 +9,11 @@ const toolsDirectory = path.dirname(fileURLToPath(import.meta.url));
 const rootDirectory = path.resolve(toolsDirectory, "..");
 const failures = [];
 const strictImages = process.argv.includes("--strict-images");
-const approvedHomeSha256 = "428963d0d8daa03bf33f033ee4e587e9be2726fbd31d541a81f961420db4f768";
+const approvedHomeSha256 = "2c0e4a829435c1089761e6e48208e80bb4e77d0b54001377b70b09068a1c7eab";
 const approvedAssets = Object.freeze({
   "assets/styles/brand.css": "7ee7f24f04f7cc6c14ca3eaffc9c5e263342cc60b9070d3c35460e3cee5c3613",
   "assets/styles/shared.css": "30af41cf2be7a0951e4e123702da7263c9fd2bb3f5f63a791cd3065665d7dc60",
-  "assets/styles/concept-base.css": "036f9ae29e8e2e050b5a652b160562225aeed3b0a8f28f2dedc036dfdbd147b4",
+  "assets/styles/concept-base.css": "7407f0db9204062f440999436c3516037caa6bf31374d93e4add52fd5d2d7e44",
   "assets/scripts/shared.js": "5d77e4a770625571bd3e97257be4e2be0f1e303503cc813d5d98ded91618cd36",
   "assets/art/blue-corner-reference-ring.webp": "22bbe8a535d1707c6d7724f9a2d71ea9f1ff8e924d50ea690d2a251062cd07f2",
 });
@@ -66,8 +66,8 @@ for (const role of ["Patient", "Therapist"]) {
 if (!/name="role"[^>]*required[^>]*aria-describedby="member-role-error"/.test(home) || count(home, "data-role-error") !== 1) {
   fail("Root role selector must have the local accessible validation contract");
 }
-if (!home.includes('class="concept-hero__headline-line" aria-hidden="true">Nobody</span><span class="concept-hero__headline-line" aria-hidden="true">fights <span class="concept-hero__accent">alone.</span>')) {
-  fail("Hero must keep the two-line Nobody / fights alone. lock with a semantic alone. accent");
+if (!home.includes('class="concept-hero__headline-line" aria-hidden="true">Nobody</span><span class="concept-hero__headline-line" aria-hidden="true">Fights <span class="concept-hero__accent">Alone.</span>')) {
+  fail("Hero must keep the two-line Nobody / Fights Alone. lock with a semantic Alone. accent");
 }
 for (const section of ["concept-hero", "stats", "symptoms", "meaning", "roadmap", "conversion"]) {
   if (!home.includes(`class="${section}`)) fail(`Core ${section} section is missing`);
@@ -80,7 +80,7 @@ if (count(home, 'href="https://use.typekit.net/ciy6txz.css"') !== 1
   || !home.includes("font-src 'self' https://use.typekit.net;")) {
   fail("Typekit stylesheet and constrained style/font CSP are required");
 }
-if (count(home, 'href="assets/styles/concept-base.css?v=036f9ae2"') !== 1) {
+if (count(home, 'href="assets/styles/concept-base.css?v=7407f0db"') !== 1) {
   fail("Homepage must version the corrected core stylesheet for cache refresh");
 }
 if (!home.includes(`src="assets/art/${referenceHero.image}"`) || /(?:href|src)="\/assets\//.test(home)) {

@@ -41,7 +41,7 @@
 
 .concept-hero {
   overflow: hidden;
-  border-block-end: var(--signal-bar) solid var(--brand-yellow);
+  border-block-end: var(--signal-bar) solid var(--brand-blue);
   background: var(--brand-off-white);
 }
 
@@ -76,7 +76,7 @@
 
 .concept-hero h1 {
   margin-block-start: var(--space-xl);
-  font-size: clamp(4.5rem, 8.33vw, 7.5rem);
+  font-size: clamp(4.5rem, 9.17vw, 8.25rem);
 }
 
 .concept-hero__headline-line,
@@ -187,7 +187,7 @@
 
 .stats {
   min-block-size: clamp(44rem, 60.55vw, 54.5rem);
-  border-block-end: var(--signal-bar) solid var(--brand-blue);
+  border-block-end: var(--signal-bar) solid var(--brand-yellow);
   background: var(--brand-off-white);
   color: var(--brand-navy);
 }
@@ -206,7 +206,6 @@
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   margin-block-start: clamp(3rem, 5vw, 4.5rem);
-  border-block: 1px solid var(--brand-navy);
 }
 
 .stat {
@@ -372,6 +371,7 @@
   grid-template-columns: repeat(5, minmax(0, 1fr));
   padding: 0;
   margin: clamp(3rem, 5vw, 4.5rem) 0 0;
+  border-block: 1px solid var(--brand-navy);
   list-style: none;
 }
 
@@ -388,6 +388,19 @@
 
 .roadmap-item:last-child {
   border-inline-end: 0;
+}
+
+.roadmap-item::before {
+  content: "";
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline: 0;
+  block-size: 0.5rem;
+  background: var(--brand-blue);
+}
+
+.roadmap-item:first-child::before {
+  background: var(--brand-yellow);
 }
 
 .roadmap-item span {
@@ -1006,6 +1019,14 @@
     border-inline-end: 0;
   }
 
+  .roadmap-item {
+    border-block-end: 1px solid var(--brand-navy);
+  }
+
+  .roadmap-item:nth-child(n + 4) {
+    border-block-end: 0;
+  }
+
   .concept-addition__inner,
   .conversion__inner {
     grid-template-columns: 1fr;
@@ -1086,6 +1107,11 @@
   .roadmap-item:nth-child(n + 4) {
     min-block-size: 9rem;
     border-inline-end: 0;
+    border-block-end: 1px solid var(--brand-navy);
+  }
+
+  .roadmap-item:last-child {
+    border-block-end: 0;
   }
 
   .concept-addition__timeline-step,

@@ -81,10 +81,10 @@ export const renderHomePage = () => {
     <meta name="robots" content="noindex, nofollow, noarchive">
     <meta name="referrer" content="no-referrer">
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' https://use.typekit.net; img-src 'self' data:; font-src 'self' https://use.typekit.net; connect-src 'none'; form-action 'none'; object-src 'none'; base-uri 'none'; media-src 'none'; worker-src 'none'; upgrade-insecure-requests">
-    <title>The Blue Corner — Nobody fights alone.</title>
+    <title>The Blue Corner — Nobody Fights Alone.</title>
     <meta name="description" content="${escapeHtml(sourceCopy.hero.heading)} A Canadian men's mental-health coming-soon concept.">
     <meta name="theme-color" content="#197CE3">
-    <meta property="og:title" content="The Blue Corner — Nobody fights alone.">
+    <meta property="og:title" content="The Blue Corner — Nobody Fights Alone.">
     <meta property="og:description" content="${escapeHtml(sourceCopy.hero.body)}">
     <meta property="og:type" content="website">
     <meta property="og:image" content="https://winwinmarketing.github.io/blue-corner-coming-soon-review/assets/art/${escapeHtml(referenceHero.image)}">
@@ -93,7 +93,7 @@ export const renderHomePage = () => {
     <link rel="stylesheet" href="https://use.typekit.net/ciy6txz.css">
     <link rel="stylesheet" href="assets/styles/brand.css">
     <link rel="stylesheet" href="assets/styles/shared.css">
-    <link rel="stylesheet" href="assets/styles/concept-base.css?v=036f9ae2">
+    <link rel="stylesheet" href="assets/styles/concept-base.css?v=7407f0db">
     <script src="assets/scripts/shared.js" defer></script>
   </head>
   <body class="concept-page">
@@ -112,7 +112,7 @@ export const renderHomePage = () => {
         <div class="concept-hero__inner page-frame">
           <div class="concept-hero__copy" data-reveal>
             <p class="eyebrow">${escapeHtml(sourceCopy.hero.eyebrow)}</p>
-            <h1 id="hero-title" aria-label="${escapeHtml(sourceCopy.hero.heading)}"><span class="concept-hero__headline-line" aria-hidden="true">Nobody</span><span class="concept-hero__headline-line" aria-hidden="true">fights <span class="concept-hero__accent">alone.</span></span></h1>
+            <h1 id="hero-title" aria-label="Nobody Fights Alone."><span class="concept-hero__headline-line" aria-hidden="true">Nobody</span><span class="concept-hero__headline-line" aria-hidden="true">Fights <span class="concept-hero__accent">Alone.</span></span></h1>
           </div>
           <figure class="concept-hero__media image-frame" data-image-frame data-image-fallback-label="Blue Corner hero image">
             <img class="concept-hero__image" src="assets/art/${escapeHtml(referenceHero.image)}" width="${escapeHtml(referenceHero.width)}" height="${escapeHtml(referenceHero.height)}" alt="${escapeHtml(referenceHero.alt)}" fetchpriority="high" data-fallback-image>

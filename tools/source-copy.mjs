@@ -9,7 +9,7 @@ export const sourceCopy = Object.freeze({
   header: Object.freeze({ name: "The Blue Corner" }),
   hero: Object.freeze({
     eyebrow: "Round one is coming",
-    heading: "Nobody fights alone.",
+    heading: "Nobody Fights Alone.",
     lead: "Three in four suicides in Canada are men. Let that sit for a second.",
     body: "The crisis isn't loud. It hides in plain sight. The guy who looks fine, says \"good\" when you ask, and is quietly running on empty. Canada's corner for men is about to open.",
     memberCta: "Get early access",
