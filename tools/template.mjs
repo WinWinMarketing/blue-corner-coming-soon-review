@@ -1,4 +1,5 @@
-import { sourceCopy, safetyCopy } from "./source-copy.mjs";
+import { referenceHero } from "./concepts.mjs";
+import { conceptAdditions, sourceCopy, safetyCopy } from "./source-copy.mjs";
 
 const escapeHtml = (value) => String(value)
   .replaceAll("&", "&amp;")
@@ -7,13 +8,7 @@ const escapeHtml = (value) => String(value)
   .replaceAll('"', "&quot;")
   .replaceAll("'", "&#39;");
 
-const className = (value) => String(value)
-  .toLowerCase()
-  .normalize("NFKD")
-  .replace(/[^a-z0-9]+/g, "-")
-  .replace(/(^-|-$)/g, "");
-
-const renderCrisisUtility = (assetPrefix = "") => `
+const renderCrisisUtility = () => `
     <div class="crisis-bar page-frame" role="region" aria-label="Immediate support">
       <p class="crisis-bar__message">${escapeHtml(safetyCopy.utility)}</p>
       <div class="crisis-bar__links">
@@ -34,9 +29,9 @@ const renderFields = (audience) => sourceCopy.conversion.fields.map((field) => {
                     </div>`;
 }).join("");
 
-const renderForm = (audience, copy) => {
-  const isMember = audience === "member";
-  const disclosureId = `${audience}-prototype-disclosure`;
+const renderMemberForm = (copy) => {
+  const audience = "member";
+  const disclosureId = "member-prototype-disclosure";
   return `
             <article class="conversion-path conversion-path--${audience}" data-reveal>
               <p class="eyebrow">${escapeHtml(copy.eyebrow)}</p>
@@ -44,10 +39,10 @@ const renderForm = (audience, copy) => {
               <p class="prototype-disclosure" id="${disclosureId}">${escapeHtml(safetyCopy.prototypeDisclosure)}</p>
               <form class="prototype-form" id="${audience}-form" data-prototype-form data-audience="${audience}" data-loading-label="${escapeHtml(safetyCopy.prototypeLoading)}" data-success-title="${escapeHtml(safetyCopy.prototypeSuccessTitle)}" data-success-body="${escapeHtml(safetyCopy.prototypeSuccessBody)}" method="post" autocomplete="off" aria-describedby="${disclosureId}" novalidate>
                 <fieldset data-form-fields>
-                  <legend class="sr-only">${isMember ? "Men's early-access interest" : "Therapist interest"}</legend>
+                  <legend class="sr-only">Men's early-access interest</legend>
                   <div class="field-grid">${renderFields(audience)}
                   </div>
-                  <button class="button${isMember ? " button--signal" : ""}" type="submit" data-submit>${escapeHtml(copy.button)}</button>
+                  <button class="button button--signal" type="submit" data-submit>${escapeHtml(copy.button)}</button>
                   <p class="conversion-path__note">${escapeHtml(copy.note)}</p>
                 </fieldset>
                 <div class="form-status" data-form-status tabindex="-1" role="status" aria-live="polite" aria-atomic="true" hidden>
@@ -58,9 +53,31 @@ const renderForm = (audience, copy) => {
             </article>`;
 };
 
-export const renderConceptPage = (concept, listIndex) => {
-  const bodyClass = `${className(concept.title)}-page`;
-  const reviewOrdinal = String(listIndex + 1).padStart(2, "0");
+const renderConceptAddition = (concept) => {
+  if (!concept.additionKey) return "";
+  const addition = conceptAdditions[concept.additionKey];
+  if (!addition) throw new Error(`Unknown concept addition: ${concept.additionKey}`);
+  const items = addition.items.map((item, index) => `
+              <li class="concept-addition__item">
+                <span aria-hidden="true">${String(index + 1).padStart(2, "0")}</span>
+                <p>${escapeHtml(item)}</p>
+              </li>`).join("");
+  return `
+      <section class="concept-addition" aria-labelledby="concept-addition-title">
+        <div class="concept-addition__inner page-frame">
+          <header class="concept-addition__heading" data-reveal>
+            <p class="eyebrow">Concept add-on</p>
+            <h2 id="concept-addition-title">${escapeHtml(addition.title)}</h2>
+            <p>${escapeHtml(addition.intro)}</p>
+          </header>
+          <ol class="concept-addition__list" data-reveal>${items}
+          </ol>
+        </div>
+      </section>
+`;
+};
+
+export const renderConceptPage = (concept) => {
   const stats = sourceCopy.stats.items.map((item) => `
             <article class="stat">
               <strong class="stat__value">${escapeHtml(item.value)}</strong>
@@ -86,13 +103,13 @@ export const renderConceptPage = (concept, listIndex) => {
     <meta name="robots" content="noindex, nofollow, noarchive">
     <meta name="referrer" content="no-referrer">
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'none'; form-action 'none'; object-src 'none'; base-uri 'none'; media-src 'none'; worker-src 'none'; upgrade-insecure-requests">
-    <title>${escapeHtml(concept.title)} — The Blue Corner</title>
+    <title>The Blue Corner — Nobody fights alone.</title>
     <meta name="description" content="${escapeHtml(sourceCopy.hero.heading)} A Canadian men's mental-health coming-soon concept.">
     <meta name="theme-color" content="#197CE3">
-    <meta property="og:title" content="${escapeHtml(concept.title)} — The Blue Corner">
+    <meta property="og:title" content="The Blue Corner — Nobody fights alone.">
     <meta property="og:description" content="${escapeHtml(sourceCopy.hero.body)}">
     <meta property="og:type" content="website">
-    <meta property="og:image" content="https://winwinmarketing.github.io/blue-corner-coming-soon-review/assets/art/${escapeHtml(concept.image)}">
+    <meta property="og:image" content="https://winwinmarketing.github.io/blue-corner-coming-soon-review/assets/art/${escapeHtml(referenceHero.image)}">
     <link rel="icon" href="../../assets/brand/mark-blue.png" type="image/png">
     <script src="../../assets/scripts/boot.js"></script>
     <link rel="stylesheet" href="../../assets/styles/brand.css">
@@ -101,16 +118,13 @@ export const renderConceptPage = (concept, listIndex) => {
     <link rel="stylesheet" href="style.css">
     <script src="../../assets/scripts/shared.js" defer></script>
   </head>
-  <body class="concept-page concept--${escapeHtml(concept.number)} ${bodyClass}" data-concept="${escapeHtml(concept.slug)}" data-concept-number="${escapeHtml(concept.number)}">
+  <body class="concept-page">
     <a class="skip-link" href="#main">Skip to main content</a>
-${renderCrisisUtility("../../")}
 
     <header class="site-header page-frame">
       <a class="site-header__brand" href="../../index.html" aria-label="The Blue Corner — all concepts">
         <img src="../../assets/brand/logo-horizontal-white.png" width="1655" height="170" alt="${escapeHtml(sourceCopy.header.name)}">
       </a>
-      <p class="site-header__launch">${escapeHtml(sourceCopy.header.launch)}</p>
-      <a class="site-header__review" href="../../index.html">Concept ${escapeHtml(reviewOrdinal)} of 06 · ${escapeHtml(concept.title)}</a>
     </header>
 
     <main id="main" tabindex="-1">
@@ -123,12 +137,11 @@ ${renderCrisisUtility("../../")}
             <p class="concept-hero__body">${escapeHtml(sourceCopy.hero.body)}</p>
             <div class="concept-hero__actions">
               <a class="button button--signal" href="#member-form" data-scroll-link>${escapeHtml(sourceCopy.hero.memberCta)}</a>
-              <a class="button button--ghost" href="#therapist-form" data-scroll-link>${escapeHtml(sourceCopy.hero.therapistCta)}</a>
+              <a class="button button--ghost" href="#roadmap-title" data-scroll-link>${escapeHtml(sourceCopy.hero.therapistCta)}</a>
             </div>
           </div>
-          <figure class="concept-hero__media image-frame" data-image-frame data-image-fallback-label="${escapeHtml(concept.title)} image in production">
-            <img class="concept-hero__image" src="../../assets/art/${escapeHtml(concept.image)}" width="${escapeHtml(concept.imageWidth ?? 1536)}" height="${escapeHtml(concept.imageHeight ?? 1024)}" alt="${escapeHtml(concept.alt)}" fetchpriority="high" data-fallback-image>
-            <figcaption><span>${escapeHtml(concept.number)}</span> ${escapeHtml(concept.title)}</figcaption>
+          <figure class="concept-hero__media image-frame" data-image-frame data-image-fallback-label="Blue Corner hero image">
+            <img class="concept-hero__image" src="../../assets/art/${escapeHtml(referenceHero.image)}" width="${escapeHtml(referenceHero.width)}" height="${escapeHtml(referenceHero.height)}" alt="${escapeHtml(referenceHero.alt)}" fetchpriority="high" data-fallback-image>
           </figure>
         </div>
       </section>
@@ -179,6 +192,7 @@ ${renderCrisisUtility("../../")}
         <ol class="roadmap__list" data-reveal>${roadmap}
         </ol>
       </section>
+${renderConceptAddition(concept)}
 
       <section class="conversion" aria-labelledby="conversion-title">
         <div class="conversion__inner page-frame">
@@ -187,8 +201,7 @@ ${renderCrisisUtility("../../")}
             <h2 id="conversion-title">${escapeHtml(sourceCopy.conversion.heading)}</h2>
             <p>${escapeHtml(sourceCopy.conversion.body)}</p>
           </header>
-          <div class="conversion__forms">${renderForm("member", sourceCopy.conversion.member)}
-${renderForm("therapist", sourceCopy.conversion.therapist)}
+          <div class="conversion__forms">${renderMemberForm(sourceCopy.conversion.member)}
           </div>
         </div>
       </section>
@@ -207,7 +220,12 @@ ${renderForm("therapist", sourceCopy.conversion.therapist)}
         </div>
         <div class="concept-footer__safety">
           <p>Blue Corner is not an emergency service.</p>
-          <p>Call or text <a href="tel:988">9-8-8</a> for suicide crisis support. Call <a href="tel:911">9-1-1</a> for immediate danger.</p>
+          <div class="concept-footer__help">
+            <a href="tel:988">Call 9-8-8</a>
+            <a href="sms:988">Text 9-8-8</a>
+            <a href="https://www.canada.ca/en/public-health/services/mental-health-services/mental-health-get-help.html" target="_blank" rel="noopener noreferrer">Crisis resources</a>
+          </div>
+          <p>Call <a href="tel:911">9-1-1</a> for immediate danger.</p>
         </div>
       </div>
     </footer>
@@ -218,12 +236,12 @@ ${renderForm("therapist", sourceCopy.conversion.therapist)}
 
 export const renderGallery = (concepts) => {
   const tiles = concepts.map((concept) => `
-          <a class="concept-tile concept-tile--${escapeHtml(concept.number)}" href="concepts/${escapeHtml(concept.slug)}/" data-reveal>
+          <a class="concept-tile concept-tile--${escapeHtml(concept.ordinal)}" href="concepts/${escapeHtml(concept.slug)}/" data-reveal>
             <span class="concept-tile__media image-frame" data-image-frame data-image-fallback-label="Preview in production">
-              <img class="concept-tile__art" src="assets/art/${escapeHtml(concept.image)}" alt="" width="1536" height="1024" loading="lazy" data-fallback-image>
+              <img class="concept-tile__art" src="assets/art/${escapeHtml(referenceHero.image)}" alt="" width="${escapeHtml(referenceHero.width)}" height="${escapeHtml(referenceHero.height)}" loading="lazy" data-fallback-image>
             </span>
             <span class="concept-tile__meta">
-              <span class="concept-tile__number">${escapeHtml(concept.number)}</span>
+              <span class="concept-tile__number">${escapeHtml(concept.ordinal)}</span>
               <span class="concept-tile__copy">
                 <strong>${escapeHtml(concept.title)}</strong>
                 <small>${escapeHtml(concept.descriptor)}</small>
@@ -269,7 +287,7 @@ ${renderCrisisUtility()}
         <div class="gallery-hero__copy">
           <p class="eyebrow">Coming-soon direction study</p>
           <h1>Six ways into<br>the corner.</h1>
-          <p>One locked story. Six distinct ways to make reaching out feel human, credible, and possible.</p>
+          <p>One exact reference page. Five useful additions, each tested without changing the base.</p>
         </div>
         <a class="gallery-down" href="#main" data-scroll-link>
           <span>Explore all six</span>
@@ -282,8 +300,8 @@ ${renderCrisisUtility()}
       <section class="gallery-section page-frame" aria-labelledby="gallery-title">
         <div class="gallery-intro" data-reveal>
           <p class="eyebrow">Choose a direction</p>
-          <h2 id="gallery-title">Same corner. Different signal.</h2>
-          <p>Every concept uses the same supplied copy, tactile abstract material imagery, therapy-first path, local-only form demonstration, and exact Blue Corner palette.</p>
+          <h2 id="gallery-title">The base stays fixed.</h2>
+          <p>Concept 01 is the supplied reference. Concepts 02–06 preserve it exactly and insert one clearly labeled, practical module before signup.</p>
         </div>
         <aside class="editorial-note" aria-label="Editorial verification note" data-reveal>
           <strong>Before production launch</strong>

@@ -2,35 +2,47 @@
 
 ## Shared goal
 
-Replace the generic coming-soon page with a credible, emotionally direct first encounter for Canadian men considering support. Every direction carries the same locked story, tactile abstract material imagery rooted in the Blue Corner metaphor, local-only form demonstration, crisis guidance, supplied identity, and official palette: blue `#197CE3`, navy `#042874`, yellow `#EFC82C`, and off-white `#EFF3F9`.
+Replace the generic coming-soon page with a credible, emotionally direct first encounter for Canadian men considering support. Every route uses the exact same supplied masthead, two-column hero, wide boxing-ring image, locked core copy, section order, single local-only member form, crisis access, motion, responsive layout, and official palette: blue `#197CE3`, navy `#042874`, yellow `#EFC82C`, and off-white `#EFF3F9`.
 
-## 03 — The Check-In
+## 01 — Reference master
 
-Build the experience around one direct question. Layered cloth surrounding an open off-white corner makes room for an answer while the short yellow stitch keeps the invitation precise.
+Route: `04-first-bell`.
 
-## 04 — At the Corner
+This is the screenshot/reference implementation. It has no concept add-on and is the immutable baseline for every comparison.
 
-Use the boxing origin precisely but quietly: pressed concentric signals, a single yellow interruption, and worn blue canvas evoke the pause between rounds without turning mental health into sport or spectacle.
+## 02 — No perfect words needed
 
-## 06 — Kitchen Light
+Route: `03-open-corner`.
 
-Show the hour when the polished answer drops away. Warm window light crossing blue cloth and off-white paper gives the abstract system an after-hours intimacy without depicting a literal room.
+Add exactly one practical module with three opening lines a man can use to begin a conversation. Nothing else differs from the master.
 
-## 09 — Listening Room
+## 03 — The first ten minutes
 
-Make therapy feel credible, calm, and approachable. A cyanotype of coiled rope and folded textile balances professional clarity with enough open paper to suggest room to speak honestly.
+Route: `06-kitchen-light`.
 
-## 11 — On the Other End
+Add exactly one expectation-setting module that makes a first session easier to picture without scripting or overpromising it. Nothing else differs from the master.
 
-Focus on the instant someone reaches out and someone answers. White cord paths meeting at a small yellow knot make connection feel immediate, protected, and low-pressure.
+## 04 — The Corner Standard
 
-## 12 — Two Ways In
+Route: `09-listening-room`.
 
-Give founding members and therapists equal clarity without splitting the brand in half. Layered fabric and torn-paper paths arrive at one small yellow junction, making the shared launch model easy to understand.
+Add exactly one module that makes therapist screening, consent, scope, and fit criteria visible. It does not add a second form. Nothing else differs from the master.
 
-## Review recommendation
+## 05 — Between-round plan
 
-Use **04 — At the Corner** as the visual and structural master. Compare **03 — The Check-In** for directness, **06 — Kitchen Light** for emotional warmth, **09 — Listening Room** for service credibility, **11 — On the Other End** for connection, and **12 — Two Ways In** for the dual-audience launch story.
+Route: `11-on-the-other-end`.
+
+Add exactly one module describing what a private take-home next-step plan could contain without clinical or timing promises. Nothing else differs from the master.
+
+## 06 — Bring someone into your corner
+
+Route: `12-two-ways-in`.
+
+Add exactly one consent-led module for optionally involving a trusted person. Nothing else differs from the master.
+
+## Review rule
+
+Judge every route against ordinal 01. A concept succeeds only if its single labeled module is useful and the reference page around it remains unchanged.
 
 ## Editorial gate
 

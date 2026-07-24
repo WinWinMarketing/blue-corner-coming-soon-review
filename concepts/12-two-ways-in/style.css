@@ -1,8 +1,1 @@
-/* Two Ways In keeps both material paths visible around the junction. */
-.concept--12 {
-  --hero-copy-share: 0.86fr;
-  --hero-media-share: 1.14fr;
-  --hero-image-position: center 54%;
-  --hero-image-position-mobile: center;
-  --hero-corner-color: var(--brand-yellow);
-}
+/* Intentionally empty: every route uses the immutable shared reference CSS. */

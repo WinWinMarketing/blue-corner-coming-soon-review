@@ -1,8 +1,1 @@
-/* The Check-In: the opening in the material stays centered and immediate. */
-.concept--03 {
-  --hero-copy-share: 0.96fr;
-  --hero-media-share: 1.04fr;
-  --hero-image-position: 52% center;
-  --hero-image-position-mobile: 50% center;
-  --hero-corner-inline: 1.25rem;
-}
+/* Intentionally empty: every route uses the immutable shared reference CSS. */

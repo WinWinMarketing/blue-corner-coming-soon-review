@@ -22,16 +22,16 @@ const ensureConceptStyle = async (concept) => {
   try {
     await access(destination, constants.F_OK);
   } catch {
-    const note = `/* Concept ${concept.number} — ${concept.title}\n   Scaffold only: concept-specific art direction belongs here. */\n`;
+    const note = "/* Intentionally empty: every route uses the immutable shared reference CSS. */\n";
     await writeFile(destination, note, { encoding: "utf8", flag: "wx" });
   }
 };
 
 await writeGeneratedFile("index.html", renderGallery(concepts));
 
-for (const [index, concept] of concepts.entries()) {
+for (const concept of concepts) {
   await ensureConceptStyle(concept);
-  await writeGeneratedFile(path.join("concepts", concept.slug, "index.html"), renderConceptPage(concept, index));
+  await writeGeneratedFile(path.join("concepts", concept.slug, "index.html"), renderConceptPage(concept));
 }
 
 console.log(`Generated the gallery and ${concepts.length} concept pages.`);

@@ -1,8 +1,1 @@
-/* Listening Room gives the cyanotype slightly more editorial space. */
-.concept--09 {
-  --hero-copy-share: 0.88fr;
-  --hero-media-share: 1.12fr;
-  --hero-image-position: center 57%;
-  --hero-image-position-mobile: center;
-  --hero-corner-inline: 2rem;
-}
+/* Intentionally empty: every route uses the immutable shared reference CSS. */

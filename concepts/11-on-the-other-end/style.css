@@ -1,8 +1,1 @@
-/* On the Other End holds the cord junction toward the reader. */
-.concept--11 {
-  --hero-copy-share: 0.72fr;
-  --hero-media-share: 1.28fr;
-  --hero-image-position: 68% center;
-  --hero-image-position-mobile: 67% center;
-  --hero-corner-inline: 1rem;
-}
+/* Intentionally empty: every route uses the immutable shared reference CSS. */

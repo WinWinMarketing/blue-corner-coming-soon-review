@@ -1,7 +1,1 @@
-/* At the Corner is the master crop and weighting for the shared system. */
-.concept--04 {
-  --hero-copy-share: 0.82fr;
-  --hero-media-share: 1.18fr;
-  --hero-image-position: 69% center;
-  --hero-image-position-mobile: 65% center;
-}
+/* Intentionally empty: every route uses the immutable shared reference CSS. */

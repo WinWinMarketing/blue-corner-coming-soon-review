@@ -1,8 +1,1 @@
-/* Kitchen Light keeps the warmer paper crossing high in the frame. */
-.concept--06 {
-  --hero-copy-share: 0.9fr;
-  --hero-media-share: 1.1fr;
-  --hero-image-position: center 52%;
-  --hero-image-position-mobile: 51% center;
-  --hero-corner-color: var(--brand-yellow);
-}
+/* Intentionally empty: every route uses the immutable shared reference CSS. */
