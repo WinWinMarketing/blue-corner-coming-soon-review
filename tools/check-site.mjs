@@ -9,11 +9,11 @@ const toolsDirectory = path.dirname(fileURLToPath(import.meta.url));
 const rootDirectory = path.resolve(toolsDirectory, "..");
 const failures = [];
 const strictImages = process.argv.includes("--strict-images");
-const approvedHomeSha256 = "101b33d34f700a1b14c1834f65de4e27b6756507f7e7e95e8d29f6f1b4d57de2";
+const approvedHomeSha256 = "ab7ed2e7a396097a3e20519a6ca3b622e15b38c68958f35216ae5fce4aafbbf9";
 const approvedAssets = Object.freeze({
   "assets/styles/brand.css": "7ee7f24f04f7cc6c14ca3eaffc9c5e263342cc60b9070d3c35460e3cee5c3613",
   "assets/styles/shared.css": "30af41cf2be7a0951e4e123702da7263c9fd2bb3f5f63a791cd3065665d7dc60",
-  "assets/styles/concept-base.css": "de725405d640ea2c5fcff339beae409ce89b56a48dd2a68c14d6c99863425c96",
+  "assets/styles/concept-base.css": "9492457117d4ccdf3cebc0de7783d7abb4326c8785f0acf380b2eaa83410b78d",
   "assets/scripts/shared.js": "5d77e4a770625571bd3e97257be4e2be0f1e303503cc813d5d98ded91618cd36",
   "assets/art/blue-corner-reference-ring.webp": "22bbe8a535d1707c6d7724f9a2d71ea9f1ff8e924d50ea690d2a251062cd07f2",
 });
