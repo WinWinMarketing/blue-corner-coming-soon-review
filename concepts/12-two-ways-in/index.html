@@ -152,31 +152,91 @@
         </ol>
       </section>
 
-      <section class="concept-addition" aria-labelledby="concept-addition-title">
+      <section class="concept-addition" data-module="consent-invite" data-state="idle" aria-labelledby="concept-addition-title">
         <div class="concept-addition__inner page-frame">
           <header class="concept-addition__heading" data-reveal>
             <p class="eyebrow">Concept add-on</p>
             <h2 id="concept-addition-title">Bring someone into your corner</h2>
             <p>Support from a trusted person is optional. You decide who is involved, what they know, and what help looks like.</p>
           </header>
-          <ol class="concept-addition__list" data-reveal>
-              <li class="concept-addition__item">
-                <span aria-hidden="true">01</span>
-                <p>Choose who, if anyone, you want involved.</p>
-              </li>
-              <li class="concept-addition__item">
-                <span aria-hidden="true">02</span>
-                <p>Agree on what may be shared before anyone is contacted.</p>
-              </li>
-              <li class="concept-addition__item">
-                <span aria-hidden="true">03</span>
-                <p>Choose the role: listen, join a conversation, or help with one practical next step.</p>
-              </li>
-              <li class="concept-addition__item">
-                <span aria-hidden="true">04</span>
-                <p>Change your mind or withdraw consent at any time.</p>
-              </li>
-          </ol>
+
+          <form class="concept-addition__workspace" data-consent-form>
+
+              <fieldset class="concept-addition__fieldset">
+                <legend>Who do you want to invite?</legend>
+                <div class="concept-addition__choices">
+                  <label class="concept-addition__choice" for="consent-role-1">
+                    <input id="consent-role-1" name="consent-role" type="radio" value="a friend" autocomplete="off">
+                    <span>a friend</span>
+                  </label>
+                  <label class="concept-addition__choice" for="consent-role-2">
+                    <input id="consent-role-2" name="consent-role" type="radio" value="my partner" autocomplete="off">
+                    <span>my partner</span>
+                  </label>
+                  <label class="concept-addition__choice" for="consent-role-3">
+                    <input id="consent-role-3" name="consent-role" type="radio" value="a family member" autocomplete="off">
+                    <span>a family member</span>
+                  </label>
+                  <label class="concept-addition__choice" for="consent-role-4">
+                    <input id="consent-role-4" name="consent-role" type="radio" value="another person I trust" autocomplete="off">
+                    <span>another person I trust</span>
+                  </label>
+                </div>
+              </fieldset>
+
+              <fieldset class="concept-addition__fieldset">
+                <legend>What can they know?</legend>
+                <div class="concept-addition__choices">
+                  <label class="concept-addition__choice" for="consent-boundary-1">
+                    <input id="consent-boundary-1" name="consent-boundary" type="radio" value="that I&#39;m looking for support, without details" autocomplete="off">
+                    <span>that I&#39;m looking for support, without details</span>
+                  </label>
+                  <label class="concept-addition__choice" for="consent-boundary-2">
+                    <input id="consent-boundary-2" name="consent-boundary" type="radio" value="the parts I choose in the moment" autocomplete="off">
+                    <span>the parts I choose in the moment</span>
+                  </label>
+                  <label class="concept-addition__choice" for="consent-boundary-3">
+                    <input id="consent-boundary-3" name="consent-boundary" type="radio" value="only what I write in this invitation" autocomplete="off">
+                    <span>only what I write in this invitation</span>
+                  </label>
+                </div>
+              </fieldset>
+
+              <fieldset class="concept-addition__fieldset">
+                <legend>What would help?</legend>
+                <div class="concept-addition__choices">
+                  <label class="concept-addition__choice" for="consent-help-1">
+                    <input id="consent-help-1" name="consent-help" type="radio" value="listen without trying to fix it" autocomplete="off">
+                    <span>listen without trying to fix it</span>
+                  </label>
+                  <label class="concept-addition__choice" for="consent-help-2">
+                    <input id="consent-help-2" name="consent-help" type="radio" value="check in after I ask" autocomplete="off">
+                    <span>check in after I ask</span>
+                  </label>
+                  <label class="concept-addition__choice" for="consent-help-3">
+                    <input id="consent-help-3" name="consent-help" type="radio" value="help me take one practical next step" autocomplete="off">
+                    <span>help me take one practical next step</span>
+                  </label>
+                </div>
+              </fieldset>
+            <div class="concept-addition__controls" data-js-controls hidden>
+              <button class="button button--signal" type="button" data-action="generate" disabled>Draft invitation</button>
+              <button class="button button--ghost" type="reset">Reset</button>
+            </div>
+            <div class="concept-addition__preview" data-invite-preview hidden>
+              <div class="concept-addition__field">
+                <label for="consent-invite-editor">Your invitation</label>
+                <p id="consent-invite-hint">Edit this before sharing it yourself. Nothing sends from this page.</p>
+                <textarea id="consent-invite-editor" data-invite-editor rows="7" maxlength="600" autocomplete="off" aria-describedby="consent-invite-hint"></textarea>
+              </div>
+              <button class="button button--ghost" type="button" data-action="copy" disabled>Copy invitation</button>
+            </div>
+            <p class="concept-addition__warning">Nothing sends from this page. Copying puts the invitation on your device clipboard, where other apps may be able to read it.</p>
+            <p class="concept-addition__status" data-module-status role="status" aria-live="polite">Choose one option in each group to draft an invitation.</p>
+          </form>
+          <noscript>
+            <p class="concept-addition__fallback">JavaScript is optional. Use the role, sharing-boundary, and requested-help choices below to draft an invitation manually. Nothing sends.</p>
+          </noscript>
         </div>
       </section>
 

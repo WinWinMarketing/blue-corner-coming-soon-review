@@ -86,55 +86,100 @@ export const sourceCopy = Object.freeze({
 
 export const conceptAdditions = Object.freeze({
   openingLines: Object.freeze({
+    type: "sentence-starter",
     title: "No perfect words needed",
     intro: "Starting can be the hardest part. Any one of these is enough to open the door.",
-    items: Object.freeze([
+    starters: Object.freeze([
       "I haven't felt like myself lately.",
       "I don't know where to start, but I know something needs to change.",
       "Can we talk for ten minutes? I could use someone in my corner.",
     ]),
+    fallback: "JavaScript is optional. Choose a starter, then copy or adapt it manually in any notes app you trust.",
   }),
   firstTenMinutes: Object.freeze({
+    type: "first-ten-minutes",
     title: "The first ten minutes",
     intro: "A first conversation can stay simple. You set the pace, and nothing needs to come out in perfect order.",
-    items: Object.freeze([
-      "Arrive as you are. There is no story to prepare.",
-      "Say what feels okay to cover and what can wait.",
-      "Start with the one thing that feels hardest to carry today.",
-      "Before you leave, ask what the next step could be and decide whether it feels right for you.",
+    steps: Object.freeze([
+      Object.freeze({ minute: "0", heading: "Arrive as you are", body: "There is no story to prepare and no right place to begin." }),
+      Object.freeze({ minute: "2", heading: "Set the pace", body: "Say what feels okay to cover and what can wait." }),
+      Object.freeze({ minute: "5", heading: "Name one thing", body: "Start with the one thing that feels hardest to carry today." }),
+      Object.freeze({ minute: "10", heading: "Choose what comes next", body: "Ask what a next step could be, then decide whether it feels right for you." }),
     ]),
+    fallback: "JavaScript is optional. The complete 0, 2, 5, and 10-minute outline is already shown below for reading or manual copying.",
   }),
   cornerStandard: Object.freeze({
+    type: "corner-standard",
     title: "The Corner Standard",
     intro: "Trust should be visible before a member shares anything personal. These are the basics Blue Corner expects.",
-    items: Object.freeze([
-      "Registered, insured, and in good standing with the relevant provincial regulator.",
-      "Experienced in supporting men's mental health without stereotypes, shame, or pressure.",
-      "Clear about scope, confidentiality, fees, and available next steps before care begins.",
-      "Trauma-informed, culturally humble, and led by the member's consent.",
-      "Open to a fit check that leaves the member free to say no.",
+    standards: Object.freeze([
+      Object.freeze({
+        standard: "Registered, insured, and in good standing",
+        evidence: "A current public registry entry and professional-liability coverage.",
+        verifier: "Check the relevant provincial regulator's public register.",
+        verification: "Not yet verified in this design-review prototype.",
+      }),
+      Object.freeze({
+        standard: "Experienced without stereotypes or shame",
+        evidence: "Relevant training and examples of supporting men's mental health without forcing one idea of masculinity.",
+        verifier: "Ask the therapist how their experience applies to the support you want.",
+        verification: "Not yet verified in this design-review prototype.",
+      }),
+      Object.freeze({
+        standard: "Clear about scope, privacy, fees, and next steps",
+        evidence: "Plain-language intake information available before care begins.",
+        verifier: "Review the therapist's written policies and ask questions before agreeing.",
+        verification: "Not yet verified in this design-review prototype.",
+      }),
+      Object.freeze({
+        standard: "Trauma-informed, culturally humble, and consent-led",
+        evidence: "A clear explanation of choice, boundaries, and how consent can change during care.",
+        verifier: "Ask how the therapist handles consent, identity, culture, and difficult disclosures.",
+        verification: "Not yet verified in this design-review prototype.",
+      }),
+      Object.freeze({
+        standard: "Open to a fit check and a member's no",
+        evidence: "A fit conversation that does not pressure a member to continue.",
+        verifier: "Ask what happens when the fit does not feel right or a referral is needed.",
+        verification: "Not yet verified in this design-review prototype.",
+      }),
     ]),
+    fallback: "JavaScript is optional. Open any standard to read its evidence, verifier, and current verification note.",
   }),
   betweenRoundPlan: Object.freeze({
+    type: "between-round-plan",
     title: "Between-round plan",
     intro: "A private take-home plan could keep the next step visible without turning progress into a promise or a deadline.",
-    items: Object.freeze([
-      "The one priority you chose to focus on.",
-      "People, services, or resources you want close at hand.",
-      "A small action that feels realistic to you.",
-      "Signs that would tell you to reach out for more support.",
-      "Crisis contacts kept visible if safety becomes urgent.",
+    prompts: Object.freeze([
+      Object.freeze({ key: "priority", label: "Priority", hint: "The one thing you want to keep in view.", maxLength: 160 }),
+      Object.freeze({ key: "support", label: "Support or resource", hint: "A person, service, or resource you want close at hand.", maxLength: 180 }),
+      Object.freeze({ key: "action", label: "Realistic action", hint: "One small step that feels possible to you.", maxLength: 160 }),
+      Object.freeze({ key: "warning", label: "Warning sign", hint: "A sign that would tell you to reach out for more support.", maxLength: 180 }),
     ]),
+    safety: "Keep crisis contacts visible if safety becomes urgent. Call or text 9-8-8 in Canada; call 9-1-1 for immediate danger.",
+    fallback: "JavaScript is optional. Use the four prompts as a private written outline; generating, copying, and printing require JavaScript.",
   }),
   trustedPerson: Object.freeze({
+    type: "consent-invite",
     title: "Bring someone into your corner",
     intro: "Support from a trusted person is optional. You decide who is involved, what they know, and what help looks like.",
-    items: Object.freeze([
-      "Choose who, if anyone, you want involved.",
-      "Agree on what may be shared before anyone is contacted.",
-      "Choose the role: listen, join a conversation, or help with one practical next step.",
-      "Change your mind or withdraw consent at any time.",
+    roles: Object.freeze([
+      "a friend",
+      "my partner",
+      "a family member",
+      "another person I trust",
     ]),
+    boundaries: Object.freeze([
+      "that I'm looking for support, without details",
+      "the parts I choose in the moment",
+      "only what I write in this invitation",
+    ]),
+    help: Object.freeze([
+      "listen without trying to fix it",
+      "check in after I ask",
+      "help me take one practical next step",
+    ]),
+    fallback: "JavaScript is optional. Use the role, sharing-boundary, and requested-help choices below to draft an invitation manually. Nothing sends.",
   }),
 });
 

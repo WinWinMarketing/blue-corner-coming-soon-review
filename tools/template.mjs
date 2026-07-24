@@ -53,25 +53,203 @@ const renderMemberForm = (copy) => {
             </article>`;
 };
 
+const renderChoiceGroup = ({ legend, name, values }) => {
+  const choices = values.map((value, index) => {
+    const id = `${name}-${index + 1}`;
+    return `
+                  <label class="concept-addition__choice" for="${id}">
+                    <input id="${id}" name="${escapeHtml(name)}" type="radio" value="${escapeHtml(value)}" autocomplete="off">
+                    <span>${escapeHtml(value)}</span>
+                  </label>`;
+  }).join("");
+  return `
+              <fieldset class="concept-addition__fieldset">
+                <legend>${escapeHtml(legend)}</legend>
+                <div class="concept-addition__choices">${choices}
+                </div>
+              </fieldset>`;
+};
+
+const renderSentenceStarter = (addition) => {
+  const choices = addition.starters.map((starter, index) => {
+    const id = `sentence-starter-${index + 1}`;
+    return `
+                  <label class="concept-addition__choice" for="${id}">
+                    <input id="${id}" name="sentence-starter" type="radio" value="${escapeHtml(starter)}" autocomplete="off">
+                    <span>${escapeHtml(starter)}</span>
+                  </label>`;
+  }).join("");
+  return `
+          <form class="concept-addition__workspace" data-sentence-form>
+            <fieldset class="concept-addition__fieldset">
+              <legend>Choose a sentence starter</legend>
+              <div class="concept-addition__choices">${choices}
+              </div>
+            </fieldset>
+            <div class="concept-addition__field">
+              <label for="sentence-editor">Your line</label>
+              <p id="sentence-editor-hint">Edit the starter, or write your own. Nothing is sent or stored.</p>
+              <textarea id="sentence-editor" data-sentence-editor maxlength="240" rows="4" autocomplete="off" aria-describedby="sentence-editor-hint"></textarea>
+            </div>
+            <div class="concept-addition__controls" data-js-controls hidden>
+              <button class="button button--signal" type="button" data-action="copy" disabled>Copy line</button>
+              <button class="button button--ghost" type="reset">Reset</button>
+            </div>
+            <p class="concept-addition__warning">Copying puts this line on your device clipboard, where other apps may be able to read it.</p>
+            <p class="concept-addition__status" data-module-status role="status" aria-live="polite">Choose a starter or write your own line.</p>
+          </form>`;
+};
+
+const renderFirstTenMinutes = (addition) => {
+  const steps = addition.steps.map((step) => `
+              <li class="concept-addition__timeline-step" data-step data-minute="${escapeHtml(step.minute)}">
+                <span class="concept-addition__minute">Minute ${escapeHtml(step.minute)}</span>
+                <div>
+                  <h3>${escapeHtml(step.heading)}</h3>
+                  <p>${escapeHtml(step.body)}</p>
+                </div>
+              </li>`).join("");
+  return `
+          <div class="concept-addition__workspace" data-timeline>
+            <ol class="concept-addition__timeline">${steps}
+            </ol>
+            <div class="concept-addition__controls" data-js-controls hidden>
+              <button class="button button--signal" type="button" data-action="next">Show next step</button>
+              <button class="button button--ghost" type="button" data-action="show-all">Show all</button>
+              <button class="button button--ghost" type="button" data-action="copy">Copy outline</button>
+              <button class="button button--ghost" type="button" data-action="reset" disabled>Reset</button>
+            </div>
+            <div class="concept-addition__field" data-copy-fallback hidden>
+              <label for="timeline-copy-fallback">Copy the outline manually</label>
+              <textarea id="timeline-copy-fallback" rows="8" autocomplete="off" readonly></textarea>
+            </div>
+            <p class="concept-addition__warning">Copying puts this outline on your device clipboard, where other apps may be able to read it.</p>
+            <p class="concept-addition__status" data-module-status role="status" aria-live="polite">Start at minute 0, or show the complete outline.</p>
+          </div>`;
+};
+
+const renderCornerStandard = (addition) => {
+  const standards = addition.standards.map((item, index) => {
+    const reviewId = `corner-standard-review-${index + 1}`;
+    return `
+              <details class="concept-addition__standard">
+                <summary>${escapeHtml(item.standard)}</summary>
+                <dl>
+                  <div>
+                    <dt>Evidence to look for</dt>
+                    <dd>${escapeHtml(item.evidence)}</dd>
+                  </div>
+                  <div>
+                    <dt>How to verify it</dt>
+                    <dd>${escapeHtml(item.verifier)}</dd>
+                  </div>
+                  <div>
+                    <dt>Current verification</dt>
+                    <dd>${escapeHtml(item.verification)}</dd>
+                  </div>
+                </dl>
+                <label class="concept-addition__review" for="${reviewId}">
+                  <input id="${reviewId}" type="checkbox" data-review-check autocomplete="off">
+                  <span>Reviewed here</span>
+                </label>
+              </details>`;
+  }).join("");
+  return `
+          <div class="concept-addition__workspace" data-corner-standard>
+            <div class="concept-addition__standards">${standards}
+            </div>
+            <div class="concept-addition__controls" data-js-controls hidden>
+              <button class="button button--ghost" type="button" data-action="clear-review" disabled>Clear reviewed indicators</button>
+            </div>
+            <p class="concept-addition__warning">“Reviewed here” is a local reading aid, not a credential check or certification. It is not saved.</p>
+            <p class="concept-addition__status" data-module-status role="status" aria-live="polite">0 of ${addition.standards.length} standards reviewed here.</p>
+          </div>`;
+};
+
+const renderBetweenRoundPlan = (addition) => {
+  const fields = addition.prompts.map((prompt) => `
+              <div class="concept-addition__field">
+                <label for="plan-${escapeHtml(prompt.key)}">${escapeHtml(prompt.label)}</label>
+                <p id="plan-${escapeHtml(prompt.key)}-hint">${escapeHtml(prompt.hint)} Maximum ${escapeHtml(prompt.maxLength)} characters.</p>
+                <textarea id="plan-${escapeHtml(prompt.key)}" name="${escapeHtml(prompt.key)}" rows="3" maxlength="${escapeHtml(prompt.maxLength)}" autocomplete="off" aria-describedby="plan-${escapeHtml(prompt.key)}-hint"></textarea>
+              </div>`).join("");
+  const preview = addition.prompts.map((prompt) => `
+                <div data-preview-row="${escapeHtml(prompt.key)}" hidden>
+                  <dt>${escapeHtml(prompt.label)}</dt>
+                  <dd data-preview-value="${escapeHtml(prompt.key)}"></dd>
+                </div>`).join("");
+  return `
+          <form class="concept-addition__workspace" data-plan-form>${fields}
+            <div class="concept-addition__controls" data-js-controls hidden>
+              <button class="button button--signal" type="button" data-action="generate">Build preview</button>
+              <button class="button button--ghost" type="button" data-action="copy" disabled>Copy plan</button>
+              <button class="button button--ghost" type="button" data-action="print" disabled>Print</button>
+              <button class="button button--ghost" type="reset">Clear</button>
+            </div>
+            <div class="concept-addition__preview" data-plan-preview role="region" aria-labelledby="plan-preview-title" hidden>
+              <p class="concept-addition__print-label">Blue Corner · Local plan</p>
+              <h3 id="plan-preview-title">Your between-round plan</h3>
+              <dl>${preview}
+              </dl>
+              <p class="concept-addition__print-disclosure">Printing may create a PDF, an operating-system print-spool file, or a physical copy. Handle or delete copies according to your needs.</p>
+            </div>
+            <div class="concept-addition__field" data-copy-fallback hidden>
+              <label for="plan-copy-fallback">Copy the plan manually</label>
+              <textarea id="plan-copy-fallback" rows="10" autocomplete="off" readonly></textarea>
+            </div>
+            <p class="concept-addition__safety">${escapeHtml(addition.safety)}</p>
+            <p class="concept-addition__warning">Until you choose Copy or Print, this plan stays in this page and is not saved or sent. Copying puts it on your device clipboard; printing may create a PDF, an operating-system spool file, or a physical copy.</p>
+            <p class="concept-addition__status" data-module-status role="status" aria-live="polite">Complete any prompt to build a partial or complete preview.</p>
+          </form>`;
+};
+
+const renderConsentInvite = (addition) => `
+          <form class="concept-addition__workspace" data-consent-form>
+${renderChoiceGroup({ legend: "Who do you want to invite?", name: "consent-role", values: addition.roles })}
+${renderChoiceGroup({ legend: "What can they know?", name: "consent-boundary", values: addition.boundaries })}
+${renderChoiceGroup({ legend: "What would help?", name: "consent-help", values: addition.help })}
+            <div class="concept-addition__controls" data-js-controls hidden>
+              <button class="button button--signal" type="button" data-action="generate" disabled>Draft invitation</button>
+              <button class="button button--ghost" type="reset">Reset</button>
+            </div>
+            <div class="concept-addition__preview" data-invite-preview hidden>
+              <div class="concept-addition__field">
+                <label for="consent-invite-editor">Your invitation</label>
+                <p id="consent-invite-hint">Edit this before sharing it yourself. Nothing sends from this page.</p>
+                <textarea id="consent-invite-editor" data-invite-editor rows="7" maxlength="600" autocomplete="off" aria-describedby="consent-invite-hint"></textarea>
+              </div>
+              <button class="button button--ghost" type="button" data-action="copy" disabled>Copy invitation</button>
+            </div>
+            <p class="concept-addition__warning">Nothing sends from this page. Copying puts the invitation on your device clipboard, where other apps may be able to read it.</p>
+            <p class="concept-addition__status" data-module-status role="status" aria-live="polite">Choose one option in each group to draft an invitation.</p>
+          </form>`;
+
+const additionRenderers = Object.freeze({
+  "sentence-starter": renderSentenceStarter,
+  "first-ten-minutes": renderFirstTenMinutes,
+  "corner-standard": renderCornerStandard,
+  "between-round-plan": renderBetweenRoundPlan,
+  "consent-invite": renderConsentInvite,
+});
+
 const renderConceptAddition = (concept) => {
   if (!concept.additionKey) return "";
   const addition = conceptAdditions[concept.additionKey];
   if (!addition) throw new Error(`Unknown concept addition: ${concept.additionKey}`);
-  const items = addition.items.map((item, index) => `
-              <li class="concept-addition__item">
-                <span aria-hidden="true">${String(index + 1).padStart(2, "0")}</span>
-                <p>${escapeHtml(item)}</p>
-              </li>`).join("");
+  const renderModule = additionRenderers[addition.type];
+  if (!renderModule) throw new Error(`Unknown concept addition type: ${addition.type}`);
   return `
-      <section class="concept-addition" aria-labelledby="concept-addition-title">
+      <section class="concept-addition" data-module="${escapeHtml(addition.type)}" data-state="idle" aria-labelledby="concept-addition-title">
         <div class="concept-addition__inner page-frame">
           <header class="concept-addition__heading" data-reveal>
             <p class="eyebrow">Concept add-on</p>
             <h2 id="concept-addition-title">${escapeHtml(addition.title)}</h2>
             <p>${escapeHtml(addition.intro)}</p>
           </header>
-          <ol class="concept-addition__list" data-reveal>${items}
-          </ol>
+${renderModule(addition)}
+          <noscript>
+            <p class="concept-addition__fallback">${escapeHtml(addition.fallback)}</p>
+          </noscript>
         </div>
       </section>
 `;

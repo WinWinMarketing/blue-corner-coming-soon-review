@@ -152,27 +152,47 @@
         </ol>
       </section>
 
-      <section class="concept-addition" aria-labelledby="concept-addition-title">
+      <section class="concept-addition" data-module="sentence-starter" data-state="idle" aria-labelledby="concept-addition-title">
         <div class="concept-addition__inner page-frame">
           <header class="concept-addition__heading" data-reveal>
             <p class="eyebrow">Concept add-on</p>
             <h2 id="concept-addition-title">No perfect words needed</h2>
             <p>Starting can be the hardest part. Any one of these is enough to open the door.</p>
           </header>
-          <ol class="concept-addition__list" data-reveal>
-              <li class="concept-addition__item">
-                <span aria-hidden="true">01</span>
-                <p>I haven&#39;t felt like myself lately.</p>
-              </li>
-              <li class="concept-addition__item">
-                <span aria-hidden="true">02</span>
-                <p>I don&#39;t know where to start, but I know something needs to change.</p>
-              </li>
-              <li class="concept-addition__item">
-                <span aria-hidden="true">03</span>
-                <p>Can we talk for ten minutes? I could use someone in my corner.</p>
-              </li>
-          </ol>
+
+          <form class="concept-addition__workspace" data-sentence-form>
+            <fieldset class="concept-addition__fieldset">
+              <legend>Choose a sentence starter</legend>
+              <div class="concept-addition__choices">
+                  <label class="concept-addition__choice" for="sentence-starter-1">
+                    <input id="sentence-starter-1" name="sentence-starter" type="radio" value="I haven&#39;t felt like myself lately." autocomplete="off">
+                    <span>I haven&#39;t felt like myself lately.</span>
+                  </label>
+                  <label class="concept-addition__choice" for="sentence-starter-2">
+                    <input id="sentence-starter-2" name="sentence-starter" type="radio" value="I don&#39;t know where to start, but I know something needs to change." autocomplete="off">
+                    <span>I don&#39;t know where to start, but I know something needs to change.</span>
+                  </label>
+                  <label class="concept-addition__choice" for="sentence-starter-3">
+                    <input id="sentence-starter-3" name="sentence-starter" type="radio" value="Can we talk for ten minutes? I could use someone in my corner." autocomplete="off">
+                    <span>Can we talk for ten minutes? I could use someone in my corner.</span>
+                  </label>
+              </div>
+            </fieldset>
+            <div class="concept-addition__field">
+              <label for="sentence-editor">Your line</label>
+              <p id="sentence-editor-hint">Edit the starter, or write your own. Nothing is sent or stored.</p>
+              <textarea id="sentence-editor" data-sentence-editor maxlength="240" rows="4" autocomplete="off" aria-describedby="sentence-editor-hint"></textarea>
+            </div>
+            <div class="concept-addition__controls" data-js-controls hidden>
+              <button class="button button--signal" type="button" data-action="copy" disabled>Copy line</button>
+              <button class="button button--ghost" type="reset">Reset</button>
+            </div>
+            <p class="concept-addition__warning">Copying puts this line on your device clipboard, where other apps may be able to read it.</p>
+            <p class="concept-addition__status" data-module-status role="status" aria-live="polite">Choose a starter or write your own line.</p>
+          </form>
+          <noscript>
+            <p class="concept-addition__fallback">JavaScript is optional. Choose a starter, then copy or adapt it manually in any notes app you trust.</p>
+          </noscript>
         </div>
       </section>
 

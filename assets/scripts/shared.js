@@ -81,6 +81,315 @@
     revealTargets.forEach((target) => observer.observe(target));
   }
 
+  const moduleStates = new Set(["idle", "active", "ready", "success", "error"]);
+
+  const setModuleState = (module, state, status, message) => {
+    if (!moduleStates.has(state)) return;
+    module.dataset.state = state;
+    if (status && message) status.textContent = message;
+  };
+
+  const selectCopyFallback = (module, text, preferredField) => {
+    const fallback = preferredField || module.querySelector("[data-copy-fallback] textarea");
+    const wrapper = fallback?.closest("[data-copy-fallback]");
+    if (wrapper) wrapper.hidden = false;
+    if (!(fallback instanceof HTMLTextAreaElement)) return;
+    fallback.value = text;
+    fallback.focus();
+    fallback.select();
+  };
+
+  const copyModuleText = async (module, text, status, successMessage, preferredField) => {
+    try {
+      if (!navigator.clipboard || typeof navigator.clipboard.writeText !== "function") {
+        throw new Error("Clipboard unavailable");
+      }
+      await navigator.clipboard.writeText(text);
+      setModuleState(module, "success", status, successMessage);
+    } catch {
+      selectCopyFallback(module, text, preferredField);
+      setModuleState(module, "error", status, "Automatic copy was unavailable. The text is selected so you can copy it manually.");
+    }
+  };
+
+  const selectedValue = (form, name) => {
+    const selected = form.querySelector(`input[name="${name}"]:checked`);
+    return selected instanceof HTMLInputElement ? selected.value : "";
+  };
+
+  const enableModuleControls = (module) => {
+    module.querySelectorAll("[data-js-controls]").forEach((controls) => {
+      controls.hidden = false;
+    });
+  };
+
+  const initializeSentenceStarter = (module) => {
+    const form = module.querySelector("[data-sentence-form]");
+    const editor = form?.querySelector("[data-sentence-editor]");
+    const copyButton = form?.querySelector("[data-action='copy']");
+    const status = module.querySelector("[data-module-status]");
+    if (!(form instanceof HTMLFormElement) || !(editor instanceof HTMLTextAreaElement) || !(copyButton instanceof HTMLButtonElement)) return;
+
+    enableModuleControls(module);
+    const resetSentence = () => {
+      editor.value = "";
+      copyButton.disabled = true;
+      setModuleState(module, "idle", status, "Choose a starter or write your own line.");
+    };
+    form.querySelectorAll("input[name='sentence-starter']").forEach((choice) => {
+      choice.addEventListener("change", () => {
+        editor.value = choice.value;
+        copyButton.disabled = false;
+        setModuleState(module, "ready", status, "Starter added. Edit it if you want, then copy the line.");
+      });
+    });
+    editor.addEventListener("input", () => {
+      const hasText = Boolean(editor.value.trim());
+      copyButton.disabled = !hasText;
+      setModuleState(module, hasText ? "ready" : "idle", status, hasText ? "Your line is ready to copy." : "Choose a starter or write your own line.");
+    });
+    copyButton.addEventListener("click", () => {
+      const text = editor.value.trim();
+      if (text) copyModuleText(module, text, status, "Line copied to your clipboard.", editor);
+    });
+    form.addEventListener("reset", () => {
+      window.setTimeout(resetSentence, 0);
+    });
+    return () => {
+      form.reset();
+      resetSentence();
+    };
+  };
+
+  const initializeTimeline = (module) => {
+    const workspace = module.querySelector("[data-timeline]");
+    const steps = [...(workspace?.querySelectorAll("[data-step]") || [])];
+    const nextButton = workspace?.querySelector("[data-action='next']");
+    const showAllButton = workspace?.querySelector("[data-action='show-all']");
+    const copyButton = workspace?.querySelector("[data-action='copy']");
+    const resetButton = workspace?.querySelector("[data-action='reset']");
+    const status = module.querySelector("[data-module-status]");
+    if (!workspace || !steps.length || !(nextButton instanceof HTMLButtonElement) || !(showAllButton instanceof HTMLButtonElement) || !(copyButton instanceof HTMLButtonElement) || !(resetButton instanceof HTMLButtonElement)) return;
+
+    enableModuleControls(module);
+    let visibleSteps = 1;
+    const outline = steps.map((step) => {
+      const minute = step.dataset.minute || "";
+      const heading = step.querySelector("h3")?.textContent.trim() || "";
+      const body = step.querySelector("p")?.textContent.trim() || "";
+      return `Minute ${minute}: ${heading}\n${body}`;
+    }).join("\n\n");
+    const renderSteps = (state, message) => {
+      steps.forEach((step, index) => {
+        step.hidden = index >= visibleSteps;
+      });
+      const complete = visibleSteps >= steps.length;
+      nextButton.disabled = complete;
+      showAllButton.disabled = complete;
+      resetButton.disabled = visibleSteps === 1;
+      setModuleState(module, state, status, message);
+    };
+    const resetTimeline = () => {
+      visibleSteps = 1;
+      const fallback = module.querySelector("[data-copy-fallback]");
+      const fallbackField = fallback?.querySelector("textarea");
+      if (fallback) fallback.hidden = true;
+      if (fallbackField instanceof HTMLTextAreaElement) fallbackField.value = "";
+      renderSteps("idle", "Start at minute 0, or show the complete outline.");
+    };
+    resetTimeline();
+    nextButton.addEventListener("click", () => {
+      visibleSteps = Math.min(visibleSteps + 1, steps.length);
+      renderSteps(visibleSteps === steps.length ? "ready" : "active", visibleSteps === steps.length ? "The complete ten-minute outline is visible." : `${visibleSteps} of ${steps.length} steps are visible.`);
+    });
+    showAllButton.addEventListener("click", () => {
+      visibleSteps = steps.length;
+      renderSteps("ready", "The complete ten-minute outline is visible.");
+    });
+    resetButton.addEventListener("click", resetTimeline);
+    copyButton.addEventListener("click", () => {
+      copyModuleText(module, outline, status, "Complete outline copied to your clipboard.");
+    });
+    return resetTimeline;
+  };
+
+  const initializeCornerStandard = (module) => {
+    const workspace = module.querySelector("[data-corner-standard]");
+    const checks = [...(workspace?.querySelectorAll("[data-review-check]") || [])];
+    const clearButton = workspace?.querySelector("[data-action='clear-review']");
+    const status = module.querySelector("[data-module-status]");
+    if (!workspace || !checks.length || !(clearButton instanceof HTMLButtonElement)) return;
+
+    enableModuleControls(module);
+    const updateReviewCount = () => {
+      const reviewed = checks.filter((check) => check.checked).length;
+      clearButton.disabled = reviewed === 0;
+      setModuleState(module, reviewed === 0 ? "idle" : reviewed === checks.length ? "ready" : "active", status, `${reviewed} of ${checks.length} standards reviewed here.`);
+    };
+    checks.forEach((check) => check.addEventListener("change", updateReviewCount));
+    clearButton.addEventListener("click", () => {
+      checks.forEach((check) => {
+        check.checked = false;
+      });
+      updateReviewCount();
+    });
+    return () => {
+      checks.forEach((check) => {
+        check.checked = false;
+      });
+      module.querySelectorAll("details").forEach((details) => {
+        details.open = false;
+      });
+      updateReviewCount();
+    };
+  };
+
+  const initializePlan = (module) => {
+    const form = module.querySelector("[data-plan-form]");
+    const fields = [...(form?.querySelectorAll("textarea[name]") || [])];
+    const generateButton = form?.querySelector("[data-action='generate']");
+    const copyButton = form?.querySelector("[data-action='copy']");
+    const printButton = form?.querySelector("[data-action='print']");
+    const preview = form?.querySelector("[data-plan-preview]");
+    const status = module.querySelector("[data-module-status]");
+    if (!(form instanceof HTMLFormElement) || !fields.length || !(generateButton instanceof HTMLButtonElement) || !(copyButton instanceof HTMLButtonElement) || !(printButton instanceof HTMLButtonElement) || !preview) return;
+
+    enableModuleControls(module);
+    let planText = "";
+    const values = () => fields.map((field) => ({ key: field.name, label: field.labels?.[0]?.textContent.trim() || field.name, value: field.value.trim() }));
+    const invalidatePreview = () => {
+      planText = "";
+      preview.hidden = true;
+      copyButton.disabled = true;
+      printButton.disabled = true;
+      preview.querySelectorAll("[data-preview-value]").forEach((value) => {
+        value.textContent = "";
+      });
+      preview.querySelectorAll("[data-preview-row]").forEach((row) => {
+        row.hidden = true;
+      });
+      const fallback = form.querySelector("[data-copy-fallback]");
+      const fallbackField = fallback?.querySelector("textarea");
+      if (fallback) fallback.hidden = true;
+      if (fallbackField instanceof HTMLTextAreaElement) fallbackField.value = "";
+      const hasText = fields.some((field) => field.value.trim());
+      setModuleState(module, hasText ? "active" : "idle", status, hasText ? "Build a preview when you are ready." : "Complete any prompt to build a partial or complete preview.");
+    };
+    fields.forEach((field) => field.addEventListener("input", invalidatePreview));
+    generateButton.addEventListener("click", () => {
+      const entries = values();
+      const completed = entries.filter((entry) => entry.value);
+      if (!completed.length) {
+        setModuleState(module, "error", status, "Complete at least one prompt before building a preview.");
+        fields[0].focus();
+        return;
+      }
+      entries.forEach((entry) => {
+        const row = preview.querySelector(`[data-preview-row="${entry.key}"]`);
+        const value = row?.querySelector("[data-preview-value]");
+        if (value) value.textContent = entry.value;
+        if (row) row.hidden = !entry.value;
+      });
+      planText = completed.map((entry) => `${entry.label}\n${entry.value}`).join("\n\n");
+      preview.hidden = false;
+      copyButton.disabled = false;
+      printButton.disabled = false;
+      setModuleState(module, "ready", status, completed.length === fields.length ? "Your complete plan is ready." : `A partial plan with ${completed.length} of ${fields.length} prompts is ready.`);
+    });
+    copyButton.addEventListener("click", () => {
+      if (planText) copyModuleText(module, planText, status, "Plan copied to your clipboard.");
+    });
+    printButton.addEventListener("click", () => {
+      if (!planText) return;
+      document.body.dataset.printPlan = "true";
+      window.addEventListener("afterprint", () => {
+        delete document.body.dataset.printPlan;
+      }, { once: true });
+      setModuleState(module, "ready", status, "Print dialog opening. Printing may create a PDF, an operating-system print-spool file, or a physical copy.");
+      window.print();
+    });
+    form.addEventListener("reset", () => {
+      window.setTimeout(invalidatePreview, 0);
+    });
+    return () => {
+      form.reset();
+      fields.forEach((field) => {
+        field.value = "";
+      });
+      delete document.body.dataset.printPlan;
+      invalidatePreview();
+    };
+  };
+
+  const initializeConsentInvite = (module) => {
+    const form = module.querySelector("[data-consent-form]");
+    const generateButton = form?.querySelector("[data-action='generate']");
+    const copyButton = form?.querySelector("[data-action='copy']");
+    const preview = form?.querySelector("[data-invite-preview]");
+    const editor = form?.querySelector("[data-invite-editor]");
+    const status = module.querySelector("[data-module-status]");
+    if (!(form instanceof HTMLFormElement) || !(generateButton instanceof HTMLButtonElement) || !(copyButton instanceof HTMLButtonElement) || !preview || !(editor instanceof HTMLTextAreaElement)) return;
+
+    enableModuleControls(module);
+    const selections = () => ({
+      role: selectedValue(form, "consent-role"),
+      boundary: selectedValue(form, "consent-boundary"),
+      help: selectedValue(form, "consent-help"),
+    });
+    const updateChoices = () => {
+      const current = selections();
+      const count = Object.values(current).filter(Boolean).length;
+      generateButton.disabled = count < 3;
+      preview.hidden = true;
+      editor.value = "";
+      copyButton.disabled = true;
+      setModuleState(module, count ? "active" : "idle", status, count === 3 ? "All choices are set. Draft your invitation when ready." : `${count} of 3 choices set.`);
+    };
+    form.querySelectorAll("input[type='radio']").forEach((choice) => choice.addEventListener("change", updateChoices));
+    generateButton.addEventListener("click", () => {
+      const current = selections();
+      if (!current.role || !current.boundary || !current.help) return;
+      editor.value = `Hey — I'm taking a step to get some support. I'd like you in my corner as ${current.role}. I'm comfortable sharing ${current.boundary}. What would help most is if you could ${current.help}. Please ask before sharing this with anyone else.`;
+      preview.hidden = false;
+      copyButton.disabled = false;
+      setModuleState(module, "ready", status, "Invitation drafted. Edit it before sharing it yourself.");
+      editor.focus();
+    });
+    editor.addEventListener("input", () => {
+      const hasText = Boolean(editor.value.trim());
+      copyButton.disabled = !hasText;
+      setModuleState(module, hasText ? "ready" : "active", status, hasText ? "Invitation is ready to copy." : "Edit the invitation or reset your choices.");
+    });
+    copyButton.addEventListener("click", () => {
+      const text = editor.value.trim();
+      if (text) copyModuleText(module, text, status, "Invitation copied to your clipboard.", editor);
+    });
+    form.addEventListener("reset", () => {
+      window.setTimeout(updateChoices, 0);
+    });
+    return () => {
+      form.reset();
+      editor.value = "";
+      updateChoices();
+    };
+  };
+
+  const moduleResetters = [];
+  document.querySelectorAll(".concept-addition[data-module]").forEach((module) => {
+    let resetModule;
+    if (module.dataset.module === "sentence-starter") resetModule = initializeSentenceStarter(module);
+    if (module.dataset.module === "first-ten-minutes") resetModule = initializeTimeline(module);
+    if (module.dataset.module === "corner-standard") resetModule = initializeCornerStandard(module);
+    if (module.dataset.module === "between-round-plan") resetModule = initializePlan(module);
+    if (module.dataset.module === "consent-invite") resetModule = initializeConsentInvite(module);
+    if (typeof resetModule === "function") moduleResetters.push(resetModule);
+  });
+
+  window.addEventListener("pageshow", (event) => {
+    if (!event.persisted) return;
+    moduleResetters.forEach((resetModule) => resetModule());
+  });
+
   const validationMessages = {
     name: {
       required: "Please enter your name.",

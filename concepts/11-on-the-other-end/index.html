@@ -152,35 +152,75 @@
         </ol>
       </section>
 
-      <section class="concept-addition" aria-labelledby="concept-addition-title">
+      <section class="concept-addition" data-module="between-round-plan" data-state="idle" aria-labelledby="concept-addition-title">
         <div class="concept-addition__inner page-frame">
           <header class="concept-addition__heading" data-reveal>
             <p class="eyebrow">Concept add-on</p>
             <h2 id="concept-addition-title">Between-round plan</h2>
             <p>A private take-home plan could keep the next step visible without turning progress into a promise or a deadline.</p>
           </header>
-          <ol class="concept-addition__list" data-reveal>
-              <li class="concept-addition__item">
-                <span aria-hidden="true">01</span>
-                <p>The one priority you chose to focus on.</p>
-              </li>
-              <li class="concept-addition__item">
-                <span aria-hidden="true">02</span>
-                <p>People, services, or resources you want close at hand.</p>
-              </li>
-              <li class="concept-addition__item">
-                <span aria-hidden="true">03</span>
-                <p>A small action that feels realistic to you.</p>
-              </li>
-              <li class="concept-addition__item">
-                <span aria-hidden="true">04</span>
-                <p>Signs that would tell you to reach out for more support.</p>
-              </li>
-              <li class="concept-addition__item">
-                <span aria-hidden="true">05</span>
-                <p>Crisis contacts kept visible if safety becomes urgent.</p>
-              </li>
-          </ol>
+
+          <form class="concept-addition__workspace" data-plan-form>
+              <div class="concept-addition__field">
+                <label for="plan-priority">Priority</label>
+                <p id="plan-priority-hint">The one thing you want to keep in view. Maximum 160 characters.</p>
+                <textarea id="plan-priority" name="priority" rows="3" maxlength="160" autocomplete="off" aria-describedby="plan-priority-hint"></textarea>
+              </div>
+              <div class="concept-addition__field">
+                <label for="plan-support">Support or resource</label>
+                <p id="plan-support-hint">A person, service, or resource you want close at hand. Maximum 180 characters.</p>
+                <textarea id="plan-support" name="support" rows="3" maxlength="180" autocomplete="off" aria-describedby="plan-support-hint"></textarea>
+              </div>
+              <div class="concept-addition__field">
+                <label for="plan-action">Realistic action</label>
+                <p id="plan-action-hint">One small step that feels possible to you. Maximum 160 characters.</p>
+                <textarea id="plan-action" name="action" rows="3" maxlength="160" autocomplete="off" aria-describedby="plan-action-hint"></textarea>
+              </div>
+              <div class="concept-addition__field">
+                <label for="plan-warning">Warning sign</label>
+                <p id="plan-warning-hint">A sign that would tell you to reach out for more support. Maximum 180 characters.</p>
+                <textarea id="plan-warning" name="warning" rows="3" maxlength="180" autocomplete="off" aria-describedby="plan-warning-hint"></textarea>
+              </div>
+            <div class="concept-addition__controls" data-js-controls hidden>
+              <button class="button button--signal" type="button" data-action="generate">Build preview</button>
+              <button class="button button--ghost" type="button" data-action="copy" disabled>Copy plan</button>
+              <button class="button button--ghost" type="button" data-action="print" disabled>Print</button>
+              <button class="button button--ghost" type="reset">Clear</button>
+            </div>
+            <div class="concept-addition__preview" data-plan-preview role="region" aria-labelledby="plan-preview-title" hidden>
+              <p class="concept-addition__print-label">Blue Corner · Local plan</p>
+              <h3 id="plan-preview-title">Your between-round plan</h3>
+              <dl>
+                <div data-preview-row="priority" hidden>
+                  <dt>Priority</dt>
+                  <dd data-preview-value="priority"></dd>
+                </div>
+                <div data-preview-row="support" hidden>
+                  <dt>Support or resource</dt>
+                  <dd data-preview-value="support"></dd>
+                </div>
+                <div data-preview-row="action" hidden>
+                  <dt>Realistic action</dt>
+                  <dd data-preview-value="action"></dd>
+                </div>
+                <div data-preview-row="warning" hidden>
+                  <dt>Warning sign</dt>
+                  <dd data-preview-value="warning"></dd>
+                </div>
+              </dl>
+              <p class="concept-addition__print-disclosure">Printing may create a PDF, an operating-system print-spool file, or a physical copy. Handle or delete copies according to your needs.</p>
+            </div>
+            <div class="concept-addition__field" data-copy-fallback hidden>
+              <label for="plan-copy-fallback">Copy the plan manually</label>
+              <textarea id="plan-copy-fallback" rows="10" autocomplete="off" readonly></textarea>
+            </div>
+            <p class="concept-addition__safety">Keep crisis contacts visible if safety becomes urgent. Call or text 9-8-8 in Canada; call 9-1-1 for immediate danger.</p>
+            <p class="concept-addition__warning">Until you choose Copy or Print, this plan stays in this page and is not saved or sent. Copying puts it on your device clipboard; printing may create a PDF, an operating-system spool file, or a physical copy.</p>
+            <p class="concept-addition__status" data-module-status role="status" aria-live="polite">Complete any prompt to build a partial or complete preview.</p>
+          </form>
+          <noscript>
+            <p class="concept-addition__fallback">JavaScript is optional. Use the four prompts as a private written outline; generating, copying, and printing require JavaScript.</p>
+          </noscript>
         </div>
       </section>
 

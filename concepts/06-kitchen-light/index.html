@@ -152,31 +152,61 @@
         </ol>
       </section>
 
-      <section class="concept-addition" aria-labelledby="concept-addition-title">
+      <section class="concept-addition" data-module="first-ten-minutes" data-state="idle" aria-labelledby="concept-addition-title">
         <div class="concept-addition__inner page-frame">
           <header class="concept-addition__heading" data-reveal>
             <p class="eyebrow">Concept add-on</p>
             <h2 id="concept-addition-title">The first ten minutes</h2>
             <p>A first conversation can stay simple. You set the pace, and nothing needs to come out in perfect order.</p>
           </header>
-          <ol class="concept-addition__list" data-reveal>
-              <li class="concept-addition__item">
-                <span aria-hidden="true">01</span>
-                <p>Arrive as you are. There is no story to prepare.</p>
+
+          <div class="concept-addition__workspace" data-timeline>
+            <ol class="concept-addition__timeline">
+              <li class="concept-addition__timeline-step" data-step data-minute="0">
+                <span class="concept-addition__minute">Minute 0</span>
+                <div>
+                  <h3>Arrive as you are</h3>
+                  <p>There is no story to prepare and no right place to begin.</p>
+                </div>
               </li>
-              <li class="concept-addition__item">
-                <span aria-hidden="true">02</span>
-                <p>Say what feels okay to cover and what can wait.</p>
+              <li class="concept-addition__timeline-step" data-step data-minute="2">
+                <span class="concept-addition__minute">Minute 2</span>
+                <div>
+                  <h3>Set the pace</h3>
+                  <p>Say what feels okay to cover and what can wait.</p>
+                </div>
               </li>
-              <li class="concept-addition__item">
-                <span aria-hidden="true">03</span>
-                <p>Start with the one thing that feels hardest to carry today.</p>
+              <li class="concept-addition__timeline-step" data-step data-minute="5">
+                <span class="concept-addition__minute">Minute 5</span>
+                <div>
+                  <h3>Name one thing</h3>
+                  <p>Start with the one thing that feels hardest to carry today.</p>
+                </div>
               </li>
-              <li class="concept-addition__item">
-                <span aria-hidden="true">04</span>
-                <p>Before you leave, ask what the next step could be and decide whether it feels right for you.</p>
+              <li class="concept-addition__timeline-step" data-step data-minute="10">
+                <span class="concept-addition__minute">Minute 10</span>
+                <div>
+                  <h3>Choose what comes next</h3>
+                  <p>Ask what a next step could be, then decide whether it feels right for you.</p>
+                </div>
               </li>
-          </ol>
+            </ol>
+            <div class="concept-addition__controls" data-js-controls hidden>
+              <button class="button button--signal" type="button" data-action="next">Show next step</button>
+              <button class="button button--ghost" type="button" data-action="show-all">Show all</button>
+              <button class="button button--ghost" type="button" data-action="copy">Copy outline</button>
+              <button class="button button--ghost" type="button" data-action="reset" disabled>Reset</button>
+            </div>
+            <div class="concept-addition__field" data-copy-fallback hidden>
+              <label for="timeline-copy-fallback">Copy the outline manually</label>
+              <textarea id="timeline-copy-fallback" rows="8" autocomplete="off" readonly></textarea>
+            </div>
+            <p class="concept-addition__warning">Copying puts this outline on your device clipboard, where other apps may be able to read it.</p>
+            <p class="concept-addition__status" data-module-status role="status" aria-live="polite">Start at minute 0, or show the complete outline.</p>
+          </div>
+          <noscript>
+            <p class="concept-addition__fallback">JavaScript is optional. The complete 0, 2, 5, and 10-minute outline is already shown below for reading or manual copying.</p>
+          </noscript>
         </div>
       </section>
 

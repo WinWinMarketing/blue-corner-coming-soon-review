@@ -39,6 +39,14 @@ const expectedAdditionTitles = [
   "Between-round plan",
   "Bring someone into your corner",
 ];
+const expectedModuleTypes = [
+  null,
+  "sentence-starter",
+  "first-ten-minutes",
+  "corner-standard",
+  "between-round-plan",
+  "consent-invite",
+];
 const coreSectionClasses = ["concept-hero", "stats", "symptoms", "meaning", "roadmap", "conversion"];
 const extractSection = (html, className) => html.match(new RegExp(`<section class="${className}"[\\s\\S]*?<\\/section>`))?.[0] ?? "";
 const extractMasthead = (html) => html.match(/<header class="site-header page-frame">[\s\S]*?<\/header>/)?.[0] ?? "";
@@ -77,6 +85,22 @@ const htmlEscape = (value) => String(value)
   .replaceAll('"', "&quot;")
   .replaceAll("'", "&#39;");
 
+const additionSourceStrings = (addition) => {
+  const common = [addition.title, addition.intro, addition.fallback];
+  if (addition.type === "sentence-starter") return [...common, ...addition.starters];
+  if (addition.type === "first-ten-minutes") {
+    return [...common, ...addition.steps.flatMap((step) => [step.minute, step.heading, step.body])];
+  }
+  if (addition.type === "corner-standard") {
+    return [...common, ...addition.standards.flatMap((item) => [item.standard, item.evidence, item.verifier, item.verification])];
+  }
+  if (addition.type === "between-round-plan") {
+    return [...common, addition.safety, ...addition.prompts.flatMap((prompt) => [prompt.label, prompt.hint, prompt.maxLength])];
+  }
+  if (addition.type === "consent-invite") return [...common, ...addition.roles, ...addition.boundaries, ...addition.help];
+  return common;
+};
+
 const checkLocalReferences = async (html, htmlPath) => {
   const referencePattern = /\b(?:href|src)="([^"]+)"/g;
   for (const match of html.matchAll(referencePattern)) {
@@ -110,7 +134,12 @@ if (approvedCornerHash !== approvedCornerSha256) {
 }
 
 if (concepts.length !== 6) fail(`Concept configuration has ${concepts.length} entries; expected exactly 6`);
-if (conceptAdditions.openingLines.items.length !== 3) fail("No perfect words needed must contain exactly three opening lines");
+if (conceptAdditions.openingLines.starters.length !== 3) fail("No perfect words needed must contain exactly three opening lines");
+if (conceptAdditions.firstTenMinutes.steps.map((step) => step.minute).join("|") !== "0|2|5|10") {
+  fail("The first ten minutes must preserve the semantic 0, 2, 5, and 10-minute sequence");
+}
+if (conceptAdditions.cornerStandard.standards.length !== 5) fail("The Corner Standard must contain exactly five standards");
+if (conceptAdditions.betweenRoundPlan.prompts.length !== 4) fail("Between-round plan must contain exactly four prompts");
 if (concepts.map((concept) => concept.slug).join("|") !== expectedRouteOrder.join("|")) {
   fail(`Concept route order must be ${expectedRouteOrder.join(", ")}`);
 }
@@ -121,6 +150,9 @@ for (const [index, concept] of concepts.entries()) {
   const addition = concept.additionKey ? conceptAdditions[concept.additionKey] : null;
   if ((addition?.title ?? null) !== expectedAdditionTitles[index]) {
     fail(`${concept.slug}: configured add-on title must be ${expectedAdditionTitles[index] ?? "absent"}`);
+  }
+  if ((addition?.type ?? null) !== expectedModuleTypes[index]) {
+    fail(`${concept.slug}: configured add-on module must be ${expectedModuleTypes[index] ?? "absent"}`);
   }
 }
 
@@ -154,7 +186,8 @@ for (const [index, concept] of concepts.entries()) {
     fail(`${concept.slug}: concept page body must not expose route-specific attributes`);
   }
   if (count(html, "data-prototype-form") !== 1) fail(`${concept.slug}: expected exactly one prototype form`);
-  if (count(html, "<fieldset") !== 1) fail(`${concept.slug}: expected exactly one form fieldset`);
+  const prototypeForm = html.match(/<form\b[^>]*data-prototype-form[\s\S]*?<\/form>/)?.[0] ?? "";
+  if (count(prototypeForm, "<fieldset") !== 1) fail(`${concept.slug}: prototype form must contain exactly one fieldset`);
   if (count(html, "<h1") !== 1) fail(`${concept.slug}: expected exactly one h1`);
   const masthead = extractMasthead(html);
   if (count(masthead, "<img") !== 1 || count(masthead, "<a") !== 1 || /<p\b|Launching 2026/i.test(masthead)) {
@@ -184,18 +217,100 @@ for (const [index, concept] of concepts.entries()) {
 
   const additionCount = count(html, 'class="concept-addition"');
   const expectedAdditionTitle = expectedAdditionTitles[index];
+  const expectedModuleType = expectedModuleTypes[index];
   if (index === 0 && additionCount !== 0) fail(`${concept.slug}: reference master must not contain a concept add-on`);
   if (index > 0 && additionCount !== 1) fail(`${concept.slug}: expected exactly one concept add-on`);
   if (expectedAdditionTitle) {
+    const additionMarkup = html.match(/<section class="concept-addition"[\s\S]*?<\/section>/)?.[0] ?? "";
     if (!html.includes("<p class=\"eyebrow\">Concept add-on</p>")) fail(`${concept.slug}: add-on label is missing`);
     if (!html.includes(`<h2 id="concept-addition-title">${htmlEscape(expectedAdditionTitle)}</h2>`)) {
       fail(`${concept.slug}: add-on title must be ${expectedAdditionTitle}`);
     }
     const addition = conceptAdditions[concept.additionKey];
-    for (const additionString of [addition.intro, ...addition.items]) {
+    if (!additionMarkup.includes(`data-module="${expectedModuleType}"`) || !additionMarkup.includes('data-state="idle"')) {
+      fail(`${concept.slug}: add-on must declare data-module="${expectedModuleType}" and start at data-state="idle"`);
+    }
+    if (count(additionMarkup, "<noscript>") !== 1 || !additionMarkup.includes(htmlEscape(addition.fallback))) {
+      fail(`${concept.slug}: add-on must provide its useful no-JavaScript fallback`);
+    }
+    if (/<script\b/i.test(additionMarkup)) fail(`${concept.slug}: add-on must use only the shared external script`);
+    if (!additionMarkup.includes("data-js-controls hidden")) fail(`${concept.slug}: add-on must hide JavaScript-only controls until initialization`);
+    for (const control of additionMarkup.matchAll(/<div class="concept-addition__controls"([^>]*)>/g)) {
+      if (!/\bdata-js-controls\b/.test(control[1]) || !/\bhidden\b/.test(control[1])) {
+        fail(`${concept.slug}: JavaScript-only controls must start hidden for progressive enhancement`);
+      }
+    }
+    for (const editable of additionMarkup.matchAll(/<(?:input|textarea|select)\b[^>]*>/g)) {
+      if (!/\bautocomplete="off"/.test(editable[0])) {
+        fail(`${concept.slug}: sensitive add-on control must disable autocomplete (${editable[0]})`);
+      }
+    }
+    for (const additionString of additionSourceStrings(addition)) {
       if (!html.includes(htmlEscape(additionString))) fail(`${concept.slug}: add-on copy is missing: ${additionString}`);
     }
+    if (expectedModuleType === "sentence-starter") {
+      if (count(additionMarkup, 'name="sentence-starter"') !== 3) fail(`${concept.slug}: sentence starter must use exactly three native radio choices`);
+      if (!/data-sentence-editor[^>]*maxlength="240"/.test(additionMarkup)) fail(`${concept.slug}: sentence starter requires a length-capped editable line`);
+      if (!/data-action="copy" disabled/.test(additionMarkup) || !/>Copy line<\/button>/.test(additionMarkup) || !/type="reset">Reset<\/button>/.test(additionMarkup)) {
+        fail(`${concept.slug}: sentence starter requires disabled-by-default Copy line and native Reset controls`);
+      }
+    }
+    if (expectedModuleType === "first-ten-minutes") {
+      if (!additionMarkup.includes('<ol class="concept-addition__timeline"')) fail(`${concept.slug}: first ten minutes must use an ordered timeline`);
+      for (const minute of ["0", "2", "5", "10"]) {
+        if (!additionMarkup.includes(`data-minute="${minute}"`)) fail(`${concept.slug}: first ten minutes is missing minute ${minute}`);
+      }
+      for (const action of ["next", "show-all", "copy", "reset"]) {
+        if (!additionMarkup.includes(`data-action="${action}"`)) fail(`${concept.slug}: first ten minutes is missing ${action} control`);
+      }
+      if (/data-step[^>]*hidden/.test(additionMarkup)) fail(`${concept.slug}: complete timeline source must remain readable without JavaScript`);
+    }
+    if (expectedModuleType === "corner-standard") {
+      if (count(additionMarkup, '<details class="concept-addition__standard">') !== 5) fail(`${concept.slug}: Corner Standard must use five native details disclosures`);
+      if (count(additionMarkup, "data-review-check") !== 5) fail(`${concept.slug}: Corner Standard must provide five local reviewed indicators`);
+      for (const label of ["Evidence to look for", "How to verify it", "Current verification"]) {
+        if (count(additionMarkup, `<dt>${label}</dt>`) !== 5) fail(`${concept.slug}: each Corner Standard disclosure needs ${label}`);
+      }
+      if (!additionMarkup.includes("not a credential check or certification")) fail(`${concept.slug}: reviewed indicator must not imply verification`);
+    }
+    if (expectedModuleType === "between-round-plan") {
+      for (const prompt of addition.prompts) {
+        if (!additionMarkup.includes(`name="${prompt.key}"`) || !additionMarkup.includes(`maxlength="${prompt.maxLength}"`)) {
+          fail(`${concept.slug}: between-round prompt ${prompt.key} is missing its field or length cap`);
+        }
+      }
+      for (const action of ["generate", "copy", "print"]) {
+        if (!additionMarkup.includes(`data-action="${action}"`)) fail(`${concept.slug}: between-round plan is missing ${action} control`);
+      }
+      if (!additionMarkup.includes('type="reset">Clear</button>')) fail(`${concept.slug}: between-round plan requires a native Clear control`);
+      if (!additionMarkup.includes("partial or complete preview")) fail(`${concept.slug}: between-round plan must allow partial previews`);
+      const exactPlanPrivacyCopy = "Until you choose Copy or Print, this plan stays in this page and is not saved or sent. Copying puts it on your device clipboard; printing may create a PDF, an operating-system spool file, or a physical copy.";
+      if (!additionMarkup.includes(htmlEscape(exactPlanPrivacyCopy))) fail(`${concept.slug}: between-round plan must use the approved conditional privacy warning`);
+      if (additionMarkup.includes("This plan stays in this page only") || additionMarkup.includes("Your plan remains only in this page")) {
+        fail(`${concept.slug}: between-round plan contains a contradictory page-only privacy claim`);
+      }
+      if (!additionMarkup.includes('data-plan-preview role="region"') || !additionMarkup.includes("data-plan-preview role=\"region\" aria-labelledby=\"plan-preview-title\" hidden")) {
+        fail(`${concept.slug}: plan preview must start hidden until explicitly generated`);
+      }
+      for (const printCopy of [
+        "Blue Corner · Local plan",
+        "Printing may create a PDF, an operating-system print-spool file, or a physical copy.",
+      ]) {
+        if (!additionMarkup.includes(htmlEscape(printCopy))) fail(`${concept.slug}: print preview is missing privacy copy: ${printCopy}`);
+      }
+    }
+    if (expectedModuleType === "consent-invite") {
+      for (const name of ["consent-role", "consent-boundary", "consent-help"]) {
+        if (!additionMarkup.includes(`name="${name}"`)) fail(`${concept.slug}: consent invitation is missing the ${name} fieldset`);
+      }
+      if (count(additionMarkup, '<fieldset class="concept-addition__fieldset">') !== 3) fail(`${concept.slug}: consent invitation must use three native fieldsets`);
+      if (!/data-action="generate" disabled/.test(additionMarkup)) fail(`${concept.slug}: invitation generation must wait for all three choices`);
+      if (!/data-invite-editor[^>]*maxlength="600"/.test(additionMarkup)) fail(`${concept.slug}: generated invitation requires a length-capped editable preview`);
+      if (!additionMarkup.includes("Nothing sends from this page")) fail(`${concept.slug}: consent invitation must clearly state that nothing sends`);
+      if (!/data-invite-preview hidden/.test(additionMarkup)) fail(`${concept.slug}: invitation preview must start hidden without JavaScript`);
+    }
   }
+  if (count(html, "../../assets/scripts/shared.js") !== 1) fail(`${concept.slug}: expected exactly one shared interaction script reference`);
 
   const meaningSection = html.match(/<section class="meaning"[\s\S]*?<\/section>/)?.[0];
   if (!meaningSection) {
@@ -230,8 +345,9 @@ for (const [index, concept] of concepts.entries()) {
   const ids = [...html.matchAll(/\sid="([^"]+)"/g)].map((match) => match[1]);
   const duplicateIds = ids.filter((id, index) => ids.indexOf(id) !== index);
   if (duplicateIds.length) fail(`${concept.slug}: duplicate IDs: ${[...new Set(duplicateIds)].join(", ")}`);
+  const labelledIds = new Set([...html.matchAll(/<label\b[^>]*\bfor="([^"]+)"/g)].map((match) => match[1]));
   for (const match of html.matchAll(/<input\b[^>]*\bid="([^"]+)"/g)) {
-    if (!html.includes(`<label for="${match[1]}">`)) fail(`${concept.slug}: input ${match[1]} has no matching label`);
+    if (!labelledIds.has(match[1])) fail(`${concept.slug}: input ${match[1]} has no matching label`);
   }
   for (const match of html.matchAll(/<a\b[^>]*target="_blank"[^>]*>/g)) {
     if (!/rel="[^"]*noopener[^"]*noreferrer[^"]*"/.test(match[0])) fail(`${concept.slug}: target=_blank link lacks noopener noreferrer`);
@@ -337,6 +453,19 @@ if (!/\.meaning\s*\{[^}]*background:\s*var\(--brand-navy\);/.test(conceptBaseCss
 if (!/\.conversion\s*\{[^}]*background:\s*var\(--brand-navy\);/.test(conceptBaseCss)) {
   fail("assets/styles/concept-base.css: reference conversion section must use the navy background");
 }
+const printCss = conceptBaseCss.slice(conceptBaseCss.indexOf("@media print"));
+for (const printSelector of [
+  'body[data-print-plan="true"] > *',
+  'body[data-print-plan="true"] > main',
+  'body[data-print-plan="true"] main > *',
+  'body[data-print-plan="true"] .concept-addition__inner > *',
+  'body[data-print-plan="true"] [data-plan-form] > *',
+  'body[data-print-plan="true"] [data-plan-form] > [data-plan-preview]',
+]) {
+  if (!conceptBaseCss.includes("@media print") || !printCss.includes(printSelector)) {
+    fail(`assets/styles/concept-base.css: print isolation is missing ${printSelector}`);
+  }
+}
 
 const customPropertyDefinitions = [];
 for (const [relativePath, content] of cssContents) {
@@ -387,8 +516,71 @@ for (const [relativePath, content] of cssContents) {
 }
 
 const sharedScript = await readFile(path.join(rootDirectory, "assets/scripts/shared.js"), "utf8");
-for (const forbiddenApi of ["fetch(", "XMLHttpRequest", "localStorage", "sessionStorage", "sendBeacon"]) {
-  if (sharedScript.includes(forbiddenApi)) fail(`shared.js uses forbidden network/storage API: ${forbiddenApi}`);
+const additionTemplateSource = await readFile(path.join(rootDirectory, "tools/template.mjs"), "utf8");
+const additionCopySource = await readFile(path.join(rootDirectory, "tools/source-copy.mjs"), "utf8");
+const forbiddenPrivacyApis = [
+  "fetch(",
+  "XMLHttpRequest",
+  "WebSocket",
+  "EventSource",
+  "localStorage",
+  "sessionStorage",
+  "indexedDB",
+  "BroadcastChannel",
+  "sendBeacon",
+  "document.cookie",
+  "location.hash",
+  "location.search",
+  "URLSearchParams",
+  ".searchParams",
+  "history.pushState",
+  "history.replaceState",
+  "CacheStorage",
+  "navigator.serviceWorker",
+  "caches.",
+  "innerHTML",
+  "eval(",
+  "console.",
+];
+for (const [sourceName, source] of [
+  ["shared.js", sharedScript],
+  ["template.mjs", additionTemplateSource],
+  ["source-copy.mjs", additionCopySource],
+]) {
+  for (const forbiddenApi of forbiddenPrivacyApis) {
+    if (source.includes(forbiddenApi)) fail(`${sourceName} uses forbidden privacy/network/storage API: ${forbiddenApi}`);
+  }
+}
+if (!/new Set\(\["idle", "active", "ready", "success", "error"\]\)/.test(sharedScript)) {
+  fail("shared.js must constrain add-on modules to the idle, active, ready, success, and error states");
+}
+if (/setModuleState\([^)]*,\s*["']loading["']/.test(sharedScript)) {
+  fail("shared.js must not use a fake loading state inside concept add-ons");
+}
+if (count(sharedScript, "navigator.clipboard.writeText(") !== 1) {
+  fail("shared.js must centralize clipboard writes in one user-triggered helper");
+}
+if (!sharedScript.includes("fallback.focus()") || !sharedScript.includes("fallback.select()")) {
+  fail("shared.js must expose, focus, and select text when automatic clipboard access fails");
+}
+const sentenceStarterScript = sharedScript.match(/const initializeSentenceStarter =[\s\S]*?(?=\n  const initializeTimeline =)/)?.[0] ?? "";
+if (!sentenceStarterScript || sentenceStarterScript.includes("editor.focus()")) {
+  fail("shared.js must keep focus on the selected sentence-starter radio");
+}
+if (!sharedScript.includes('window.addEventListener("pageshow"') || !sharedScript.includes("event.persisted") || !sharedScript.includes("moduleResetters")) {
+  fail("shared.js must clear add-on drafts and state when a persisted page is restored");
+}
+if (!sharedScript.includes("controls.hidden = false")) {
+  fail("shared.js must reveal progressive-enhancement controls only after module initialization");
+}
+if (!sharedScript.includes('document.body.dataset.printPlan = "true"') || !sharedScript.includes('window.addEventListener("afterprint"')) {
+  fail("shared.js must isolate plan printing and clear print mode after the dialog closes");
+}
+if (sharedScript.includes("remains only in this page")) {
+  fail("shared.js must not claim that printed plans remain only in the page");
+}
+for (const printRisk of ["PDF", "print-spool file", "physical copy"]) {
+  if (!sharedScript.includes(printRisk)) fail(`shared.js print status must disclose possible ${printRisk} output`);
 }
 
 warnings.forEach((message) => console.warn(`WARN: ${message}`));
