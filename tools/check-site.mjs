@@ -9,11 +9,11 @@ const toolsDirectory = path.dirname(fileURLToPath(import.meta.url));
 const rootDirectory = path.resolve(toolsDirectory, "..");
 const failures = [];
 const strictImages = process.argv.includes("--strict-images");
-const approvedHomeSha256 = "c56ad429d0fe496cbf806bec3decf615217de05755a1c65c63a0696fb01e91c2";
+const approvedHomeSha256 = "46d003e94fca9854cd83251e91c7517b48027c8a17a289a1aeb9471204876d16";
 const approvedAssets = Object.freeze({
-  "assets/styles/brand.css": "86c57f4478c132ae687d6857352b9eefa7cd24ee83c4ff8e7240c560ea409370",
+  "assets/styles/brand.css": "a49a7859dea92a8c092f751d61f68c6f86a3b82521c8bef868cf1e330697a478",
   "assets/styles/shared.css": "3198759ed41f78f8719a9355f9c48868c8473f0fb9d10b71be368073921e20ad",
-  "assets/styles/concept-base.css": "a8323802acea299b04478a00e766aafdb63f5493676d0281efee79530c9801a6",
+  "assets/styles/concept-base.css": "31ff963a368ba37498414a389abf5b224871ab900eefcbaf01c255f0ed3d1372",
   "assets/scripts/shared.js": "5d77e4a770625571bd3e97257be4e2be0f1e303503cc813d5d98ded91618cd36",
   "assets/art/blue-corner-reference-ring-brand-v2.webp": "b7681e542ac272951e5be0d86ce6c6eae06f5e10a5fb73293a751da3ee4bf4db",
 });
@@ -88,7 +88,7 @@ if (count(home, 'href="https://use.typekit.net/ciy6txz.css"') !== 1
   || !home.includes("font-src 'self' https://use.typekit.net;")) {
   fail("Typekit stylesheet and constrained style/font CSP are required");
 }
-if (count(home, 'href="assets/styles/concept-base.css?v=a8323802"') !== 1) {
+if (count(home, 'href="assets/styles/concept-base.css?v=31ff963a"') !== 1) {
   fail("Homepage must version the corrected core stylesheet for cache refresh");
 }
 if (!home.includes(`src="assets/art/${referenceHero.image}"`) || /(?:href|src)="\/assets\//.test(home)) {
@@ -105,7 +105,7 @@ const brandCss = await readFile(path.join(rootDirectory, "assets/styles/brand.cs
 const sharedCss = await readFile(path.join(rootDirectory, "assets/styles/shared.css"), "utf8");
 const conceptCss = await readFile(path.join(rootDirectory, "assets/styles/concept-base.css"), "utf8");
 const sharedScript = await readFile(path.join(rootDirectory, "assets/scripts/shared.js"), "utf8");
-if (!/--font-brand:\s*"proxima-nova-condensed"/.test(brandCss) || !/--font-weight-regular:\s*400;/.test(brandCss) || !/--font-weight-semibold:\s*700;/.test(brandCss) || !/--font-size-support:\s*1rem;/.test(brandCss)) {
+if (!/--font-brand:\s*"proxima-nova-condensed"/.test(brandCss) || !/--font-weight-regular:\s*400;/.test(brandCss) || !/--font-weight-semibold:\s*700;/.test(brandCss) || !/--font-size-support:\s*1\.125rem;/.test(brandCss)) {
   fail("Brand typography must lead with Proxima Nova Condensed and use 400/700 weights");
 }
 for (const typographyRule of ["font-kerning: normal", "text-rendering: optimizeLegibility", 'font-feature-settings: "kern" 1, "liga" 1, "clig" 1']) {

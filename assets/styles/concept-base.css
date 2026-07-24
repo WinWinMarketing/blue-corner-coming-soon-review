@@ -122,9 +122,12 @@
 
 .marker-band {
   display: inline;
-  padding-inline: 0.08em;
-  background: linear-gradient(to top, var(--brand-yellow) 0 62%, transparent 62% 100%);
-  color: inherit;
+  padding-inline: 0.1em;
+  background-image: linear-gradient(var(--brand-yellow), var(--brand-yellow));
+  background-repeat: no-repeat;
+  background-position: 0 92%;
+  background-size: 100% 0.82em;
+  color: var(--brand-navy);
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
 }
@@ -295,9 +298,9 @@
   display: grid;
   grid-template-columns: minmax(0, 36fr) minmax(0, 64fr);
   gap: 0;
-  min-block-size: clamp(45rem, 63.47vw, 57.125rem);
+  min-block-size: 0;
   align-items: center;
-  padding-block: clamp(4rem, 6vw, 5.5rem);
+  padding-block: clamp(3.5rem, 5vw, 5rem);
 }
 
 .symptoms__heading {
@@ -390,6 +393,7 @@
 .meaning__body {
   max-inline-size: none;
   margin: var(--space-2xl) 0 0;
+  font-size: clamp(1.0625rem, 0.9rem + 0.5vw, 1.2rem);
 }
 
 .roadmap {
