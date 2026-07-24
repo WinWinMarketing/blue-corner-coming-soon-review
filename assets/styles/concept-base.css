@@ -148,11 +148,6 @@
   .concept-hero__lead-line {
     display: block;
   }
-
-  .symptoms__heading .eyebrow {
-    max-inline-size: none;
-    white-space: nowrap;
-  }
 }
 
 .concept-hero__details {
@@ -315,7 +310,6 @@
 .symptoms__grid {
   display: grid;
   grid-template-columns: 1fr;
-  border-block-start: 1px solid var(--brand-navy);
 }
 
 .symptom {
@@ -323,8 +317,12 @@
   grid-template-columns: 2.5rem minmax(11rem, 37%) minmax(0, 1fr);
   align-items: start;
   gap: var(--space-lg) var(--space-xl);
-  padding-block: clamp(1.75rem, 2.7vw, 2.5rem);
-  border-block-end: 1px solid var(--brand-navy);
+  padding-block: clamp(1.9rem, 3vw, 2.75rem);
+  border-block-start: 1px solid color-mix(in oklch, var(--brand-navy) 18%, var(--brand-off-white));
+}
+
+.symptom:last-child {
+  border-block-end: 1px solid color-mix(in oklch, var(--brand-navy) 18%, var(--brand-off-white));
 }
 
 .symptom__number {
@@ -974,6 +972,39 @@
     align-content: center;
     min-block-size: 0;
     padding-block: clamp(1.25rem, 2.2vh, 2.5rem);
+  }
+
+  /* Each block reads as its own page; scroll settles softly, never forced. */
+  html {
+    scroll-snap-type: y proximity;
+  }
+
+  .stats {
+    min-block-size: 100svh;
+  }
+
+  .symptoms {
+    min-block-size: 100svh;
+    align-items: start;
+    align-content: center;
+  }
+
+  .symptoms__heading {
+    align-self: start;
+  }
+
+  .conversion__inner {
+    min-block-size: 100svh;
+    align-content: center;
+  }
+
+  .concept-hero,
+  .stats,
+  .symptoms,
+  .meaning,
+  .roadmap,
+  .conversion {
+    scroll-snap-align: start;
   }
 }
 
