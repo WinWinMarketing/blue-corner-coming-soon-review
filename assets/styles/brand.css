@@ -16,9 +16,9 @@
   --color-on-signal: var(--brand-navy);
   --color-dark-muted: color-mix(in oklch, var(--brand-off-white) 84%, var(--brand-blue));
 
-  --font-brand: "Proxima Nova", "Proxima Nova Alt", "Avenir Next", "Segoe UI", sans-serif;
+  --font-brand: "proxima-nova-condensed", "Proxima Nova", "Proxima Nova Alt", "Avenir Next", "Segoe UI", sans-serif;
   --font-weight-regular: 400;
-  --font-weight-semibold: 600;
+  --font-weight-semibold: 700;
   --font-weight-bold: 700;
   --font-size-body: clamp(1rem, 0.96rem + 0.18vw, 1.125rem);
   --font-size-small: 0.875rem;

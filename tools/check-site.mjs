@@ -13,13 +13,13 @@ const warnings = [];
 const strictImages = process.argv.includes("--strict-images");
 const approvedCornerSha256 = "e3209fe0d7cdd29e4f17cbbea3c19325a783a3a1d2a5cb8d2c66e2e1db27c758";
 const approvedHeroSha256 = "22bbe8a535d1707c6d7724f9a2d71ea9f1ff8e924d50ea690d2a251062cd07f2";
-const approvedMasterSha256 = "492863f992b7176c3d291bd9a2657eb2cd391db774eff9b4883391210e4ad023";
-const approvedGallerySha256 = "4d52e3fd4bbb1dbbaf0aadc46d2e5616cf97566a8bb26411c919ade1224b7320";
+const approvedMasterSha256 = "4f76e1f9eb59ad79d6a40a46819badf7f362fed5c601363fbbb67e602219a0a8";
+const approvedGallerySha256 = "795395e92eb6c8640c8bf4d5ee40f49d18015b3027e062a461e3097402440034";
 const approvedSharedVisualHashes = Object.freeze({
-  "assets/styles/brand.css": "52fe13ced84328b10037e8c4b6d2ccd6b40b12d41a827925c4a43a93b6bc1f40",
-  "assets/styles/concept-base.css": "e8706d7d225c5e0baa9a97b7e049d8b84d9295e9acb7dcfad195c5bc4df73045",
+  "assets/styles/brand.css": "7ee7f24f04f7cc6c14ca3eaffc9c5e263342cc60b9070d3c35460e3cee5c3613",
+  "assets/styles/concept-base.css": "45df394133ef526d43b3fe9e670fa1d526b42917d90abaa9a0bf71dfa659f551",
   "assets/styles/shared.css": "6e43251497390a25cdee9bf44bc4680af93bf94eb68c3f67c845e9818a83f0aa",
-  "assets/scripts/shared.js": "aa2185bc6286dc5bf2361d4c81b70d0d7db74f95dfe8737a73cb2d76746ba529",
+  "assets/scripts/shared.js": "be3d26257ba132989d9b6d9e654b4f4751bb391751823f237b83f73b49d23f36",
   "assets/brand/logo-horizontal-white.png": "34ff2dae53d8b9911cf1aafe708bca41cc5e22469d5847cb99fdf1a93936545b",
   "assets/brand/logo-horizontal-blue.png": "c70f50961a611cf0e357cdb08ec71f241c86b7afcceb9a486180eccf4b60bed3",
 });
@@ -79,7 +79,7 @@ const expectedModuleTypes = [
 ];
 const coreSectionClasses = ["concept-hero", "stats", "symptoms", "meaning", "roadmap", "conversion"];
 const extractSection = (html, className) => html.match(new RegExp(`<section class="${className}"[\\s\\S]*?<\\/section>`))?.[0] ?? "";
-const extractMasthead = (html) => html.match(/<header class="site-header page-frame">[\s\S]*?<\/header>/)?.[0] ?? "";
+const extractMasthead = (html) => html.match(/<header class="site-header">[\s\S]*?<\/header>/)?.[0] ?? "";
 const normalizeConceptPage = (html) => html
   .replace(/\s*<section class="concept-addition"[\s\S]*?<\/section>\s*/g, "\n")
   .replace(/\s+/g, " ")
@@ -241,15 +241,31 @@ for (const [index, concept] of concepts.entries()) {
   if (!/<meta name="theme-color" content="#197CE3">/i.test(html)) fail(`${concept.slug}: theme-color must use the primary light blue #197CE3`);
   if (!html.includes("Content-Security-Policy")) fail(`${concept.slug}: CSP metadata is missing`);
   if (!html.includes("connect-src 'none'; form-action 'none'")) fail(`${concept.slug}: CSP does not block data submission`);
+  if (!html.includes("style-src 'self' https://use.typekit.net;") || !html.includes("font-src 'self' https://use.typekit.net;")) {
+    fail(`${concept.slug}: CSP must allow the licensed Typekit stylesheet and fonts only`);
+  }
+  if (count(html, 'href="https://use.typekit.net/ciy6txz.css"') !== 1) fail(`${concept.slug}: licensed Typekit stylesheet must be included exactly once`);
   if (!html.includes('<body class="concept-page">') || /\sdata-concept(?:-ordinal)?=/.test(html)) {
     fail(`${concept.slug}: concept page body must not expose route-specific attributes`);
   }
   if (count(html, "data-prototype-form") !== 1) fail(`${concept.slug}: expected exactly one prototype form`);
   const prototypeForm = html.match(/<form\b[^>]*data-prototype-form[\s\S]*?<\/form>/)?.[0] ?? "";
-  if (count(prototypeForm, "<fieldset") !== 1) fail(`${concept.slug}: prototype form must contain exactly one fieldset`);
+  if (count(prototypeForm, "<fieldset") !== 2) fail(`${concept.slug}: prototype form must contain the interest and role fieldsets`);
+  if (!prototypeForm.includes("<legend>I'm joining as</legend>") || count(prototypeForm, 'name="role" type="radio"') !== 2) {
+    fail(`${concept.slug}: prototype form must offer exactly two native role radios`);
+  }
+  for (const role of ["Patient", "Therapist"]) {
+    if (!prototypeForm.includes(`value="${role}"`) || !prototypeForm.includes(`>${role}</span>`)) {
+      fail(`${concept.slug}: prototype role option is missing ${role}`);
+    }
+  }
+  if (count(prototypeForm, "data-role-error") !== 1 || !/name="role"[^>]*required[^>]*aria-describedby="member-role-error"/.test(prototypeForm)) {
+    fail(`${concept.slug}: prototype role radios require an accessible local validation contract`);
+  }
   if (count(html, "<h1") !== 1) fail(`${concept.slug}: expected exactly one h1`);
   const masthead = extractMasthead(html);
-  if (count(masthead, "<img") !== 1 || count(masthead, "<a") !== 1 || /<p\b|Launching 2026/i.test(masthead)) {
+  if (!/^<header class="site-header">\s*<div class="site-header__inner page-frame">[\s\S]*<\/div>\s*<\/header>$/.test(masthead)
+    || count(masthead, "<img") !== 1 || count(masthead, "<a") !== 1 || /<p\b|Launching 2026/i.test(masthead)) {
     fail(`${concept.slug}: reference masthead must contain only the linked logo`);
   }
   const heroSection = extractSection(html, "concept-hero");
@@ -540,6 +556,10 @@ if (galleryHash !== approvedGallerySha256) {
   fail(`Gallery HTML hash changed: expected ${approvedGallerySha256}, received ${galleryHash}`);
 }
 if (!/<meta name="theme-color" content="#197CE3">/i.test(gallery)) fail("Gallery theme-color must use the primary light blue #197CE3");
+if (!gallery.includes("style-src 'self' https://use.typekit.net;") || !gallery.includes("font-src 'self' https://use.typekit.net;")) {
+  fail("Gallery CSP must allow the licensed Typekit stylesheet and fonts only");
+}
+if (count(gallery, 'href="https://use.typekit.net/ciy6txz.css"') !== 1) fail("Gallery must include the licensed Typekit stylesheet exactly once");
 const galleryFooter = gallery.match(/<footer class="gallery-footer">[\s\S]*?<\/footer>/)?.[0];
 if (!galleryFooter) {
   fail("Gallery footer markup is missing");
@@ -587,6 +607,13 @@ for (const relativePath of cssFiles) {
 
 const conceptBaseCss = cssContents.get("assets/styles/concept-base.css") ?? "";
 const sharedCss = cssContents.get("assets/styles/shared.css") ?? "";
+const brandCss = cssContents.get("assets/styles/brand.css") ?? "";
+if (!/--font-brand:\s*"proxima-nova-condensed"/.test(brandCss)
+  || !/--font-weight-regular:\s*400;/.test(brandCss)
+  || !/--font-weight-semibold:\s*700;/.test(brandCss)
+  || !/--font-weight-bold:\s*700;/.test(brandCss)) {
+  fail("assets/styles/brand.css: Typekit must lead the brand stack and use only 400/700 weights");
+}
 if (/\.js\s+\[data-reveal\]\s*\{[^}]*opacity:\s*0/.test(sharedCss)) {
   fail("assets/styles/shared.css: reveal content must be visible by default for full-page capture");
 }
@@ -621,8 +648,9 @@ for (const measuredCoreRule of [
 for (const responsiveToken of ["@media (max-width: 64rem)", "@media (max-width: 48rem)", "@media (max-width: 39rem)", "@media (max-width: 24.375rem)"]) {
   if (!conceptBaseCss.includes(responsiveToken)) fail(`assets/styles/concept-base.css: responsive target is missing ${responsiveToken}`);
 }
-if (!/\.meaning\s*\{[^}]*background:\s*var\(--brand-navy\);/.test(conceptBaseCss)) {
-  fail("assets/styles/concept-base.css: reference manifesto section must use the navy background");
+if (!/\.meaning\s*\{[^}]*background:\s*var\(--brand-blue\);/.test(conceptBaseCss)
+  || !/\.meaning__mark\s*\{[^}]*background:\s*var\(--brand-navy\);/.test(conceptBaseCss)) {
+  fail("assets/styles/concept-base.css: manifesto must pair a navy rail with bright Blue Corner blue content");
 }
 if (!/\.conversion\s*\{[^}]*background:\s*var\(--brand-navy\);/.test(conceptBaseCss)) {
   fail("assets/styles/concept-base.css: reference conversion section must use the navy background");
@@ -675,7 +703,7 @@ for (const [relativePath, content] of cssContents) {
           navyAliases.has(variable[1]) || /(?:navy|ink|action)/i.test(variable[1])
         ));
       const approvedNavyReferenceSection = relativePath === "assets/styles/concept-base.css"
-        && (selector === ".meaning" || selector === ".conversion" || selector === ".concept-hero__media");
+        && (selector === ".meaning__mark" || selector === ".conversion" || selector === ".concept-hero__media");
       if (usesNavySurface && !approvedNavyReferenceSection) {
         fail(`${relativePath}: ${selector} ${match[1]} cannot use navy or a navy-derived alias (${value.trim()})`);
       }

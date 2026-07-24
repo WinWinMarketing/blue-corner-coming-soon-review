@@ -16,12 +16,15 @@
 }
 
 .site-header {
-  display: flex;
-  align-items: center;
-  min-block-size: clamp(7rem, 10.2vw, 9.1875rem);
-  padding-block: var(--space-lg);
   background: var(--brand-blue);
   color: var(--brand-off-white);
+}
+
+.site-header__inner {
+  display: flex;
+  min-block-size: clamp(7rem, 10.2vw, 9.1875rem);
+  align-items: center;
+  padding-block: var(--space-lg);
 }
 
 .site-header__brand {
@@ -306,7 +309,7 @@
 
 .meaning {
   min-block-size: clamp(25rem, 33.2vw, 29.875rem);
-  background: var(--brand-navy);
+  background: var(--brand-blue);
 }
 
 .meaning__inner {
@@ -323,7 +326,7 @@
   min-block-size: inherit;
   place-items: center;
   border-inline-end: clamp(0.25rem, 0.4vw, 0.4rem) solid var(--brand-yellow);
-  background: var(--brand-blue);
+  background: var(--brand-navy);
 }
 
 .meaning__mark img {
@@ -784,6 +787,59 @@
   font-weight: var(--font-weight-bold);
 }
 
+.prototype-role {
+  min-inline-size: 0;
+  padding: 0;
+  margin: 0;
+  border: 0;
+}
+
+.prototype-role > legend {
+  padding: 0;
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-bold);
+}
+
+.prototype-role__choices {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-sm);
+  margin-block-start: var(--space-sm);
+}
+
+.prototype-role__choice {
+  display: grid;
+  grid-template-columns: 1.25rem minmax(0, 1fr);
+  min-block-size: 2.75rem;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--brand-navy);
+  cursor: pointer;
+  font-weight: var(--font-weight-bold);
+}
+
+.prototype-role__choice:has(input:checked) {
+  border-width: 2px;
+  background: color-mix(in oklch, var(--brand-yellow) 18%, var(--brand-off-white));
+}
+
+.prototype-role__choice input {
+  inline-size: 1.25rem;
+  block-size: 1.25rem;
+  margin: 0;
+  accent-color: var(--brand-navy);
+}
+
+.prototype-role.has-error .field-error {
+  font-weight: var(--font-weight-bold);
+}
+
+.prototype-role.has-error .prototype-role__choices {
+  outline: 2px solid var(--brand-yellow);
+  outline-offset: 2px;
+}
+
 .conversion-path__note {
   margin: 0;
   font-size: var(--font-size-small);
@@ -840,6 +896,10 @@
   }
 
   .site-header {
+    inline-size: 100%;
+  }
+
+  .site-header__inner {
     min-block-size: 6.5rem;
   }
 
@@ -976,6 +1036,10 @@
 
   .concept-hero h1 {
     font-size: clamp(2.625rem, 13.8vw, 3.375rem);
+  }
+
+  .prototype-role__choices {
+    grid-template-columns: 1fr;
   }
 
   .concept-hero__headline-line {

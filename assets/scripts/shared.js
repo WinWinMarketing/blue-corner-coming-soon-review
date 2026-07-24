@@ -644,9 +644,13 @@
       required: "Please enter your phone number.",
       invalid: "Phone number needs at least 10 digits.",
     },
+    role: {
+      required: "Choose whether you're joining as a patient or therapist.",
+    },
   };
 
   const findErrorNode = (form, field) => {
+    if (field.name === "role") return form.querySelector("[data-role-error]");
     const namedError = [...form.querySelectorAll("[data-field-error]")].find(
       (node) => node.dataset.fieldError === field.name,
     );
@@ -656,6 +660,9 @@
   };
 
   const errorFor = (field) => {
+    if (field.name === "role") {
+      return field.form?.querySelector("input[name='role']:checked") ? "" : validationMessages.role.required;
+    }
     const value = field.value.trim();
     const messages = validationMessages[field.name];
     if (!messages) return field.required && !value ? field.validationMessage : "";
@@ -673,7 +680,7 @@
     const message = errorFor(field);
     const errorNode = findErrorNode(form, field);
     field.setAttribute("aria-invalid", String(Boolean(message)));
-    field.closest(".field")?.classList.toggle("has-error", Boolean(message));
+    field.closest(".field, .prototype-role")?.classList.toggle("has-error", Boolean(message));
     if (errorNode) errorNode.textContent = message;
     return !message;
   };
@@ -686,7 +693,11 @@
 
     fields.forEach((field) => {
       field.addEventListener("blur", () => renderFieldState(form, field));
-      field.addEventListener("input", () => {
+      field.addEventListener(field.type === "radio" ? "change" : "input", () => {
+        if (field.name === "role") {
+          fields.filter((candidate) => candidate.name === "role").forEach((candidate) => renderFieldState(form, candidate));
+          return;
+        }
         if (field.getAttribute("aria-invalid") === "true") renderFieldState(form, field);
       });
     });
@@ -703,6 +714,7 @@
       }
 
       if (!submitButton || !status) return;
+      const selectedRole = fields.find((field) => field.name === "role" && field.checked)?.value;
       form.dataset.state = "loading";
       submitButton.dataset.idleLabel = submitButton.textContent.trim();
       submitButton.textContent = form.dataset.loadingLabel || "Checking…";
@@ -713,15 +725,21 @@
       window.setTimeout(() => {
         form.reset();
         fields.forEach((field) => field.removeAttribute("aria-invalid"));
+        form.querySelector("[data-role-group]")?.classList.remove("has-error");
         form.querySelectorAll("[data-field-error]").forEach((node) => {
           node.textContent = "";
         });
+        const roleError = form.querySelector("[data-role-error]");
+        if (roleError) roleError.textContent = "";
         if (fieldGroup) fieldGroup.hidden = true;
         submitButton.removeAttribute("aria-busy");
         const title = status.querySelector("[data-status-title]");
         const body = status.querySelector("[data-status-body]");
         if (title) title.textContent = form.dataset.successTitle || "Prototype complete.";
-        if (body) body.textContent = form.dataset.successBody || "Your details were checked on this device only. Nothing was sent, stored, or added to a waitlist.";
+        if (body) {
+          const base = form.dataset.successBody || "Your details were checked on this device only. Nothing was sent, stored, or added to a waitlist.";
+          body.textContent = selectedRole ? `${base} You selected ${selectedRole} for this local check.` : base;
+        }
         status.hidden = false;
         form.dataset.state = "success";
         status.focus();

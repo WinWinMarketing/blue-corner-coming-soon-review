@@ -40,6 +40,20 @@ const renderMemberForm = (copy) => {
               <form class="prototype-form" data-prototype-form data-audience="${audience}" data-loading-label="${escapeHtml(safetyCopy.prototypeLoading)}" data-success-title="${escapeHtml(safetyCopy.prototypeSuccessTitle)}" data-success-body="${escapeHtml(safetyCopy.prototypeSuccessBody)}" method="post" autocomplete="off" aria-describedby="${disclosureId}" novalidate>
                 <fieldset data-form-fields>
                   <legend class="sr-only">Men's early-access interest</legend>
+                  <fieldset class="prototype-role" data-role-group>
+                    <legend>I'm joining as</legend>
+                    <div class="prototype-role__choices">
+                      <label class="prototype-role__choice" for="${audience}-role-patient">
+                        <input id="${audience}-role-patient" name="role" type="radio" value="Patient" autocomplete="off" required aria-describedby="${audience}-role-error">
+                        <span>Patient</span>
+                      </label>
+                      <label class="prototype-role__choice" for="${audience}-role-therapist">
+                        <input id="${audience}-role-therapist" name="role" type="radio" value="Therapist" autocomplete="off" required aria-describedby="${audience}-role-error">
+                        <span>Therapist</span>
+                      </label>
+                    </div>
+                    <p class="field-error" id="${audience}-role-error" data-role-error aria-live="polite"></p>
+                  </fieldset>
                   <div class="field-grid">${renderFields(audience)}
                   </div>
                   <button class="button button--signal" type="submit" data-submit>${escapeHtml(copy.button)}</button>
@@ -435,7 +449,7 @@ export const renderConceptPage = (concept) => {
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="robots" content="noindex, nofollow, noarchive">
     <meta name="referrer" content="no-referrer">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'none'; form-action 'none'; object-src 'none'; base-uri 'none'; media-src 'none'; worker-src 'none'; upgrade-insecure-requests">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' https://use.typekit.net; img-src 'self' data:; font-src 'self' https://use.typekit.net; connect-src 'none'; form-action 'none'; object-src 'none'; base-uri 'none'; media-src 'none'; worker-src 'none'; upgrade-insecure-requests">
     <title>The Blue Corner — Nobody fights alone.</title>
     <meta name="description" content="${escapeHtml(sourceCopy.hero.heading)} A Canadian men's mental-health coming-soon concept.">
     <meta name="theme-color" content="#197CE3">
@@ -445,6 +459,7 @@ export const renderConceptPage = (concept) => {
     <meta property="og:image" content="https://winwinmarketing.github.io/blue-corner-coming-soon-review/assets/art/${escapeHtml(referenceHero.image)}">
     <link rel="icon" href="../../assets/brand/mark-blue.png" type="image/png">
     <script src="../../assets/scripts/boot.js"></script>
+    <link rel="stylesheet" href="https://use.typekit.net/ciy6txz.css">
     <link rel="stylesheet" href="../../assets/styles/brand.css">
     <link rel="stylesheet" href="../../assets/styles/shared.css">
     <link rel="stylesheet" href="../../assets/styles/concept-base.css">
@@ -454,10 +469,12 @@ export const renderConceptPage = (concept) => {
   <body class="concept-page">
     <a class="skip-link" href="#main">Skip to main content</a>
 
-    <header class="site-header page-frame">
+    <header class="site-header">
+      <div class="site-header__inner page-frame">
       <a class="site-header__brand" href="../../index.html" aria-label="The Blue Corner — all concepts">
         <img src="../../assets/brand/logo-horizontal-white.png" width="1655" height="170" alt="${escapeHtml(sourceCopy.header.name)}">
       </a>
+      </div>
     </header>
 
     <main id="main" tabindex="-1">
@@ -580,7 +597,7 @@ export const renderGallery = (concepts) => {
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="robots" content="noindex, nofollow, noarchive">
     <meta name="referrer" content="no-referrer">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'none'; form-action 'none'; object-src 'none'; base-uri 'none'; media-src 'none'; worker-src 'none'; upgrade-insecure-requests">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' https://use.typekit.net; img-src 'self' data:; font-src 'self' https://use.typekit.net; connect-src 'none'; form-action 'none'; object-src 'none'; base-uri 'none'; media-src 'none'; worker-src 'none'; upgrade-insecure-requests">
     <title>The Blue Corner — Coming-soon concepts</title>
     <meta name="description" content="Twelve reference-led directions for The Blue Corner's Canadian men's mental-health coming-soon experience.">
     <meta name="theme-color" content="#197CE3">
@@ -592,6 +609,7 @@ export const renderGallery = (concepts) => {
     <meta name="twitter:card" content="summary_large_image">
     <link rel="icon" href="assets/brand/mark-blue.png" type="image/png">
     <script src="assets/scripts/boot.js"></script>
+    <link rel="stylesheet" href="https://use.typekit.net/ciy6txz.css">
     <link rel="stylesheet" href="assets/styles/brand.css">
     <link rel="stylesheet" href="assets/styles/shared.css">
     <link rel="stylesheet" href="assets/styles/gallery.css">
