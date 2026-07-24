@@ -1,4 +1,4 @@
-import { readFile, stat } from "node:fs/promises";
+import { readFile, readdir, stat } from "node:fs/promises";
 import { createHash } from "node:crypto";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -88,7 +88,21 @@ if (approvedCornerHash !== approvedCornerSha256) {
   fail("assets/brand/corner-off-white.png does not match the approved Asset_84x-8.png");
 }
 
-for (const concept of concepts) {
+if (concepts.length !== 6) fail(`Concept configuration has ${concepts.length} entries; expected exactly 6`);
+
+const conceptsDirectory = path.join(rootDirectory, "concepts");
+const configuredConceptSlugs = new Set(concepts.map((concept) => concept.slug));
+const conceptDirectories = (await readdir(conceptsDirectory, { withFileTypes: true }))
+  .filter((entry) => entry.isDirectory())
+  .map((entry) => entry.name);
+for (const directory of conceptDirectories) {
+  if (!configuredConceptSlugs.has(directory)) fail(`Unexpected public concept route directory: concepts/${directory}/`);
+}
+for (const slug of configuredConceptSlugs) {
+  if (!conceptDirectories.includes(slug)) fail(`Configured concept route directory is missing: concepts/${slug}/`);
+}
+
+for (const [index, concept] of concepts.entries()) {
   const htmlPath = path.join(rootDirectory, "concepts", concept.slug, "index.html");
   const stylePath = path.join(rootDirectory, "concepts", concept.slug, "style.css");
   if (!(await exists(htmlPath))) {
@@ -105,6 +119,13 @@ for (const concept of concepts) {
   if (count(html, "data-prototype-form") !== 2) fail(`${concept.slug}: expected two prototype forms`);
   if (count(html, "<fieldset") !== 2) fail(`${concept.slug}: expected two form fieldsets`);
   if (count(html, "<h1") !== 1) fail(`${concept.slug}: expected exactly one h1`);
+  const expectedOrdinal = String(index + 1).padStart(2, "0");
+  if (!html.includes(`Concept ${expectedOrdinal} of 06 · ${htmlEscape(concept.title)}`)) {
+    fail(`${concept.slug}: header review ordinal must be ${expectedOrdinal} based on retained-list position`);
+  }
+  if (!html.includes('<span class="concept-hero__headline-line" aria-hidden="true">Nobody</span><span class="concept-hero__headline-line" aria-hidden="true">fights alone.</span>')) {
+    fail(`${concept.slug}: hero headline must render as the two reference lines "Nobody" and "fights alone."`);
+  }
   if (count(html, "data-fallback-image") < 1) fail(`${concept.slug}: image fallback hook is missing`);
   if (/<form\b[^>]*\baction=/i.test(html)) fail(`${concept.slug}: prototype form must not declare an action`);
   if (/\son[a-z]+\s*=/i.test(html)) fail(`${concept.slug}: inline event handler violates CSP`);

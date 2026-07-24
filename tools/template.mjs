@@ -58,8 +58,9 @@ const renderForm = (audience, copy) => {
             </article>`;
 };
 
-export const renderConceptPage = (concept) => {
+export const renderConceptPage = (concept, listIndex) => {
   const bodyClass = `${className(concept.title)}-page`;
+  const reviewOrdinal = String(listIndex + 1).padStart(2, "0");
   const stats = sourceCopy.stats.items.map((item) => `
             <article class="stat">
               <strong class="stat__value">${escapeHtml(item.value)}</strong>
@@ -106,10 +107,10 @@ ${renderCrisisUtility("../../")}
 
     <header class="site-header page-frame">
       <a class="site-header__brand" href="../../index.html" aria-label="The Blue Corner — all concepts">
-        <img src="../../assets/brand/logo-horizontal-blue.png" width="1655" height="170" alt="${escapeHtml(sourceCopy.header.name)}">
+        <img src="../../assets/brand/logo-horizontal-white.png" width="1655" height="170" alt="${escapeHtml(sourceCopy.header.name)}">
       </a>
       <p class="site-header__launch">${escapeHtml(sourceCopy.header.launch)}</p>
-      <a class="site-header__review" href="../../index.html">Concept ${escapeHtml(concept.number)} of 12 · ${escapeHtml(concept.title)}</a>
+      <a class="site-header__review" href="../../index.html">Concept ${escapeHtml(reviewOrdinal)} of 06 · ${escapeHtml(concept.title)}</a>
     </header>
 
     <main id="main" tabindex="-1">
@@ -117,7 +118,7 @@ ${renderCrisisUtility("../../")}
         <div class="concept-hero__inner page-frame">
           <div class="concept-hero__copy" data-reveal>
             <p class="eyebrow">${escapeHtml(sourceCopy.hero.eyebrow)}</p>
-            <h1 id="hero-title">${escapeHtml(sourceCopy.hero.heading)}</h1>
+            <h1 id="hero-title" aria-label="${escapeHtml(sourceCopy.hero.heading)}"><span class="concept-hero__headline-line" aria-hidden="true">Nobody</span><span class="concept-hero__headline-line" aria-hidden="true">fights alone.</span></h1>
             <p class="concept-hero__lead">${escapeHtml(sourceCopy.hero.lead)}</p>
             <p class="concept-hero__body">${escapeHtml(sourceCopy.hero.body)}</p>
             <div class="concept-hero__actions">
@@ -126,7 +127,7 @@ ${renderCrisisUtility("../../")}
             </div>
           </div>
           <figure class="concept-hero__media image-frame" data-image-frame data-image-fallback-label="${escapeHtml(concept.title)} image in production">
-            <img class="concept-hero__image" src="../../assets/art/${escapeHtml(concept.image)}" width="1536" height="1024" alt="${escapeHtml(concept.alt)}" fetchpriority="high" data-fallback-image>
+            <img class="concept-hero__image" src="../../assets/art/${escapeHtml(concept.image)}" width="${escapeHtml(concept.imageWidth ?? 1536)}" height="${escapeHtml(concept.imageHeight ?? 1024)}" alt="${escapeHtml(concept.alt)}" fetchpriority="high" data-fallback-image>
             <figcaption><span>${escapeHtml(concept.number)}</span> ${escapeHtml(concept.title)}</figcaption>
           </figure>
         </div>
@@ -240,10 +241,10 @@ export const renderGallery = (concepts) => {
     <meta name="referrer" content="no-referrer">
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'none'; form-action 'none'; object-src 'none'; base-uri 'none'; media-src 'none'; worker-src 'none'; upgrade-insecure-requests">
     <title>The Blue Corner — Coming-soon concepts</title>
-    <meta name="description" content="Twelve production-minded directions for The Blue Corner's Canadian men's mental-health coming-soon experience.">
+    <meta name="description" content="Six reference-led directions for The Blue Corner's Canadian men's mental-health coming-soon experience.">
     <meta name="theme-color" content="#197CE3">
-    <meta property="og:title" content="Blue Corner — Twelve coming-soon concepts">
-    <meta property="og:description" content="Twelve distinctive, responsive directions for Blue Corner's therapy-first launch.">
+    <meta property="og:title" content="Blue Corner — Six coming-soon concepts">
+    <meta property="og:description" content="Six distinctive, responsive directions for Blue Corner's therapy-first launch.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://winwinmarketing.github.io/blue-corner-coming-soon-review/">
     <meta property="og:image" content="https://winwinmarketing.github.io/blue-corner-coming-soon-review/assets/social-preview.jpg">
@@ -267,11 +268,11 @@ ${renderCrisisUtility()}
         </div>
         <div class="gallery-hero__copy">
           <p class="eyebrow">Coming-soon direction study</p>
-          <h1>Twelve ways into<br>the corner.</h1>
-          <p>One locked story. Twelve distinct ways to make reaching out feel human, credible, and possible.</p>
+          <h1>Six ways into<br>the corner.</h1>
+          <p>One locked story. Six distinct ways to make reaching out feel human, credible, and possible.</p>
         </div>
         <a class="gallery-down" href="#main" data-scroll-link>
-          <span>Explore all twelve</span>
+          <span>Explore all six</span>
           <span aria-hidden="true">↓</span>
         </a>
       </div>

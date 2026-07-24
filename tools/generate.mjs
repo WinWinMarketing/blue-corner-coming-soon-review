@@ -29,9 +29,9 @@ const ensureConceptStyle = async (concept) => {
 
 await writeGeneratedFile("index.html", renderGallery(concepts));
 
-for (const concept of concepts) {
+for (const [index, concept] of concepts.entries()) {
   await ensureConceptStyle(concept);
-  await writeGeneratedFile(path.join("concepts", concept.slug, "index.html"), renderConceptPage(concept));
+  await writeGeneratedFile(path.join("concepts", concept.slug, "index.html"), renderConceptPage(concept, index));
 }
 
 console.log(`Generated the gallery and ${concepts.length} concept pages.`);

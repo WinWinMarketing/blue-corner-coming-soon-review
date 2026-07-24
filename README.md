@@ -1,6 +1,6 @@
 # Blue Corner coming-soon concepts
 
-Twelve responsive coming-soon directions for Blue Corner, prepared as a public design-review prototype.
+Six responsive coming-soon directions for Blue Corner, normalized to the supplied reference system and prepared as a public design-review prototype.
 
 ## Live review
 
@@ -8,28 +8,24 @@ https://winwinmarketing.github.io/blue-corner-coming-soon-review/
 
 ## Directions
 
-1. Held Seat
-2. Side by Side
-3. The Check-In
-4. At the Corner
-5. The Long Walk
-6. Kitchen Light
-7. Workday Pause
-8. What Hands Say
-9. Listening Room
-10. Blue Margin
-11. On the Other End
-12. Two Ways In
+1. 03 — The Check-In
+2. 04 — At the Corner
+3. 06 — Kitchen Light
+4. 09 — Listening Room
+5. 11 — On the Other End
+6. 12 — Two Ways In
+
+The six retained routes are the only public concept directories and share the reference page's section order and responsive system. The site checker rejects any extra route directory.
 
 See [CONCEPT-GOALS.md](CONCEPT-GOALS.md) for the rationale behind each direction.
 
 ## Content and generation
 
 - `tools/source-copy.mjs` is the single source for the locked reference-site copy.
-- `tools/concepts.mjs` maps the 12 titles, public slugs, descriptions, and tactile material art assets.
+- `tools/concepts.mjs` maps the six retained titles, public slugs, descriptions, and tactile material art assets.
 - `node tools/generate.mjs` rebuilds the gallery and all concept HTML without dependencies or runtime fetching.
 - `node tools/check-site.mjs` checks copy parity, page order, local links, security metadata, form hooks, shared brand colours, and font weights. Add `--strict-images` for the final pre-deploy gate.
-- Each concept keeps its own `style.css`; the generator creates a clearly marked empty scaffold only when that file does not exist.
+- Each retained concept keeps a small `style.css` for hero crop, emphasis, and restrained accent placement; the full reference system lives in `assets/styles/concept-base.css`.
 
 ## Privacy and safety
 
