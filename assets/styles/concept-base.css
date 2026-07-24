@@ -751,6 +751,18 @@
   font-size: clamp(4rem, 6.2vw, 5.75rem);
 }
 
+@media (min-width: 64.0625rem) {
+  .conversion__heading h2 {
+    font-size: clamp(4.5rem, 9.17vw, 8.25rem);
+  }
+}
+
+@media (min-width: 48.0625rem) and (max-width: 64rem) {
+  .conversion__heading h2 {
+    font-size: clamp(4rem, 7.2vw, 4.75rem);
+  }
+}
+
 .conversion__heading > p:last-child {
   max-inline-size: 35ch;
   margin: var(--space-xl) 0 0;
