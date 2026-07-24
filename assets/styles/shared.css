@@ -177,11 +177,18 @@ button {
 }
 
 .eyebrow {
+  display: inline-block;
+  inline-size: fit-content;
+  max-inline-size: min(100%, 38ch);
   margin: 0;
-  font-size: var(--font-size-small);
+  padding: 0.35rem 0.55rem 0.3rem;
+  background: var(--brand-yellow);
+  color: var(--brand-navy);
+  font-size: var(--font-size-support);
   font-weight: 700;
-  letter-spacing: 0.12em;
-  line-height: 1.25;
+  letter-spacing: 0.1em;
+  line-height: 1.2;
+  text-wrap: balance;
   text-transform: uppercase;
 }
 

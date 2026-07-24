@@ -9,13 +9,13 @@ const toolsDirectory = path.dirname(fileURLToPath(import.meta.url));
 const rootDirectory = path.resolve(toolsDirectory, "..");
 const failures = [];
 const strictImages = process.argv.includes("--strict-images");
-const approvedHomeSha256 = "cb267807aa21517cf3b2d89363928f85033eaae0bf95e64f8d7ed3f4fcf1d677";
+const approvedHomeSha256 = "77e67cc759ba8371434fd8e722eb3f93c7b703542694c71f76e90ef4d83bc589";
 const approvedAssets = Object.freeze({
   "assets/styles/brand.css": "86c57f4478c132ae687d6857352b9eefa7cd24ee83c4ff8e7240c560ea409370",
-  "assets/styles/shared.css": "1e54cbfc50352431ee3182ba29692c693311f39f811b56563e5d7beb2d421e6a",
-  "assets/styles/concept-base.css": "897bc7ffd1963cf8eeb405ec222d5839a467d4ea046e365e22ded13ebffdef45",
+  "assets/styles/shared.css": "09dd5672c3345e513969fa8c45ea7b2599c85aed904af344f13fa2ce47408e7b",
+  "assets/styles/concept-base.css": "70ee86081f08ed9ffc4fcc5d408ad9dbaceefa4fc1541e2390a064f9f930f43d",
   "assets/scripts/shared.js": "5d77e4a770625571bd3e97257be4e2be0f1e303503cc813d5d98ded91618cd36",
-  "assets/art/blue-corner-reference-ring.webp": "22bbe8a535d1707c6d7724f9a2d71ea9f1ff8e924d50ea690d2a251062cd07f2",
+  "assets/art/blue-corner-reference-ring-brand-v2.webp": "805dafa5d496b4be6d0a912a50ee37f202fe8ba98d8b2241275867ce2b9f8b22",
 });
 
 const fail = (message) => failures.push(message);
@@ -59,9 +59,10 @@ for (const removedPath of ["assets/styles/gallery.css", "tools/concepts.mjs", "C
 if (!home.includes('<body class="concept-page">')) fail("Root must retain the canonical homepage body");
 if (/(?:concept-addition|data-module|data-concept-nav|gallery-|Twelve ways|Concept add-on)/i.test(home)) fail("Root homepage includes retired gallery or variant markup");
 if (home.includes("Designer review only")) fail("Root must not expose the retired editorial review note");
-if (!home.includes('class="concept-hero__lead-line">Three in four suicides in Canada are men.</span> <span class="concept-hero__lead-line">Let that sit for a second.</span>')) {
-  fail("Hero support copy must preserve the requested desktop line break with semantic text");
+if (!home.includes('class="concept-hero__lead-line"><span class="concept-hero__underline">Three</span> in four suicides in Canada are men.</span> <span class="concept-hero__lead-line">Let that sit for a second.</span>')) {
+  fail("Hero support copy must preserve the locked lines and yellow Three underline");
 }
+if (home.includes('The guy who looks fine, says "good" when you ask, and is quietly running on empty.')) fail("Retired hero sentence must remain removed");
 if (count(home, "data-prototype-form") !== 1 || /<form\b[^>]*\baction=/i.test(home)) fail("Root must retain one local-only form without an action");
 if (count(home, 'name="role" type="radio"') !== 2 || !home.includes("<legend>I'm joining as</legend>")) fail("Root form must retain exactly two named role radios");
 for (const role of ["Patient", "Therapist"]) {
@@ -70,8 +71,8 @@ for (const role of ["Patient", "Therapist"]) {
 if (!/name="role"[^>]*required[^>]*aria-describedby="member-role-error"/.test(home) || count(home, "data-role-error") !== 1) {
   fail("Root role selector must have the local accessible validation contract");
 }
-if (!home.includes('class="concept-hero__headline-line" aria-hidden="true">Nobody</span><span class="concept-hero__headline-line" aria-hidden="true">Fights <span class="concept-hero__accent">Alone.</span>')) {
-  fail("Hero must keep the two-line Nobody / Fights Alone. lock with a semantic Alone. accent");
+if (!home.includes('class="concept-hero__headline-line" aria-hidden="true">Nobody</span><span class="concept-hero__headline-line" aria-hidden="true">Fights <span class="concept-hero__accent concept-hero__underline">Alone.</span>')) {
+  fail("Hero must keep the two-line lock with blue and yellow-underlined Alone.");
 }
 for (const section of ["concept-hero", "stats", "symptoms", "meaning", "roadmap", "conversion"]) {
   if (!home.includes(`class="${section}`)) fail(`Core ${section} section is missing`);
@@ -79,12 +80,15 @@ for (const section of ["concept-hero", "stats", "symptoms", "meaning", "roadmap"
 if (!/^\s*<header class="site-header">\s*<div class="site-header__inner page-frame">/m.test(home)) {
   fail("Homepage masthead must be full-bleed with a page-frame inner");
 }
+if (!/<nav class="site-header__actions"[^>]*>[\s\S]*?Get early access[\s\S]*?Therapists, join us[\s\S]*?<\/nav>/.test(home) || home.includes("concept-hero__actions")) {
+  fail("Both hero actions must live only in the compact masthead");
+}
 if (count(home, 'href="https://use.typekit.net/ciy6txz.css"') !== 1
   || !home.includes("style-src 'self' https://use.typekit.net;")
   || !home.includes("font-src 'self' https://use.typekit.net;")) {
   fail("Typekit stylesheet and constrained style/font CSP are required");
 }
-if (count(home, 'href="assets/styles/concept-base.css?v=897bc7ff"') !== 1) {
+if (count(home, 'href="assets/styles/concept-base.css?v=70ee8608"') !== 1) {
   fail("Homepage must version the corrected core stylesheet for cache refresh");
 }
 if (!home.includes(`src="assets/art/${referenceHero.image}"`) || /(?:href|src)="\/assets\//.test(home)) {
@@ -117,6 +121,27 @@ for (const readabilityRule of [
 ]) {
   if (!readabilityRule.test(`${conceptCss}\n${sharedCss}`)) fail("Supporting copy must use the readable 1rem scale");
 }
+if (!/\.eyebrow\s*\{[^}]*max-inline-size:\s*min\(100%, 38ch\);[^}]*background:\s*var\(--brand-yellow\);[^}]*color:\s*var\(--brand-navy\);[^}]*font-size:\s*var\(--font-size-support\);/.test(sharedCss)) {
+  fail("Eyebrows must use the readable navy-on-yellow two-line treatment");
+}
+if (count(home, 'class="marker-band"') !== 5
+  || !home.includes('<span class="marker-band">worse.</span>')
+  || !home.includes('<span class="marker-band">A Corner.</span>')
+  || !home.includes('<span class="marker-band">therapy.</span>')
+  || !home.includes('<span class="marker-band">Therapy</span>')
+  || !home.includes('<span class="marker-band">one</span>')) {
+  fail("The five approved marker-band highlights must remain");
+}
+if (!/\.section-heading h2 > span\s*\{[^}]*display:\s*block;/.test(conceptCss)
+  || !/\.marker-band\s*\{[^}]*display:\s*inline;/.test(conceptCss)) {
+  fail("Heading line locks must not force nested marker bands into full-width rows");
+}
+if (count(home, 'class="meaning__body-line"') !== 2 || !home.includes("That&#39;s what this is.</span>")) {
+  fail("Manifesto body must retain its two deliberate desktop lines");
+}
+if (count(home, "roadmap-item--current") !== 1 || count(home, "roadmap-item--future") !== 4) {
+  fail("Roadmap must keep one dominant Therapy item and four muted future services");
+}
 if (!/\.concept-hero__accent\s*\{[^}]*color:\s*var\(--brand-blue\);/.test(conceptCss) || !/letter-spacing:\s*-0\.035em;/.test(conceptCss)) {
   fail("Hero accent and restrained condensed-display tracking are required");
 }
@@ -131,6 +156,28 @@ if (!/@media \(min-width: 82\.0625rem\)\s*\{\s*\.site-header__inner\.page-frame,
 }
 if (!/@media \(min-width: 82\.0625rem\)\s*\{[\s\S]*?\.concept-hero h1\s*\{[^}]*font-size:\s*7\.25rem;/.test(conceptCss)) {
   fail("Wide-desktop hero display must cap at 7.25rem to preserve the image gap");
+}
+if (!/\.site-header__actions \.button\s*\{[^}]*min-block-size:\s*2\.75rem;[^}]*font-size:\s*1rem;/.test(conceptCss)
+  || !/\.concept-hero__inner\s*\{[^}]*row-gap:\s*clamp\(0\.75rem, 1\.2vw, 1rem\);[^}]*min-block-size:\s*clamp\(35rem, 43vw, 39\.5rem\);/.test(conceptCss)) {
+  fail("Compact masthead and desktop hero fit contract is missing");
+}
+if (!/\.stats__sources\s*\{[^}]*grid-template-columns:\s*1fr;/.test(conceptCss)
+  || /\.stats__grid\s*\{[^}]*border-block/.test(conceptCss)) {
+  fail("Statistics must keep stacked sources and vertical dividers only");
+}
+if (!/\.roadmap__list\s*\{[^}]*grid-template-columns:[^}]*\}[^@]*?\.roadmap-item\s*\{[^}]*border-inline-end:\s*1px solid var\(--brand-navy\);/.test(conceptCss)
+  || /\.roadmap__list\s*\{[^}]*border-block/.test(conceptCss)
+  || !/\.roadmap-item--future\s*\{[^}]*background:\s*color-mix\(in oklch, var\(--brand-navy\) 7%, var\(--brand-off-white\)\);[^}]*color:\s*var\(--color-muted\);/.test(conceptCss)) {
+  fail("Roadmap must stay dense with vertical dividers and muted future services");
+}
+if (!/@media \(min-width: 82\.0625rem\)\s*\{[\s\S]*?\.meaning__body-line\s*\{[^}]*display:\s*block;[^}]*white-space:\s*nowrap;[\s\S]*?\.conversion__inner\s*\{[^}]*grid-template-columns:\s*minmax\(0, 1fr\) minmax\(0, 40\.625rem\);/.test(conceptCss)) {
+  fail("Wide-desktop manifesto lines and 650px conversion form track are required");
+}
+if (!/\.conversion__forms\s*\{[^}]*align-self:\s*start;/.test(conceptCss)
+  || !/\.conversion-path\s*\{[^}]*align-self:\s*start;[^}]*padding:\s*1\.25rem clamp\(1\.5rem, 2vw, 1\.75rem\);/.test(conceptCss)
+  || !/\.conversion-path h3\s*\{[^}]*margin:\s*var\(--space-sm\) 0;/.test(conceptCss)
+  || !/@media \(min-width: 48\.0625rem\) and \(max-width: 64rem\)\s*\{[\s\S]*?\.conversion-path\s*\{[^}]*padding-block:\s*var\(--space-md\);[\s\S]*?\.conversion \.prototype-form fieldset\s*\{[^}]*gap:\s*var\(--space-sm\);[\s\S]*?\.conversion \.field-error:empty\s*\{[^}]*min-block-size:\s*0;/.test(conceptCss)) {
+  fail("Conversion card must self-start and retain its compact desktop spacing contract");
 }
 if (!/\.meaning\s*\{[^}]*background:\s*var\(--brand-blue\);/.test(conceptCss) || !/\.meaning__mark\s*\{[^}]*background:\s*var\(--brand-navy\);/.test(conceptCss)) {
   fail("Manifesto must retain its navy rail and bright-blue content field");

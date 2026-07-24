@@ -22,21 +22,37 @@
 
 .site-header__inner {
   display: flex;
-  min-block-size: clamp(7rem, 10.2vw, 9.1875rem);
+  min-block-size: clamp(5.5rem, 7vw, 6rem);
   align-items: center;
-  padding-block: var(--space-lg);
+  justify-content: space-between;
+  gap: clamp(1.5rem, 3vw, 3rem);
+  padding-block: var(--space-md);
 }
 
 .site-header__brand {
   display: inline-flex;
   min-block-size: 2.75rem;
   align-items: center;
-  inline-size: clamp(14rem, 22vw, 20rem);
+  inline-size: clamp(12.5rem, 18vw, 16.5rem);
 }
 
 .site-header__brand img {
   inline-size: 100%;
   block-size: auto;
+}
+
+.site-header__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-sm);
+}
+
+.site-header__actions .button {
+  min-block-size: 2.75rem;
+  padding: 0.625rem 1rem;
+  font-size: 1rem;
+  white-space: nowrap;
 }
 
 .concept-hero {
@@ -54,9 +70,9 @@
   align-content: center;
   align-items: start;
   column-gap: 2%;
-  row-gap: clamp(1.5rem, 2vw, 2rem);
-  min-block-size: clamp(38rem, 50.35vw, 45.3125rem);
-  padding-block: clamp(2.25rem, 3vw, 2.75rem);
+  row-gap: clamp(0.75rem, 1.2vw, 1rem);
+  min-block-size: clamp(35rem, 43vw, 39.5rem);
+  padding-block: clamp(1.75rem, 2.2vw, 2.25rem);
 }
 
 .concept-hero__copy {
@@ -75,12 +91,12 @@
 }
 
 .concept-hero h1 {
-  margin-block-start: var(--space-xl);
+  margin-block-start: var(--space-lg);
   font-size: clamp(4.5rem, 9.17vw, 8.25rem);
 }
 
 .concept-hero__headline-line,
-.section-heading h2 span {
+.section-heading h2 > span {
   display: block;
 }
 
@@ -93,6 +109,22 @@
   font-kerning: normal;
   font-feature-settings: "kern" 1, "liga" 1, "clig" 1;
   letter-spacing: -0.02em;
+}
+
+.concept-hero__underline {
+  text-decoration: underline;
+  text-decoration-color: var(--brand-yellow);
+  text-decoration-thickness: 0.09em;
+  text-underline-offset: 0.08em;
+}
+
+.marker-band {
+  display: inline;
+  padding-inline: 0.06em;
+  background: linear-gradient(to top, var(--brand-yellow) 0 38%, transparent 38% 100%);
+  color: inherit;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
 }
 
 .concept-hero__lead {
@@ -109,6 +141,11 @@
   .concept-hero__lead-line {
     display: block;
   }
+
+  .symptoms__heading .eyebrow {
+    max-inline-size: none;
+    white-space: nowrap;
+  }
 }
 
 .concept-hero__details {
@@ -119,13 +156,6 @@
 .concept-hero__body {
   max-inline-size: 55ch;
   margin: 0;
-}
-
-.concept-hero__actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-sm);
-  margin-block-start: var(--space-xl);
 }
 
 .concept-hero__media {
@@ -246,8 +276,8 @@
 
 .stats__sources {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-md) var(--space-2xl);
+  grid-template-columns: 1fr;
+  gap: var(--space-xs);
   margin-block-start: var(--space-xl);
   font-size: var(--font-size-support);
   line-height: 1.5;
@@ -353,36 +383,35 @@
   white-space: nowrap;
 }
 
-.meaning__copy p:last-child {
-  max-inline-size: 61ch;
+.meaning__body {
+  max-inline-size: none;
   margin: var(--space-2xl) 0 0;
 }
 
 .roadmap {
   display: flex;
-  min-block-size: clamp(39rem, 51.46vw, 46.3125rem);
+  min-block-size: clamp(30rem, 40vw, 36rem);
   flex-direction: column;
   justify-content: center;
-  padding-block: clamp(4rem, 6vw, 5.5rem);
+  padding-block: clamp(3rem, 4vw, 4rem);
 }
 
 .roadmap__list {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   padding: 0;
-  margin: clamp(3rem, 5vw, 4.5rem) 0 0;
-  border-block: 1px solid var(--brand-navy);
+  margin: clamp(2rem, 3vw, 3rem) 0 0;
   list-style: none;
 }
 
 .roadmap-item {
   position: relative;
   display: flex;
-  min-block-size: clamp(12rem, 15vw, 13.5rem);
+  min-block-size: clamp(8.5rem, 10vw, 10rem);
   flex-direction: column;
   justify-content: space-between;
   gap: var(--space-lg);
-  padding: var(--space-xl);
+  padding: clamp(1rem, 1.5vw, 1.5rem);
   border-inline-end: 1px solid var(--brand-navy);
 }
 
@@ -390,22 +419,18 @@
   border-inline-end: 0;
 }
 
-.roadmap-item::before {
-  content: "";
-  position: absolute;
-  inset-block-start: 0;
-  inset-inline: 0;
-  block-size: 0.5rem;
-  background: var(--brand-blue);
-}
-
-.roadmap-item:first-child::before {
-  background: var(--brand-yellow);
-}
-
-.roadmap-item span {
+.roadmap-item__name {
   font-size: clamp(1.2rem, 1.75vw, 1.7rem);
   font-weight: var(--font-weight-bold);
+}
+
+.roadmap-item--current .roadmap-item__name {
+  font-size: clamp(1.75rem, 2.4vw, 2.5rem);
+}
+
+.roadmap-item--future {
+  background: color-mix(in oklch, var(--brand-navy) 7%, var(--brand-off-white));
+  color: var(--color-muted);
 }
 
 .roadmap-item strong {
@@ -741,8 +766,8 @@
   grid-template-columns: minmax(0, 42fr) minmax(0, 53fr);
   align-items: start;
   gap: 5%;
-  min-block-size: clamp(38rem, 46vw, 43rem);
-  padding-block: clamp(2.5rem, 3.5vw, 3rem);
+  min-block-size: clamp(34rem, 42vw, 39rem);
+  padding-block: clamp(2rem, 3vw, 2.5rem);
 }
 
 .conversion__heading {
@@ -775,13 +800,15 @@
   display: grid;
   inline-size: 100%;
   max-inline-size: 42.5rem;
+  align-self: start;
   grid-template-columns: 1fr;
   gap: var(--space-lg);
   justify-self: end;
 }
 
 .conversion-path {
-  padding: clamp(1.5rem, 2vw, 1.75rem);
+  align-self: start;
+  padding: 1.25rem clamp(1.5rem, 2vw, 1.75rem);
   border: 1px solid var(--brand-navy);
   background: var(--brand-off-white);
   color: var(--brand-navy);
@@ -792,7 +819,7 @@
 }
 
 .conversion-path h3 {
-  margin: var(--space-md) 0 var(--space-md);
+  margin: var(--space-sm) 0;
   font-size: clamp(2rem, 3vw, 3rem);
   font-weight: var(--font-weight-bold);
   letter-spacing: -0.04em;
@@ -877,6 +904,24 @@
   gap: var(--space-2xs);
 }
 
+@media (min-width: 48.0625rem) and (max-width: 64rem) {
+  .conversion-path {
+    padding-block: var(--space-md);
+  }
+
+  .conversion .prototype-form fieldset {
+    gap: var(--space-sm);
+  }
+
+  .conversion .field-grid {
+    gap: var(--space-xs);
+  }
+
+  .conversion .field-error:empty {
+    min-block-size: 0;
+  }
+}
+
 .conversion-path__note {
   margin: 0;
   font-size: var(--font-size-support);
@@ -911,6 +956,20 @@
 
   .concept-hero h1 {
     font-size: 7.25rem;
+  }
+
+  .meaning__body-line {
+    display: block;
+    white-space: nowrap;
+  }
+
+  .conversion__inner {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 40.625rem);
+    gap: 2rem;
+  }
+
+  .conversion__forms {
+    max-inline-size: 40.625rem;
   }
 }
 
@@ -949,7 +1008,14 @@
   }
 
   .site-header__inner {
-    min-block-size: 6.5rem;
+    min-block-size: 0;
+    flex-wrap: wrap;
+    gap: var(--space-md) var(--space-lg);
+    padding-block: var(--space-lg);
+  }
+
+  .site-header__actions {
+    flex: 1 1 22rem;
   }
 
   .concept-hero__inner {
@@ -1047,7 +1113,7 @@
   }
 
   .roadmap-item {
-    border-block-end: 1px solid var(--brand-navy);
+    border-block-end: 0;
   }
 
   .roadmap-item:nth-child(n + 4) {
@@ -1079,6 +1145,16 @@
     inline-size: min(13rem, 100%);
   }
 
+  .site-header__actions {
+    inline-size: 100%;
+    flex: 1 0 100%;
+    justify-content: stretch;
+  }
+
+  .site-header__actions .button {
+    flex: 1 1 12rem;
+  }
+
   .concept-hero h1 {
     font-size: clamp(2.625rem, 13.8vw, 3.375rem);
   }
@@ -1091,13 +1167,11 @@
     white-space: normal;
   }
 
-  .concept-hero__actions,
   .concept-addition__controls {
     align-items: stretch;
     flex-direction: column;
   }
 
-  .concept-hero__actions .button,
   .concept-addition__controls .button {
     inline-size: 100%;
   }
@@ -1132,9 +1206,9 @@
   .roadmap-item,
   .roadmap-item:nth-child(3),
   .roadmap-item:nth-child(n + 4) {
-    min-block-size: 9rem;
+    min-block-size: 7rem;
     border-inline-end: 0;
-    border-block-end: 1px solid var(--brand-navy);
+    border-block-end: 0;
   }
 
   .roadmap-item:last-child {

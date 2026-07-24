@@ -1,8 +1,8 @@
 export const referenceHero = Object.freeze({
-  image: "blue-corner-reference-ring.webp",
+  image: "blue-corner-reference-ring-brand-v2.webp",
   width: 1774,
   height: 887,
-  alt: "An empty black boxing-ring corner with white ropes and a single wooden stool.",
+  alt: "An empty boxing-ring corner with yellow ropes, a black post and stool, and a deep blue backdrop.",
 });
 
 export const sourceCopy = Object.freeze({
@@ -12,7 +12,7 @@ export const sourceCopy = Object.freeze({
     heading: "Nobody Fights Alone.",
     leadFirst: "Three in four suicides in Canada are men.",
     leadSecond: "Let that sit for a second.",
-    body: "The crisis isn't loud. It hides in plain sight. The guy who looks fine, says \"good\" when you ask, and is quietly running on empty. Canada's corner for men is about to open.",
+    body: "The crisis isn't loud. It hides in plain sight. Canada's corner for men is about to open.",
     memberCta: "Get early access",
     therapistCta: "Therapists, join us",
   }),
@@ -40,8 +40,9 @@ export const sourceCopy = Object.freeze({
   }),
   meaning: Object.freeze({
     eyebrow: "What Blue Corner is",
-    heading: "Not a clinic. A corner.",
-    body: "In boxing, the underdog fights out of the blue corner. It's where his people wait between rounds, patch him up, and tell him he's still in it. That's what this is. Real people who've been there, in your corner for the guy who never asks. You're not broken. You've just been fighting without a corner.",
+    heading: "Not a clinic. A Corner.",
+    bodyFirst: "The blue corner is where the underdog's people wait between rounds, patch him up, and tell him he's still in it. That's what this is.",
+    bodySecond: "Real people who've been there, in your corner—because you're not broken. You've just been fighting without one.",
   }),
   roadmap: Object.freeze({
     eyebrow: "This is just the first bell",

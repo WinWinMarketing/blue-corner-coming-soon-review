@@ -67,9 +67,9 @@ export const renderHomePage = () => {
               <h3>${escapeHtml(item.heading)}</h3>
               <p>${escapeHtml(item.body)}</p>
             </article>`).join("");
-  const roadmap = sourceCopy.roadmap.items.map((item) => `
-            <li class="roadmap-item">
-              <span>${escapeHtml(item.name)}</span>
+  const roadmap = sourceCopy.roadmap.items.map((item, index) => `
+            <li class="roadmap-item ${index === 0 ? "roadmap-item--current" : "roadmap-item--future"}">
+              <span class="roadmap-item__name">${index === 0 ? `<span class="marker-band">${escapeHtml(item.name)}</span>` : escapeHtml(item.name)}</span>
               <strong>${escapeHtml(item.status)}</strong>
             </li>`).join("");
 
@@ -93,7 +93,7 @@ export const renderHomePage = () => {
     <link rel="stylesheet" href="https://use.typekit.net/ciy6txz.css">
     <link rel="stylesheet" href="assets/styles/brand.css">
     <link rel="stylesheet" href="assets/styles/shared.css">
-    <link rel="stylesheet" href="assets/styles/concept-base.css?v=897bc7ff">
+    <link rel="stylesheet" href="assets/styles/concept-base.css?v=70ee8608">
     <script src="assets/scripts/shared.js" defer></script>
   </head>
   <body class="concept-page">
@@ -104,6 +104,10 @@ export const renderHomePage = () => {
         <a class="site-header__brand" href="./" aria-label="The Blue Corner home">
           <img src="assets/brand/logo-horizontal-white.png" width="1655" height="170" alt="${escapeHtml(sourceCopy.header.name)}">
         </a>
+        <nav class="site-header__actions" aria-label="Blue Corner access">
+          <a class="button button--signal" href="#member-form" data-scroll-link>${escapeHtml(sourceCopy.hero.memberCta)}</a>
+          <a class="button button--ghost" href="#roadmap-title" data-scroll-link>${escapeHtml(sourceCopy.hero.therapistCta)}</a>
+        </nav>
       </div>
     </header>
 
@@ -112,19 +116,15 @@ export const renderHomePage = () => {
         <div class="concept-hero__inner page-frame">
           <div class="concept-hero__copy" data-reveal>
             <p class="eyebrow">${escapeHtml(sourceCopy.hero.eyebrow)}</p>
-            <h1 id="hero-title" aria-label="Nobody Fights Alone."><span class="concept-hero__headline-line" aria-hidden="true">Nobody</span><span class="concept-hero__headline-line" aria-hidden="true">Fights <span class="concept-hero__accent">Alone.</span></span></h1>
+            <h1 id="hero-title" aria-label="Nobody Fights Alone."><span class="concept-hero__headline-line" aria-hidden="true">Nobody</span><span class="concept-hero__headline-line" aria-hidden="true">Fights <span class="concept-hero__accent concept-hero__underline">Alone.</span></span></h1>
           </div>
           <figure class="concept-hero__media image-frame" data-image-frame data-image-fallback-label="Blue Corner hero image">
             <img class="concept-hero__image" src="assets/art/${escapeHtml(referenceHero.image)}" width="${escapeHtml(referenceHero.width)}" height="${escapeHtml(referenceHero.height)}" alt="${escapeHtml(referenceHero.alt)}" fetchpriority="high" data-fallback-image>
             <span class="concept-hero__corner" aria-hidden="true"></span>
           </figure>
-          <p class="concept-hero__lead" data-reveal><span class="concept-hero__lead-line">${escapeHtml(sourceCopy.hero.leadFirst)}</span> <span class="concept-hero__lead-line">${escapeHtml(sourceCopy.hero.leadSecond)}</span></p>
+          <p class="concept-hero__lead" data-reveal><span class="concept-hero__lead-line"><span class="concept-hero__underline">Three</span> in four suicides in Canada are men.</span> <span class="concept-hero__lead-line">${escapeHtml(sourceCopy.hero.leadSecond)}</span></p>
           <div class="concept-hero__details" data-reveal>
             <p class="concept-hero__body">${escapeHtml(sourceCopy.hero.body)}</p>
-            <div class="concept-hero__actions">
-              <a class="button button--signal" href="#member-form" data-scroll-link>${escapeHtml(sourceCopy.hero.memberCta)}</a>
-              <a class="button button--ghost" href="#roadmap-title" data-scroll-link>${escapeHtml(sourceCopy.hero.therapistCta)}</a>
-            </div>
           </div>
         </div>
       </section>
@@ -133,7 +133,7 @@ export const renderHomePage = () => {
         <div class="stats__inner page-frame">
           <header class="section-heading stats__heading" data-reveal>
             <p class="eyebrow">${escapeHtml(sourceCopy.stats.eyebrow)}</p>
-            <h2 id="stats-title" aria-label="${escapeHtml(sourceCopy.stats.heading)}"><span aria-hidden="true">It isn’t just bad.</span><span aria-hidden="true">It’s getting worse.</span></h2>
+            <h2 id="stats-title" aria-label="${escapeHtml(sourceCopy.stats.heading)}"><span aria-hidden="true">It isn’t just bad.</span><span aria-hidden="true">It’s getting <span class="marker-band">worse.</span></span></h2>
           </header>
           <div class="stats__grid" data-reveal>${stats}
           </div>
@@ -160,8 +160,8 @@ export const renderHomePage = () => {
           </div>
           <div class="meaning__copy" data-reveal>
             <p class="eyebrow">${escapeHtml(sourceCopy.meaning.eyebrow)}</p>
-            <h2 id="meaning-title">${escapeHtml(sourceCopy.meaning.heading)}</h2>
-            <p>${escapeHtml(sourceCopy.meaning.body)}</p>
+            <h2 id="meaning-title" aria-label="${escapeHtml(sourceCopy.meaning.heading)}"><span aria-hidden="true">Not a clinic. <span class="marker-band">A Corner.</span></span></h2>
+            <p class="meaning__body"><span class="meaning__body-line">${escapeHtml(sourceCopy.meaning.bodyFirst)}</span> <span class="meaning__body-line">${escapeHtml(sourceCopy.meaning.bodySecond)}</span></p>
           </div>
         </div>
       </section>
@@ -169,7 +169,7 @@ export const renderHomePage = () => {
       <section class="roadmap page-frame" aria-labelledby="roadmap-title">
         <header class="section-heading roadmap__heading" data-reveal>
           <p class="eyebrow">${escapeHtml(sourceCopy.roadmap.eyebrow)}</p>
-          <h2 id="roadmap-title" aria-label="${escapeHtml(sourceCopy.roadmap.heading)}"><span aria-hidden="true">We start with therapy.</span><span aria-hidden="true">The rest of the corner is on its way.</span></h2>
+          <h2 id="roadmap-title" aria-label="${escapeHtml(sourceCopy.roadmap.heading)}"><span aria-hidden="true">We start with <span class="marker-band">therapy.</span></span><span aria-hidden="true">The rest of the corner is on its way.</span></h2>
         </header>
         <ol class="roadmap__list" data-reveal>${roadmap}
         </ol>
@@ -179,7 +179,7 @@ export const renderHomePage = () => {
         <div class="conversion__inner page-frame">
           <header class="section-heading conversion__heading" data-reveal>
             <p class="eyebrow">${escapeHtml(sourceCopy.conversion.eyebrow)}</p>
-            <h2 id="conversion-title" aria-label="${escapeHtml(sourceCopy.conversion.heading)}"><span aria-hidden="true">Be one of</span><span aria-hidden="true">the first in</span><span aria-hidden="true">the corner.</span></h2>
+            <h2 id="conversion-title" aria-label="${escapeHtml(sourceCopy.conversion.heading)}"><span aria-hidden="true">Be <span class="marker-band">one</span> of</span><span aria-hidden="true">the first in</span><span aria-hidden="true">the corner.</span></h2>
             <p>${escapeHtml(sourceCopy.conversion.body)}</p>
           </header>
           <div class="conversion__forms">${renderMemberForm()}
