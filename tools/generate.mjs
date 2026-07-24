@@ -1,37 +1,14 @@
-import { access, mkdir, writeFile } from "node:fs/promises";
-import { constants } from "node:fs";
+import { mkdir, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { concepts } from "./concepts.mjs";
-import { renderConceptPage, renderGallery } from "./template.mjs";
+import { renderHomePage } from "./template.mjs";
 
 const toolsDirectory = path.dirname(fileURLToPath(import.meta.url));
 const rootDirectory = path.resolve(toolsDirectory, "..");
+const staleConceptsDirectory = path.join(rootDirectory, "concepts");
 
-const writeGeneratedFile = async (relativePath, content) => {
-  const destination = path.join(rootDirectory, relativePath);
-  await mkdir(path.dirname(destination), { recursive: true });
-  await writeFile(destination, content, "utf8");
-  return relativePath;
-};
+await rm(staleConceptsDirectory, { recursive: true, force: true });
+await mkdir(rootDirectory, { recursive: true });
+await writeFile(path.join(rootDirectory, "index.html"), renderHomePage(), "utf8");
 
-const ensureConceptStyle = async (concept) => {
-  const relativePath = path.join("concepts", concept.slug, "style.css");
-  const destination = path.join(rootDirectory, relativePath);
-  await mkdir(path.dirname(destination), { recursive: true });
-  try {
-    await access(destination, constants.F_OK);
-  } catch {
-    const note = "/* Intentionally empty: every route uses the immutable shared reference CSS. */\n";
-    await writeFile(destination, note, { encoding: "utf8", flag: "wx" });
-  }
-};
-
-await writeGeneratedFile("index.html", renderGallery(concepts));
-
-for (const concept of concepts) {
-  await ensureConceptStyle(concept);
-  await writeGeneratedFile(path.join("concepts", concept.slug, "index.html"), renderConceptPage(concept));
-}
-
-console.log(`Generated the gallery and ${concepts.length} concept pages.`);
+console.log("Generated the canonical Blue Corner homepage and removed stale concept routes.");

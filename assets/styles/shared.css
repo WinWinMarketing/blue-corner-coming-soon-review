@@ -19,6 +19,8 @@ body {
   font-family: var(--font-brand);
   font-size: var(--font-size-body);
   line-height: 1.55;
+  font-kerning: normal;
+  font-feature-settings: "kern" 1, "liga" 1, "clig" 1;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   font-synthesis-weight: none;
