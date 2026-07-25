@@ -2,12 +2,8 @@
   "use strict";
 
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-  document.documentElement.dataset.reducedMotion = reducedMotion.matches ? "true" : "false";
-  if (typeof reducedMotion.addEventListener === "function") {
-    reducedMotion.addEventListener("change", (event) => {
-      document.documentElement.dataset.reducedMotion = event.matches ? "true" : "false";
-    });
-  }
+  const root = document.documentElement;
+  root.dataset.reducedMotion = reducedMotion.matches ? "true" : "false";
 
   document.querySelectorAll("[data-fallback-image]").forEach((image) => {
     const frame = image.closest("[data-image-frame]");
@@ -36,18 +32,81 @@
   });
 
   const revealTargets = [...document.querySelectorAll("[data-reveal]")];
-  if (reducedMotion.matches || !("IntersectionObserver" in window)) {
-    revealTargets.forEach((target) => target.classList.add("is-visible"));
-  } else {
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (!entry.isIntersecting) return;
-        entry.target.classList.add("is-visible");
-        observer.unobserve(entry.target);
+  let revealObserver = null;
+
+  const disableReveals = () => {
+    root.classList.remove("reveal-ready");
+    revealObserver?.disconnect();
+    revealObserver = null;
+  };
+
+  const enableReveals = () => {
+    disableReveals();
+    if (reducedMotion.matches || !("IntersectionObserver" in window)) return;
+
+    try {
+      const observer = new IntersectionObserver((entries) => {
+        try {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
+            entry.target.classList.add("is-visible");
+            observer.unobserve(entry.target);
+          });
+        } catch {
+          disableReveals();
+        }
+      }, { rootMargin: "0px 0px -8%", threshold: 0.12 });
+
+      revealObserver = observer;
+      root.classList.add("reveal-ready");
+      revealTargets.forEach((target) => {
+        target.classList.remove("is-visible");
+        observer.observe(target);
       });
-    }, { rootMargin: "0px 0px -8%", threshold: 0.12 });
-    revealTargets.forEach((target) => observer.observe(target));
+    } catch {
+      disableReveals();
+    }
+  };
+
+  enableReveals();
+  if (typeof reducedMotion.addEventListener === "function") {
+    reducedMotion.addEventListener("change", (event) => {
+      root.dataset.reducedMotion = event.matches ? "true" : "false";
+      if (event.matches) {
+        disableReveals();
+      } else {
+        enableReveals();
+      }
+    });
   }
+
+  let scrollbarTimer = 0;
+  const hideActiveScrollbar = () => root.classList.remove("is-scrollbar-active");
+  const showActiveScrollbar = () => {
+    root.classList.add("is-scrollbar-active");
+    window.clearTimeout(scrollbarTimer);
+    scrollbarTimer = window.setTimeout(hideActiveScrollbar, 700);
+  };
+  const trackScrollbarEdge = (event) => {
+    root.classList.toggle("is-scrollbar-edge", window.innerWidth - event.clientX <= 12);
+  };
+  const clearScrollbarEdge = () => root.classList.remove("is-scrollbar-edge");
+  const cleanupScrollbar = () => {
+    window.clearTimeout(scrollbarTimer);
+    window.removeEventListener("scroll", showActiveScrollbar);
+    window.removeEventListener("pointermove", trackScrollbarEdge);
+    document.removeEventListener("pointerleave", clearScrollbarEdge);
+    window.removeEventListener("pagehide", handleScrollbarPageHide);
+    root.classList.remove("is-scrollbar-active", "is-scrollbar-edge");
+  };
+  const handleScrollbarPageHide = (event) => {
+    if (!event.persisted) cleanupScrollbar();
+  };
+
+  window.addEventListener("scroll", showActiveScrollbar, { passive: true });
+  window.addEventListener("pointermove", trackScrollbarEdge, { passive: true });
+  document.addEventListener("pointerleave", clearScrollbarEdge, { passive: true });
+  window.addEventListener("pagehide", handleScrollbarPageHide);
 
   const validationMessages = {
     name: { required: "Please enter your name." },

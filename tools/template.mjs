@@ -1,5 +1,7 @@
 import { referenceHero, safetyCopy, sourceCopy } from "./source-copy.mjs";
 
+const HERO_CACHE_KEY = "ac190f62";
+
 const escapeHtml = (value) => String(value)
   .replaceAll("&", "&amp;")
   .replaceAll("<", "&lt;")
@@ -55,6 +57,15 @@ const renderMemberForm = () => {
             </article>`;
 };
 
+const renderConversionBody = () => {
+  const copy = sourceCopy.conversion.body;
+  const sentenceBreak = copy.indexOf(". ");
+  if (sentenceBreak < 0) return escapeHtml(copy);
+  const first = copy.slice(0, sentenceBreak + 1);
+  const second = copy.slice(sentenceBreak + 2);
+  return `<span class="conversion__body-line">${escapeHtml(first)}</span> <span class="conversion__body-line">${escapeHtml(second)}</span>`;
+};
+
 export const renderHomePage = () => {
   const stats = sourceCopy.stats.items.map((item) => `
             <article class="stat">
@@ -86,14 +97,14 @@ export const renderHomePage = () => {
     <meta property="og:title" content="The Blue Corner — Nobody Fights Alone.">
     <meta property="og:description" content="${escapeHtml(sourceCopy.hero.body)}">
     <meta property="og:type" content="website">
-    <meta property="og:image" content="https://winwinmarketing.github.io/blue-corner-coming-soon-review/assets/art/${escapeHtml(referenceHero.image)}">
+    <meta property="og:image" content="https://winwinmarketing.github.io/blue-corner-coming-soon-review/assets/art/${escapeHtml(referenceHero.image)}?v=${HERO_CACHE_KEY}">
     <link rel="icon" href="assets/brand/mark-blue.png" type="image/png">
     <script src="assets/scripts/boot.js"></script>
     <link rel="stylesheet" href="https://use.typekit.net/ciy6txz.css">
     <link rel="stylesheet" href="assets/styles/brand.css">
     <link rel="stylesheet" href="assets/styles/shared.css">
-    <link rel="stylesheet" href="assets/styles/concept-base.css?v=11b0a8b1">
-    <script src="assets/scripts/shared.js" defer></script>
+    <link rel="stylesheet" href="assets/styles/concept-base.css?v=2032fdaa">
+    <script src="assets/scripts/shared.js?v=4a4bf5f3" defer></script>
   </head>
   <body class="concept-page">
     <a class="skip-link" href="#main">Skip to main content</a>
@@ -118,7 +129,7 @@ export const renderHomePage = () => {
             <h1 id="hero-title" aria-label="Nobody Fights Alone."><span class="concept-hero__headline-line" aria-hidden="true">Nobody</span><span class="concept-hero__headline-line" aria-hidden="true">Fights <span class="concept-hero__accent concept-hero__underline">Alone.</span></span></h1>
           </div>
           <figure class="concept-hero__media image-frame" data-image-frame data-image-fallback-label="Blue Corner hero image">
-            <img class="concept-hero__image" src="assets/art/${escapeHtml(referenceHero.image)}" width="${escapeHtml(referenceHero.width)}" height="${escapeHtml(referenceHero.height)}" alt="${escapeHtml(referenceHero.alt)}" fetchpriority="high" data-fallback-image>
+            <img class="concept-hero__image" src="assets/art/${escapeHtml(referenceHero.image)}?v=${HERO_CACHE_KEY}" width="${escapeHtml(referenceHero.width)}" height="${escapeHtml(referenceHero.height)}" alt="${escapeHtml(referenceHero.alt)}" fetchpriority="high" data-fallback-image>
             <span class="concept-hero__corner" aria-hidden="true"></span>
           </figure>
           <p class="concept-hero__lead" data-reveal><span class="concept-hero__lead-line"><span class="concept-hero__underline">Three</span> in four suicides in Canada are men.</span> <span class="concept-hero__lead-line">${escapeHtml(sourceCopy.hero.leadSecond)}</span></p>
@@ -181,7 +192,7 @@ export const renderHomePage = () => {
           <header class="section-heading conversion__heading" data-reveal>
             <p class="eyebrow">${escapeHtml(sourceCopy.conversion.eyebrow)}</p>
             <h2 id="conversion-title" aria-label="${escapeHtml(sourceCopy.conversion.heading)}"><span aria-hidden="true">Be <span class="marker-band">one</span> of</span><span aria-hidden="true">the first in</span><span aria-hidden="true">the corner.</span></h2>
-            <p>${escapeHtml(sourceCopy.conversion.body)}</p>
+            <p>${renderConversionBody()}</p>
           </header>
           <div class="conversion__forms">${renderMemberForm()}
           </div>

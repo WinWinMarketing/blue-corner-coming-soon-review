@@ -9,14 +9,18 @@ const toolsDirectory = path.dirname(fileURLToPath(import.meta.url));
 const rootDirectory = path.resolve(toolsDirectory, "..");
 const failures = [];
 const strictImages = process.argv.includes("--strict-images");
-const approvedHomeSha256 = "a0081a51b934ac940720f00507dc44c9878b509b0cdff9feb8099758a6a3baf2";
+const approvedHomeSha256 = "54a6e904e7d5fc8dc989ef92a5e446dbb96b26622fcd817576398dd8d89f7dad";
 const approvedAssets = Object.freeze({
   "assets/styles/brand.css": "a80fc3111bf8b07398eb344d855e302a1e748678d6164c0f1999cee842cf25f6",
-  "assets/styles/shared.css": "a5fafa418c782ea2fa02805674c50e202f9f8f0814a1d2a012ef5b69c5c7799b",
-  "assets/styles/concept-base.css": "11b0a8b14166c3c5af61c3a86f82c3590bf8f4aa7c769bcb23accf3dd7b8d2e0",
-  "assets/scripts/shared.js": "5d77e4a770625571bd3e97257be4e2be0f1e303503cc813d5d98ded91618cd36",
-  "assets/art/blue-corner-reference-ring-brand-v3.webp": "0d921a25360f1a36d23bbb48ce401b723b95bb7959f1439d7548d9350c450829",
+  "assets/styles/shared.css": "68d8af37dd07de7e90a256d3ef7472d2330d03f80dbaccfe858e9b54b84fb835",
+  "assets/styles/concept-base.css": "2032fdaa924ef29b140b1141254f0858b901a7d5832d3c8cbbdee669434f1a6b",
+  "assets/scripts/shared.js": "4a4bf5f3e576e51b644d73ed4c2c16e060e526532b0cc4f9af8426a1e7720c48",
+  "assets/art/blue-corner-reference-ring.webp": "22bbe8a535d1707c6d7724f9a2d71ea9f1ff8e924d50ea690d2a251062cd07f2",
+  "assets/art/blue-corner-reference-ring-brand-v3.webp": "ac190f623adc1e2f7cd474853c39917912ea381c8657a69c8c278ebbd497ea84",
 });
+const sharedScriptCacheKey = approvedAssets["assets/scripts/shared.js"].slice(0, 8);
+const conceptCssCacheKey = approvedAssets["assets/styles/concept-base.css"].slice(0, 8);
+const heroCacheKey = approvedAssets["assets/art/blue-corner-reference-ring-brand-v3.webp"].slice(0, 8);
 
 const fail = (message) => failures.push(message);
 const count = (value, token) => value.split(token).length - 1;
@@ -88,11 +92,19 @@ if (count(home, 'href="https://use.typekit.net/ciy6txz.css"') !== 1
   || !home.includes("font-src 'self' https://use.typekit.net;")) {
   fail("Typekit stylesheet and constrained style/font CSP are required");
 }
-if (count(home, 'href="assets/styles/concept-base.css?v=11b0a8b1"') !== 1) {
+if (count(home, `href="assets/styles/concept-base.css?v=${conceptCssCacheKey}"`) !== 1) {
   fail("Homepage must version the corrected core stylesheet for cache refresh");
 }
-if (!home.includes(`src="assets/art/${referenceHero.image}"`) || /(?:href|src)="\/assets\//.test(home)) {
+if (count(home, `src="assets/scripts/shared.js?v=${sharedScriptCacheKey}"`) !== 1) {
+  fail("Homepage must version shared.js with the first eight characters of its approved SHA-256");
+}
+if (count(home, `src="assets/art/${referenceHero.image}?v=${heroCacheKey}"`) !== 1
+  || count(home, `assets/art/${referenceHero.image}?v=${heroCacheKey}`) !== 2
+  || /(?:href|src)="\/assets\//.test(home)) {
   fail("Homepage assets must be project-relative and use the approved hero");
+}
+if (!home.includes('alt="An empty boxing-ring corner with yellow ropes, a dark navy corner pad, a black wall, a gray floor, and a black stool."')) {
+  fail("Hero alt text must accurately describe the recoloured original");
 }
 await checkLocalReferences(home, indexPath);
 
@@ -105,6 +117,56 @@ const brandCss = await readFile(path.join(rootDirectory, "assets/styles/brand.cs
 const sharedCss = await readFile(path.join(rootDirectory, "assets/styles/shared.css"), "utf8");
 const conceptCss = await readFile(path.join(rootDirectory, "assets/styles/concept-base.css"), "utf8");
 const sharedScript = await readFile(path.join(rootDirectory, "assets/scripts/shared.js"), "utf8");
+const recolorScript = await readFile(path.join(rootDirectory, "tools/recolor-hero.mjs"), "utf8");
+if (/(?:\.concept-addition(?:__[\w-]+)?|data-print-plan|data-plan-(?:form|preview))/.test(`${conceptCss}\n${sharedCss}`)) {
+  fail("Retired concept-addition selectors must not remain in the canonical stylesheets");
+}
+if (!/scrollbar-color:\s*transparent transparent;/.test(sharedCss)
+  || !/scrollbar-width:\s*thin;/.test(sharedCss)
+  || !/html\.is-scrollbar-active,\s*html\.is-scrollbar-edge\s*\{[^}]*scrollbar-color:\s*var\(--brand-navy\) transparent;/.test(sharedCss)
+  || !/html::\-webkit-scrollbar\s*\{[^}]*inline-size:\s*0\.75rem;[^}]*block-size:\s*0\.75rem;/.test(sharedCss)
+  || !/html\.is-scrollbar-active::\-webkit-scrollbar-thumb,\s*html\.is-scrollbar-edge::\-webkit-scrollbar-thumb\s*\{[^}]*background-color:\s*var\(--brand-navy\);/.test(sharedCss)
+  || !/window\.addEventListener\("scroll", showActiveScrollbar, \{ passive: true \}\)/.test(sharedScript)
+  || !/window\.addEventListener\("pointermove", trackScrollbarEdge, \{ passive: true \}\)/.test(sharedScript)
+  || !/window\.innerWidth - event\.clientX <= 12/.test(sharedScript)
+  || !/const handleScrollbarPageHide = \(event\) => \{\s*if \(!event\.persisted\) cleanupScrollbar\(\);\s*\};/.test(sharedScript)
+  || !/window\.addEventListener\("pagehide", handleScrollbarPageHide\)/.test(sharedScript)
+  || !/window\.removeEventListener\("pagehide", handleScrollbarPageHide\)/.test(sharedScript)
+  || !/window\.removeEventListener\("scroll", showActiveScrollbar\)/.test(sharedScript)
+  || /(?:edge-progress|data-scroll-indicator|--edge-thumb-(?:size|offset))/.test(`${home}\n${sharedCss}\n${sharedScript}`)
+  || !/@media \(forced-colors: active\)[\s\S]*?scrollbar-color:\s*auto;/.test(sharedCss)
+  || /scrollbar-gutter/.test(`${conceptCss}\n${sharedCss}`)) {
+  fail("Scrollbar must remain native/draggable, transparent at rest, and visible only while scrolling or near the right edge");
+}
+const observerConstruction = sharedScript.indexOf("new IntersectionObserver");
+const revealReadiness = sharedScript.indexOf('classList.add("reveal-ready")');
+if (observerConstruction < 0 || revealReadiness < observerConstruction
+  || !/if \(reducedMotion\.matches \|\| !\("IntersectionObserver" in window\)\) return;/.test(sharedScript)
+  || !/const disableReveals = \(\) => \{[\s\S]*?classList\.remove\("reveal-ready"\);[\s\S]*?disconnect\(\);/.test(sharedScript)
+  || !/catch \{\s*disableReveals\(\);\s*\}/.test(sharedScript)) {
+  fail("Reveal readiness must begin only after observer construction and fail open for reduced motion, missing APIs, and runtime errors");
+}
+if (!/\.reveal-ready \[data-reveal\][\s\S]*?opacity:\s*0;[\s\S]*?transform:\s*translateY\(1rem\);/.test(sharedCss)
+  || !/@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.reveal-ready \[data-reveal\][\s\S]*?opacity:\s*1 !important;[\s\S]*?transform:\s*none !important;/.test(sharedCss)
+  || /\.js\s+\[data-reveal\]/.test(sharedCss)) {
+  fail("Reveal CSS must be readiness-gated, visible by default, and explicitly neutralized for reduced motion");
+}
+for (const staggerContract of [
+  /\.stats__grid \.stat:nth-child\(4\)/,
+  /\.symptoms \.symptom:nth-child\(4\)/,
+  /\.roadmap__list \.roadmap-item:nth-child\(5\)/,
+  /\.conversion-path\[data-reveal\]/,
+]) {
+  if (!staggerContract.test(sharedCss)) fail("Reveal stagger must remain short, CSS-defined, and applied to section wrappers and repeated rows");
+}
+if (!/\.reveal-ready \.conversion-path\[data-reveal\] > \.eyebrow,[\s\S]*?transform var\(--duration-reveal\) cubic-bezier\(0\.16, 1, 0\.3, 1\),[\s\S]*?opacity var\(--duration-reveal\) cubic-bezier\(0\.16, 1, 0\.3, 1\);/.test(sharedCss)
+  || !/--conversion-reveal-delay:\s*270ms;/.test(sharedCss)
+  || !/@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.reveal-ready \.conversion-path\[data-reveal\] \.conversion-path__note\s*\{[^}]*opacity:\s*1 !important;[^}]*transform:\s*none !important;[^}]*transition:\s*none !important;/.test(sharedCss)) {
+  fail("Conversion entrance must use a capped transform/opacity stagger and disappear under reduced motion");
+}
+if (/transition(?:-property)?:[^;]*(?:background|color|border|inline-size|block-size|width|height|top|left)/.test(`${conceptCss}\n${sharedCss}`)) {
+  fail("Motion must animate only transform and opacity");
+}
 if (!/--font-brand:\s*"proxima-nova-condensed"/.test(brandCss) || !/--font-weight-regular:\s*400;/.test(brandCss) || !/--font-weight-semibold:\s*700;/.test(brandCss) || !/--font-size-support:\s*1\.25rem;/.test(brandCss)) {
   fail("Brand typography must lead with Proxima Nova Condensed and use 400/700 weights");
 }
@@ -137,9 +199,9 @@ if (!/\.section-heading h2 > span\s*\{[^}]*display:\s*block;/.test(conceptCss)
   fail("Heading line locks must not force nested marker bands into full-width rows");
 }
 if (!/\.marker-band\s*\{[^}]*position:\s*relative;[^}]*padding-inline:\s*0;[^}]*white-space:\s*nowrap;/.test(conceptCss)
-  || !/\.marker-band::before\s*\{[^}]*z-index:\s*-1;[^}]*inset:\s*0;[^}]*background:\s*var\(--brand-yellow\);/.test(conceptCss)
+  || !/\.marker-band::before\s*\{[^}]*z-index:\s*-1;[^}]*inset-block:\s*0;[^}]*inset-inline:\s*-0\.075em;[^}]*background:\s*var\(--brand-yellow\);/.test(conceptCss)
   || /transparent 0 14%|--marker-band-height/.test(`${conceptCss}\n${brandCss}`)) {
-  fail("Marker highlights must reproduce a browser text selection: inset:0 layer behind the text, no padding");
+  fail("Marker highlights must preserve the no-padding selection box with balanced visual inline breathing room");
 }
 if (!/\.concept-hero h1,\s*\.section-heading h2,\s*\.meaning h2\s*\{[^}]*isolation:\s*isolate;/.test(conceptCss)
   || !/\.roadmap-item__name\s*\{[^}]*isolation:\s*isolate;/.test(conceptCss)) {
@@ -154,6 +216,17 @@ if (/\.concept-footer__support\s*\{[^}]*position:\s*fixed/.test(sharedCss)) {
 if (!/<footer class="concept-footer">\s*<div class="concept-footer__bar page-frame">[\s\S]*?<\/div>\s*<img class="concept-footer__wordmark"/.test(home)) {
   fail("Footer must open with its content bar above the wordmark");
 }
+const crisisLinks = [
+  '<a href="tel:988">Call 9-8-8</a>',
+  '<a href="sms:988">Text 9-8-8</a>',
+  "Crisis resources</a>",
+  '<a href="tel:911">Call 9-1-1 for immediate danger</a>',
+];
+if (crisisLinks.some((link) => count(home, link) !== 1)
+  || !/@media \(max-width: 47\.99rem\)[\s\S]*?\.concept-footer__support\s*\{[^}]*display:\s*grid;[^}]*grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\);[\s\S]*?\.concept-footer__support a\s*\{[^}]*min-block-size:\s*2\.75rem;/.test(sharedCss)
+  || /\.concept-footer__support[^{]*\{[^}]*(?:display:\s*none|visibility:\s*hidden|opacity:\s*0)/.test(`${conceptCss}\n${sharedCss}`)) {
+  fail("All four crisis links must stay visible in order with 44px mobile targets and a readable two-column reflow");
+}
 if (!/@media \(min-width: 64\.0625rem\)[\s\S]*?\.roadmap\s*\{[^}]*min-block-size:\s*100svh;/.test(conceptCss)) {
   fail("The roadmap must be its own full desktop page");
 }
@@ -163,6 +236,13 @@ if (/scroll-snap/.test(`${conceptCss}\n${sharedCss}\n${brandCss}`)) {
 if (!/<div class="corner-block">[\s\S]*?<section class="symptoms page-frame"[\s\S]*?<section class="meaning"[\s\S]*?<\/div>/.test(home)
   || !/@media \(min-width: 64\.0625rem\)[\s\S]*?\.corner-block\s*\{[^}]*min-block-size:\s*100svh;/.test(conceptCss)) {
   fail("Symptoms and the manifesto must share one desktop page inside .corner-block");
+}
+if (!/@media \(min-width: 64\.0625rem\) and \(max-height: 50rem\)\s*\{\s*\.stats__inner\s*\{\s*padding-block:\s*clamp\(0\.75rem, 1\.8svh, 3rem\);\s*\}\s*\.meaning\s*\{\s*min-block-size:\s*21rem;\s*\}\s*\.meaning__copy\s*\{\s*padding-block:\s*clamp\(0\.75rem, 1\.8svh, 3rem\);\s*\}\s*\}/.test(conceptCss)) {
+  fail("Short desktop viewports must compact only stats/manifesto padding and the manifesto height floor");
+}
+if (!/\.meaning__inner\s*\{[^}]*grid-template-columns:\s*12\.6% minmax\(0, 87\.4%\);/.test(conceptCss)
+  || !/\.stats__heading h2\s*\{[^}]*font-size:\s*clamp\(3\.75rem, min\(7\.6vw, 16svh\), 10rem\);/.test(conceptCss)) {
+  fail("Compact-height spacing must preserve the manifesto rail ratio and statistics display type");
 }
 const symptomsGrid = home.match(/<div class="symptoms__grid">([\s\S]*?)<\/div>/)?.[1] ?? "";
 if (/<p[\s>]/.test(symptomsGrid) || count(symptomsGrid, '<article class="symptom"') !== 4 || count(symptomsGrid, "<h3>") !== 4) {
@@ -203,14 +283,24 @@ if (!/\.stats__sources\s*\{[^}]*grid-template-columns:\s*1fr;/.test(conceptCss)
 }
 if (!/\.roadmap__list\s*\{[^}]*grid-template-columns:[^}]*\}[^@]*?\.roadmap-item\s*\{[^}]*border-inline-end:\s*1px solid var\(--brand-navy\);/.test(conceptCss)
   || /\.roadmap__list\s*\{[^}]*border-block/.test(conceptCss)
-  || !/\.roadmap-item--future\s*\{[^}]*background:\s*color-mix\(in oklch, var\(--brand-navy\) 13%, var\(--brand-off-white\)\);[^}]*color:\s*var\(--color-muted\);/.test(conceptCss)) {
-  fail("Roadmap must stay dense with vertical dividers and muted future services");
+  || !/\.roadmap__list\s*\{[^}]*margin:\s*clamp\(1\.5rem, 2\.4vw, 2\.25rem\) 0 clamp\(0\.75rem, 1\.4svh, 1\.25rem\);/.test(conceptCss)
+  || !/@media \(min-width: 64\.0625rem\)[\s\S]*?\.roadmap__list\s*\{[^}]*flex:\s*0 0 auto;[^}]*block-size:\s*clamp\(20rem, 44\.5svh, 25rem\);[^}]*max-block-size:\s*25rem;/.test(conceptCss)
+  || !/@media \(min-width: 64\.0625rem\) and \(max-height: 55rem\)\s*\{\s*\.roadmap\s*\{[^}]*padding-block:\s*clamp\(2rem, 4svh, 3rem\);/.test(conceptCss)
+  || !/\.roadmap-item--future\s*\{[^}]*background:\s*color-mix\(in oklch, var\(--brand-navy\) 13%, var\(--brand-off-white\)\);[^}]*color:\s*color-mix\(in oklch, var\(--brand-navy\) 78%, var\(--brand-off-white\)\);/.test(conceptCss)) {
+  fail("Roadmap must keep five columns and a bounded 44.5svh desktop table with short-height breathing room");
 }
-if (!/@media \(min-width: 86rem\)\s*\{[\s\S]*?\.meaning__body-line\s*\{[^}]*display:\s*block;[^}]*white-space:\s*nowrap;/.test(conceptCss)) {
+if (!/\.meaning__body\s*\{[^}]*max-inline-size:\s*58ch;/.test(conceptCss)
+  || !/@media \(min-width: 86rem\)\s*\{[\s\S]*?\.meaning__body-line\s*\{[^}]*display:\s*block;[^}]*white-space:\s*nowrap;[\s\S]*?\.meaning__body\s*\{[^}]*max-inline-size:\s*none;/.test(conceptCss)) {
   fail("Desktop manifesto body must hold its two deliberate lines");
 }
-if (!/@media \(min-width: 82\.0625rem\)\s*\{[\s\S]*?\.conversion__inner\s*\{[^}]*grid-template-columns:\s*minmax\(0, 1fr\) minmax\(0, 40\.625rem\);/.test(conceptCss)) {
-  fail("Wide-desktop 650px conversion form track is required");
+if (count(home, 'class="conversion__body-line"') !== 2
+  || !home.includes('<span class="conversion__body-line">Founding members get in ahead of everyone.</span> <span class="conversion__body-line">Leave your details and we&#39;ll reach out the moment we open.</span>')
+  || !/@media \(min-width: 82\.0625rem\)[\s\S]*?\.conversion__body-line\s*\{[^}]*display:\s*block;[^}]*white-space:\s*nowrap;/.test(conceptCss)) {
+  fail("Wide-desktop conversion body must preserve the approved copy in exactly two locked lines");
+}
+if (!/@media \(min-width: 82\.0625rem\)\s*\{[\s\S]*?\.conversion__inner\s*\{[^}]*grid-template-columns:\s*minmax\(0, 1fr\) minmax\(0, 45rem\);/.test(conceptCss)
+  || !/\.conversion__forms\s*\{[^}]*max-inline-size:\s*45rem;/.test(conceptCss)) {
+  fail("Wide-desktop conversion form must use the responsive 45rem track");
 }
 if (!/\.conversion__forms\s*\{[^}]*align-self:\s*start;/.test(conceptCss)
   || !/\.conversion-path\s*\{[^}]*align-self:\s*start;[^}]*padding:\s*1\.25rem clamp\(1\.5rem, 2vw, 1\.75rem\);/.test(conceptCss)
@@ -218,11 +308,34 @@ if (!/\.conversion__forms\s*\{[^}]*align-self:\s*start;/.test(conceptCss)
   || !/@media \(min-width: 48\.0625rem\) and \(max-width: 64rem\)\s*\{[\s\S]*?\.conversion-path\s*\{[^}]*padding-block:\s*var\(--space-md\);[\s\S]*?\.conversion \.prototype-form fieldset\s*\{[^}]*gap:\s*var\(--space-sm\);[\s\S]*?\.conversion \.field-error:empty\s*\{[^}]*min-block-size:\s*0;/.test(conceptCss)) {
   fail("Conversion card must self-start and retain its compact desktop spacing contract");
 }
+if (!/\.prototype-disclosure\s*\{[^}]*padding:\s*0\.375rem var\(--space-sm\);[^}]*border:\s*1px solid color-mix\([^;]+\);[^}]*background:\s*color-mix\(in oklch, var\(--brand-yellow\) 9%, var\(--brand-off-white\)\);[^}]*font-size:\s*var\(--font-size-support\);[^}]*font-weight:\s*var\(--font-weight-regular\);/.test(conceptCss)
+  || /\.prototype-disclosure\s*\{[^}]*(?:opacity:\s*0|font-size:\s*(?:0\.|[1-9][0-9]?px))/.test(conceptCss)
+  || /\.prototype-role__choice:has\(input:checked\)\s*\{[^}]*border-width/.test(conceptCss)
+  || !/\.prototype-role__choice:has\(input:checked\)\s*\{[^}]*outline:\s*2px solid var\(--brand-navy\);/.test(conceptCss)) {
+  fail("Prototype disclosure and checked radios must be quieter without reduced legibility or layout-shifting borders");
+}
+if (!/@media \(max-width: 48rem\)[\s\S]*?\.stats__sources,\s*\.prototype-disclosure,\s*\.conversion-path__note\s*\{[^}]*font-size:\s*var\(--font-size-support\);[^}]*line-height:\s*1\.55;/.test(conceptCss)) {
+  fail("Mobile source and prototype/legal text must remain at least 1rem with comfortable leading");
+}
+if (!/:focus-visible\s*\{[^}]*outline:\s*3px solid/.test(sharedCss)
+  || !/@media \(forced-colors: active\)[\s\S]*?:focus-visible\s*\{[^}]*outline:\s*3px solid Highlight;/.test(sharedCss)
+  || !/@media \(hover: hover\) and \(pointer: fine\)[\s\S]*?\.button:hover/.test(sharedCss)) {
+  fail("Interactive states must retain 3px focus rings, forced-colors distinction, and pointer-gated hover");
+}
 if (!/\.meaning\s*\{[^}]*background:\s*var\(--brand-blue\);/.test(conceptCss) || !/\.meaning__mark\s*\{[^}]*background:\s*var\(--brand-navy\);/.test(conceptCss)) {
   fail("Manifesto must retain its navy rail and bright-blue content field");
 }
 if (/(?:concept-addition|data-module|data-concept-nav|initializeSentenceStarter|navigator\.clipboard|localStorage|sessionStorage|fetch\()/.test(sharedScript)) {
   fail("Shared runtime includes retired variant or privacy-sensitive behavior");
+}
+if (!/const SOURCE = path\.join\(ROOT, "assets\/art\/blue-corner-reference-ring\.webp"\);/.test(recolorScript)
+  || !/const ROPE_SEGMENTS = \[/.test(recolorScript)
+  || !/const PAD_POLYGON = \[/.test(recolorScript)
+  || !/\.webp\(\{ lossless: true, effort: 6 \}\)/.test(recolorScript)
+  || !/if \(changedMask\[pixel\]\) continue;/.test(recolorScript)
+  || !/Unmasked decoded pixel changed/.test(recolorScript)
+  || /\.webp\(\{[^}]*quality:/.test(recolorScript)) {
+  fail("Hero recolour must use the original photo, explicit rope/pad masks, lossless output, and decoded unmasked-pixel verification");
 }
 if (/\.js\s+\[data-reveal\]\s*\{[^}]*opacity:\s*0/.test(sharedCss)) fail("Core content must remain visible without JavaScript");
 

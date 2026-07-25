@@ -3,7 +3,7 @@ export const referenceHero = Object.freeze({
   image: "blue-corner-reference-ring-brand-v3.webp",
   width: 1774,
   height: 887,
-  alt: "An empty boxing-ring corner with yellow ropes, a bright-blue padded corner post, a black stool, and a deep blue backdrop.",
+  alt: "An empty boxing-ring corner with yellow ropes, a dark navy corner pad, a black wall, a gray floor, and a black stool.",
 });
 
 export const sourceCopy = Object.freeze({
