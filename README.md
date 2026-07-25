@@ -10,6 +10,10 @@ https://winwinmarketing.github.io/blue-corner-coming-soon-review/
 
 `node tools/check-site.mjs` validates the single-page source, local assets, CSP, Typekit contract, core sections, form privacy, and deterministic baselines. Use `node tools/check-site.mjs --strict-images` before publishing.
 
+`node tools/acceptance.mjs` drives the rendered page in headless Chromium at 2048x870, 2048x1020, 2048x989, 390x844 and 320x700. `check-site.mjs` is static analysis and can only prove the source says the right thing; the acceptance run proves the runtime facts it cannot reach — that the hero actually animates on first paint, that scrolling stops when the wheel stops, that the scrollbar thumb reveals and hides without shifting layout, that the roadmap table measures ~418px, that every highlight carries optical bleed on both sides, that the conversion copy is exactly two lines, that nothing overflows horizontally at 320px, that keyboard focus and form validation survive, and that every `?v=` cache key matches its file's content hash. Add `--target <url>` to run it against a deployed build and `--shots <dir>` to capture screenshots. It SKIPS cleanly when playwright-core or a local Chromium is unavailable.
+
+`node tools/recolor-hero.mjs` regenerates the hero art from the original reference photograph. It recolours only two masks — the ropes to brand yellow and the rear corner pad to brand navy — and asserts that every decoded pixel outside those masks is byte-identical to the source. Never hand-edit the generated `-brand-v3.webp`.
+
 ## Privacy and safety
 
 - The form validates only in the browser and neither sends nor stores details.
