@@ -479,14 +479,12 @@
 
 .roadmap-item__name {
   isolation: isolate;
-  font-size: clamp(1.4rem, 2.9vw, 4rem);
+  font-size: clamp(1.4rem, 2.15vw, 2.5rem);
   font-weight: var(--font-weight-bold);
-  letter-spacing: -0.03em;
-  line-height: 0.95;
 }
 
 .roadmap-item--current .roadmap-item__name {
-  font-size: clamp(2.1rem, 4.4vw, 6rem);
+  font-size: clamp(2.1rem, 3.2vw, 3.75rem);
 }
 
 .roadmap-item--future {
@@ -494,17 +492,13 @@
   color: var(--color-muted);
 }
 
-/* Tinted, not bare. Left transparent it read as a hole punched in the band —
-   the only cell whose empty middle sat against the page rather than a fill.
-   Yellow stays functional here: it marks the one service that is open. */
 .roadmap-item--current {
   border-block-start: 0.5rem solid var(--brand-yellow);
-  background: color-mix(in oklch, var(--brand-yellow) 16%, var(--brand-off-white));
 }
 
 .roadmap-item strong {
-  font-size: var(--font-size-support);
-  letter-spacing: 0.14em;
+  font-size: var(--font-size-small);
+  letter-spacing: 0.12em;
   line-height: 1.35;
   text-transform: uppercase;
 }
@@ -1078,16 +1072,17 @@
     align-self: stretch;
   }
 
-  /* The roadmap is a page of its own; the service columns take the slack. */
+  /* The roadmap is a page of its own; the service columns take the slack.
+     The band stays CAPPED. Uncapping it to fill the page stretched the cells
+     into tall empty colour columns, which read far worse than the whitespace
+     they were filling — reverted 2026-07-25. */
   .roadmap {
     min-block-size: 100svh;
-    padding-block: clamp(2rem, 3vw, 3.25rem);
   }
 
-  /* No cap: the band takes whatever the headline leaves, so the section is
-     filled by construction rather than floating in the middle of the page. */
   .roadmap__list {
     flex: 1;
+    max-block-size: 38svh;
   }
 
   .roadmap-item {

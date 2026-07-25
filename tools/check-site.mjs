@@ -9,11 +9,11 @@ const toolsDirectory = path.dirname(fileURLToPath(import.meta.url));
 const rootDirectory = path.resolve(toolsDirectory, "..");
 const failures = [];
 const strictImages = process.argv.includes("--strict-images");
-const approvedHomeSha256 = "754f384de72c12e45aa62438bc25cbe13fb78e0c1cd452d474b5b0f4300470c8";
+const approvedHomeSha256 = "a0081a51b934ac940720f00507dc44c9878b509b0cdff9feb8099758a6a3baf2";
 const approvedAssets = Object.freeze({
   "assets/styles/brand.css": "a80fc3111bf8b07398eb344d855e302a1e748678d6164c0f1999cee842cf25f6",
   "assets/styles/shared.css": "a5fafa418c782ea2fa02805674c50e202f9f8f0814a1d2a012ef5b69c5c7799b",
-  "assets/styles/concept-base.css": "bbb35d1ef0ae6745684593ffaf31040c6444c4924f41d7547a5fae0c3dffd32b",
+  "assets/styles/concept-base.css": "11b0a8b14166c3c5af61c3a86f82c3590bf8f4aa7c769bcb23accf3dd7b8d2e0",
   "assets/scripts/shared.js": "5d77e4a770625571bd3e97257be4e2be0f1e303503cc813d5d98ded91618cd36",
   "assets/art/blue-corner-reference-ring-brand-v3.webp": "0d921a25360f1a36d23bbb48ce401b723b95bb7959f1439d7548d9350c450829",
 });
@@ -88,7 +88,7 @@ if (count(home, 'href="https://use.typekit.net/ciy6txz.css"') !== 1
   || !home.includes("font-src 'self' https://use.typekit.net;")) {
   fail("Typekit stylesheet and constrained style/font CSP are required");
 }
-if (count(home, 'href="assets/styles/concept-base.css?v=bbb35d1e"') !== 1) {
+if (count(home, 'href="assets/styles/concept-base.css?v=11b0a8b1"') !== 1) {
   fail("Homepage must version the corrected core stylesheet for cache refresh");
 }
 if (!home.includes(`src="assets/art/${referenceHero.image}"`) || /(?:href|src)="\/assets\//.test(home)) {
