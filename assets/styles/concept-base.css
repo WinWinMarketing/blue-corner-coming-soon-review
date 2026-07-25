@@ -254,11 +254,11 @@
    stats and symptoms headings have far more room and looked undersized on a
    wide screen, so they get their own ceilings. */
 .stats__heading h2 {
-  font-size: clamp(3.75rem, 7.6vw, 10rem);
+  font-size: clamp(3.75rem, min(7.6vw, 16svh), 10rem);
 }
 
 .symptoms__heading h2 {
-  font-size: clamp(3.75rem, 8.2vw, 10.5rem);
+  font-size: clamp(3.75rem, min(8.2vw, 17svh), 10.5rem);
 }
 
 .stats {
@@ -282,17 +282,17 @@
   /* padding-block only — the inline padding is .page-frame's gutter. The old
      `padding: … 0` shorthand zeroed it, which was invisible while the inner was
      84% wide and auto-centred, but flush to the viewport edge at 100%. */
-  padding-block: clamp(1.25rem, 3.2svh, 3rem);
+  padding-block: clamp(1.25rem, 2.6svh, 3rem);
 }
 
 .stats__grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  margin-block-start: clamp(1rem, 4svh, 2.75rem);
+  margin-block-start: clamp(1rem, 3svh, 2.75rem);
 }
 
 .stat {
-  min-block-size: clamp(10.5rem, 24svh, 15.5rem);
+  min-block-size: clamp(10.5rem, 20svh, 15.5rem);
   padding: clamp(1rem, 2.1vw, 2rem);
   border-inline-end: 1px solid var(--brand-navy);
 }
@@ -350,7 +350,7 @@
   min-block-size: 0;
   align-items: center;
   align-content: center;
-  padding-block: clamp(1.25rem, 4svh, 2.5rem);
+  padding-block: clamp(1.25rem, 3.2svh, 2.5rem);
 }
 
 .symptoms__heading {
@@ -370,7 +370,7 @@
   grid-template-columns: auto minmax(0, 1fr);
   align-items: center;
   gap: clamp(1.5rem, 2.6vw, 2.75rem);
-  padding-block: clamp(0.6rem, 2.2svh, 1.5rem);
+  padding-block: clamp(0.6rem, 1.7svh, 1.5rem);
   border-block-start: 2px solid color-mix(in oklch, var(--brand-navy) 26%, var(--brand-off-white));
 }
 
@@ -442,7 +442,7 @@
 
 .meaning__body {
   max-inline-size: none;
-  margin: var(--space-xl) 0 0;
+  margin: var(--space-lg) 0 0;
   font-size: clamp(1.1875rem, 0.95rem + 0.7vw, 1.45rem);
 }
 
