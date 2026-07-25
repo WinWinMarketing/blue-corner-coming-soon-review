@@ -9,11 +9,11 @@ const toolsDirectory = path.dirname(fileURLToPath(import.meta.url));
 const rootDirectory = path.resolve(toolsDirectory, "..");
 const failures = [];
 const strictImages = process.argv.includes("--strict-images");
-const approvedHomeSha256 = "9d9459862a1b7d54e6ba57662f5c72f4442105e6e7ab30c9d011f56434e111ea";
+const approvedHomeSha256 = "62f1717f71869c0d31dfa61ba2c31786a1b641b90f9c9552541bfa4f105dc5b9";
 const approvedAssets = Object.freeze({
   "assets/styles/brand.css": "a80fc3111bf8b07398eb344d855e302a1e748678d6164c0f1999cee842cf25f6",
   "assets/styles/shared.css": "a5fafa418c782ea2fa02805674c50e202f9f8f0814a1d2a012ef5b69c5c7799b",
-  "assets/styles/concept-base.css": "ae518b9e3447995f7510d451a1c79515445c2f8263240e30e260a99035a0d779",
+  "assets/styles/concept-base.css": "395c8ef658e670737c3058e8ab4ef1e49d1b143b4232d951ae84da26d26447b9",
   "assets/scripts/shared.js": "5d77e4a770625571bd3e97257be4e2be0f1e303503cc813d5d98ded91618cd36",
   "assets/art/blue-corner-reference-ring-brand-v3.webp": "0d921a25360f1a36d23bbb48ce401b723b95bb7959f1439d7548d9350c450829",
 });
@@ -88,7 +88,7 @@ if (count(home, 'href="https://use.typekit.net/ciy6txz.css"') !== 1
   || !home.includes("font-src 'self' https://use.typekit.net;")) {
   fail("Typekit stylesheet and constrained style/font CSP are required");
 }
-if (count(home, 'href="assets/styles/concept-base.css?v=ae518b9e"') !== 1) {
+if (count(home, 'href="assets/styles/concept-base.css?v=395c8ef6"') !== 1) {
   fail("Homepage must version the corrected core stylesheet for cache refresh");
 }
 if (!home.includes(`src="assets/art/${referenceHero.image}"`) || /(?:href|src)="\/assets\//.test(home)) {
@@ -177,7 +177,7 @@ if (count(home, "roadmap-item--current") !== 1 || count(home, "roadmap-item--fut
 if (!/\.concept-hero__accent\s*\{[^}]*color:\s*var\(--brand-blue\);/.test(conceptCss) || !/letter-spacing:\s*-0\.035em;/.test(conceptCss)) {
   fail("Hero accent and restrained condensed-display tracking are required");
 }
-if (!/@media \(min-width: 64\.0625rem\)\s*\{\s*\.conversion__heading h2\s*\{[^}]*font-size:\s*clamp\(4\.5rem, 9\.17vw, 8\.25rem\);/.test(conceptCss)) {
+if (!/@media \(min-width: 64\.0625rem\)\s*\{\s*\.conversion__heading h2\s*\{[^}]*font-size:\s*clamp\(4\.5rem, 9\.17vw, 11rem\);/.test(conceptCss)) {
   fail("Desktop conversion headline must use the locked hero display scale");
 }
 if (!/@media \(min-width: 48\.0625rem\) and \(max-width: 64rem\)\s*\{\s*\.conversion__heading h2\s*\{[^}]*font-size:\s*clamp\(4rem, 7\.2vw, 4\.75rem\);/.test(conceptCss)) {
@@ -190,8 +190,8 @@ if (!/@media \(min-width: 64\.0625rem\)\s*\{\s*\.concept-hero\s*\{[\s\S]*?min-bl
   || !/--header-h:\s*clamp\(5\.5rem, 7vw, 6rem\);/.test(conceptCss)) {
   fail("Header plus hero must fit one desktop viewport (svh-based hero height)");
 }
-if (!/@media \(min-width: 82\.0625rem\)\s*\{[\s\S]*?\.concept-hero h1\s*\{[^}]*font-size:\s*7\.5rem;/.test(conceptCss)) {
-  fail("Wide-desktop hero display must cap at 7.5rem to preserve the image gap");
+if (!/@media \(min-width: 82\.0625rem\)\s*\{[\s\S]*?\.concept-hero h1\s*\{[^}]*font-size:\s*clamp\(7\.5rem, 8\.3vw, 11rem\);/.test(conceptCss)) {
+  fail("Wide-desktop hero display must scale from 7.5rem so the copy column holds against the image");
 }
 if (!/\.site-header__actions \.button\s*\{[^}]*min-block-size:\s*2\.75rem;[^}]*font-size:\s*1rem;/.test(conceptCss)
   || !/\.concept-hero__inner\s*\{[^}]*row-gap:\s*clamp\(0\.75rem, 1\.2vw, 1rem\);[^}]*min-block-size:\s*clamp\(35rem, 43vw, 39\.5rem\);/.test(conceptCss)) {
@@ -206,7 +206,7 @@ if (!/\.roadmap__list\s*\{[^}]*grid-template-columns:[^}]*\}[^@]*?\.roadmap-item
   || !/\.roadmap-item--future\s*\{[^}]*background:\s*color-mix\(in oklch, var\(--brand-navy\) 13%, var\(--brand-off-white\)\);[^}]*color:\s*var\(--color-muted\);/.test(conceptCss)) {
   fail("Roadmap must stay dense with vertical dividers and muted future services");
 }
-if (!/@media \(min-width: 80rem\)\s*\{[\s\S]*?\.meaning__body-line\s*\{[^}]*display:\s*block;[^}]*white-space:\s*nowrap;/.test(conceptCss)) {
+if (!/@media \(min-width: 86rem\)\s*\{[\s\S]*?\.meaning__body-line\s*\{[^}]*display:\s*block;[^}]*white-space:\s*nowrap;/.test(conceptCss)) {
   fail("Desktop manifesto body must hold its two deliberate lines");
 }
 if (!/@media \(min-width: 82\.0625rem\)\s*\{[\s\S]*?\.conversion__inner\s*\{[^}]*grid-template-columns:\s*minmax\(0, 1fr\) minmax\(0, 40\.625rem\);/.test(conceptCss)) {

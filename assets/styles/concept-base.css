@@ -235,8 +235,23 @@
 
 .section-heading h2,
 .meaning h2 {
-  margin-block-start: var(--space-lg);
+  /* A marker band on the FIRST line reaches (1.4309 - 0.9) / 2 = 0.266em above
+     the line box, so a fixed 24px gap let it cut through the eyebrow above once
+     the display scale grew. The em term keeps the clearance proportional. */
+  margin-block-start: max(var(--space-lg), 0.32em);
   font-size: clamp(3.75rem, 6.94vw, 8.5rem);
+}
+
+/* Per-section display scale. The shared cap is set by the roadmap, whose
+   longest line is locked to one line and already fills 81% of the frame; the
+   stats and symptoms headings have far more room and looked undersized on a
+   wide screen, so they get their own ceilings. */
+.stats__heading h2 {
+  font-size: clamp(3.75rem, 7.6vw, 10rem);
+}
+
+.symptoms__heading h2 {
+  font-size: clamp(3.75rem, 8.2vw, 10.5rem);
 }
 
 .stats {
@@ -251,11 +266,16 @@
 
 .stats__inner {
   display: flex;
-  inline-size: 84%;
+  /* Full bleed like every other section. The retired 84% inset put the stats
+     left edge 170px inboard of the symptoms one on a wide screen. */
+  inline-size: 100%;
   max-inline-size: none;
   flex-direction: column;
   justify-content: center;
-  padding: clamp(2rem, 3vw, 3rem) 0;
+  /* padding-block only — the inline padding is .page-frame's gutter. The old
+     `padding: … 0` shorthand zeroed it, which was invisible while the inner was
+     84% wide and auto-centred, but flush to the viewport edge at 100%. */
+  padding-block: clamp(2rem, 3vw, 3rem);
 }
 
 .stats__grid {
@@ -323,7 +343,7 @@
   min-block-size: 0;
   align-items: center;
   align-content: center;
-  padding-block: clamp(1.75rem, 2.4vw, 3rem);
+  padding-block: clamp(1.75rem, 2.4vw, 2.5rem);
 }
 
 .symptoms__heading {
@@ -816,7 +836,7 @@
 
 @media (min-width: 64.0625rem) {
   .conversion__heading h2 {
-    font-size: clamp(4.5rem, 9.17vw, 8.25rem);
+    font-size: clamp(4.5rem, 9.17vw, 11rem);
   }
 }
 
@@ -1064,7 +1084,10 @@
   }
 }
 
-@media (min-width: 80rem) {
+/* 86rem, not 80rem: the manifesto body font caps at 23.2px, so its longest
+   locked line needs ~1023px and the copy column only reaches that around
+   1376px. At 1280 the nowrap lines overflowed their column. */
+@media (min-width: 86rem) {
   .meaning__copy {
     padding-inline: 4.5vw 4vw;
   }
@@ -1076,8 +1099,11 @@
 }
 
 @media (min-width: 82.0625rem) {
+  /* Keeps 7.5rem at 1440 and grows from there: at 2120 the fixed size left the
+     copy column half empty against a 656px-tall hero image. The ceiling is set
+     by "Fights Alone." staying on one line inside the 46fr column. */
   .concept-hero h1 {
-    font-size: 7.5rem;
+    font-size: clamp(7.5rem, 8.3vw, 11rem);
   }
 
   .conversion__inner {
