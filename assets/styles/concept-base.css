@@ -55,7 +55,9 @@
 .site-header__actions .button {
   min-block-size: 2.75rem;
   padding: 0.625rem 1rem;
-  font-size: 1rem;
+  /* 1.1875rem, not 1rem: off-white on brand blue is 3.75:1, which passes as
+     large text (>=18.66px bold) but fails the 4.5:1 small-text rule. */
+  font-size: 1.1875rem;
   white-space: nowrap;
 }
 
@@ -443,7 +445,7 @@
 .meaning__body {
   max-inline-size: 58ch;
   margin: var(--space-lg) 0 0;
-  font-size: clamp(1.1875rem, 0.95rem + 0.7vw, 1.45rem);
+  font-size: 1.5rem;
 }
 
 .roadmap {
@@ -546,11 +548,23 @@
   .conversion__heading h2 {
     font-size: clamp(4rem, 7.2vw, 4.75rem);
   }
+
+  /* Four columns are still in play in this band but each is only ~185px wide,
+     and the 4rem floor pushed "~300%" past its content box. Scale the numeral
+     with the column here; mobile keeps the 4rem floor. */
+  .stat__value {
+    font-size: clamp(3rem, 6.2vw, 4rem);
+  }
 }
 
 .conversion__heading > p:last-child {
   max-inline-size: 48ch;
   margin: var(--space-xl) 0 0;
+  /* Pinned to the 24px WCAG large-text threshold for the same reason as
+     .meaning__body: muted off-white on the brand blue field is 3.13:1, which
+     clears the 3:1 large-text rule but not the 4.5:1 small-text one. Below
+     1440px --font-size-body drops under 24px and the copy stopped passing. */
+  font-size: 1.5rem;
   color: var(--color-dark-muted);
 }
 
@@ -817,10 +831,12 @@
   }
 }
 
-/* 86rem, not 80rem: the manifesto body font caps at 23.2px, so its longest
-   locked line needs ~1023px and the copy column only reaches that around
-   1376px. At 1280 the nowrap lines overflowed their column. */
-@media (min-width: 86rem) {
+/* 88rem, not 86rem: the manifesto body is pinned at 24px (the WCAG large-text
+   threshold, which is what lets off-white on brand blue pass at 3.75:1), so its
+   longest locked line needs 1092px. The copy column is ~0.789 of the viewport,
+   so it only clears that from ~1384px. Measured: 1376 overflows by 6px, 1400+
+   is clean; 88rem leaves 19px of margin. */
+@media (min-width: 88rem) {
   .meaning__copy {
     padding-inline: 4.5vw 4vw;
   }

@@ -281,6 +281,49 @@ for (const viewport of VIEWPORTS) {
   check(`layout ${label}: no horizontal overflow`,
     !measured.horizontalOverflow && measured.overflowing.length === 0,
     measured.overflowing.join(", ") || "clean");
+
+  // WCAG AA contrast, resolved through a canvas so oklch() and color-mix()
+  // report their true sRGB. Parsing the computed string instead silently
+  // reports 1:1 for every colour-mixed value and hides real failures.
+  const contrast = await page.evaluate(() => {
+    const canvas = document.createElement("canvas");
+    canvas.width = canvas.height = 1;
+    const ctx = canvas.getContext("2d", { willReadFrequently: true });
+    const toRgb = (css) => {
+      ctx.fillStyle = "#000"; ctx.fillRect(0, 0, 1, 1);
+      ctx.fillStyle = css; ctx.fillRect(0, 0, 1, 1);
+      const d = ctx.getImageData(0, 0, 1, 1).data;
+      return [d[0], d[1], d[2]];
+    };
+    const channel = (c) => { c /= 255; return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4; };
+    const luminance = ([r, g, b]) => 0.2126 * channel(r) + 0.7152 * channel(g) + 0.0722 * channel(b);
+    const ratio = (a, b) => { const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x); return +((hi + 0.05) / (lo + 0.05)).toFixed(2); };
+    const backdrop = (el) => {
+      let node = el;
+      while (node && node !== document.documentElement) {
+        const bg = getComputedStyle(node).backgroundColor;
+        if (!/rgba\(0, 0, 0, 0\)/.test(bg)) return bg;
+        node = node.parentElement;
+      }
+      return "rgb(255,255,255)";
+    };
+    const failures = [];
+    for (const el of document.querySelectorAll("h1,h2,h3,p,a,span,strong,label,button,legend")) {
+      const text = (el.textContent || "").trim();
+      if (!text || el.children.length > 0) continue;
+      const style = getComputedStyle(el);
+      if (style.visibility === "hidden" || style.display === "none" || Number(style.opacity) === 0) continue;
+      const box = el.getBoundingClientRect();
+      if (box.width < 2 || box.height < 2) continue;
+      const size = parseFloat(style.fontSize);
+      const large = size >= 24 || (size >= 18.66 && parseInt(style.fontWeight, 10) >= 700);
+      const need = large ? 3 : 4.5;
+      const value = ratio(toRgb(style.color), toRgb(backdrop(el)));
+      if (value < need) failures.push(`${value}:1 (needs ${need}) ${Math.round(size)}px "${text.slice(0, 30)}"`);
+    }
+    return failures;
+  });
+  check(`contrast ${label}: WCAG AA`, contrast.length === 0, contrast.join(" | ") || "all text passes AA");
   const tightest = Math.min(...measured.bands.map((b) => Math.min(b.left, b.right)));
   check(`highlights ${label}: optical bleed on both sides`,
     measured.bands.length === 5 && tightest >= 3,

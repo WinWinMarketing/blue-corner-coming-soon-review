@@ -9,11 +9,11 @@ const toolsDirectory = path.dirname(fileURLToPath(import.meta.url));
 const rootDirectory = path.resolve(toolsDirectory, "..");
 const failures = [];
 const strictImages = process.argv.includes("--strict-images");
-const approvedHomeSha256 = "ab5b85d208a719949ce5e5ecba2ad150ff47aa8837090ab4c685145ea75cdce2";
+const approvedHomeSha256 = "29716de9238a99e8b3b2958ed59b20384e1ddc70d23c35e721dbcf436fd08f06";
 const approvedAssets = Object.freeze({
   "assets/styles/brand.css": "a80fc3111bf8b07398eb344d855e302a1e748678d6164c0f1999cee842cf25f6",
-  "assets/styles/shared.css": "a03410e29dd42c0ab36726e2ff389b2c4d5f132daef5d0da2146724c663ae0e4",
-  "assets/styles/concept-base.css": "68b8e5ceccf29f6dcf14ae1a405a633b30c0f90176a4f3303dc800e156d7c4d0",
+  "assets/styles/shared.css": "96271ccef58c41144f4124397f7984792afb4928011deeaa26d6b0ef3842ec68",
+  "assets/styles/concept-base.css": "5b0f978d61fcc2ee2c3d401a1049e124f8cadc76061f410a2dee483dc2cceb8c",
   "assets/scripts/boot.js": "7d7ce8cadca26959367c68f2ac381e0fe661a3a7a1f4eeb3b514c07326f90f1e",
   "assets/scripts/shared.js": "c15703cd87d196be855dd729dc2c4b4f48a33e11e6d42b8db7cbd6f6b67e97fc",
   "assets/art/blue-corner-reference-ring.webp": "22bbe8a535d1707c6d7724f9a2d71ea9f1ff8e924d50ea690d2a251062cd07f2",
@@ -327,7 +327,7 @@ if (/html\s*\{[^}]*overflow-x:\s*(?:hidden|clip);/.test(sharedCss)
   || /\.roadmap__heading h2\s*\{[^}]*overflow(?:-x)?:\s*(?:hidden|clip);/.test(conceptCss)) {
   fail("Desktop headline fit must come from responsive typography, not root or heading overflow clipping");
 }
-if (!/\.site-header__actions \.button\s*\{[^}]*min-block-size:\s*2\.75rem;[^}]*font-size:\s*1rem;/.test(conceptCss)
+if (!/\.site-header__actions \.button\s*\{[^}]*min-block-size:\s*2\.75rem;[^}]*font-size:\s*1\.1875rem;/.test(conceptCss)
   || !/\.concept-hero__inner\s*\{[^}]*row-gap:\s*clamp\(0\.75rem, 1\.2vw, 1rem\);[^}]*min-block-size:\s*clamp\(35rem, 43vw, 39\.5rem\);/.test(conceptCss)) {
   fail("Compact masthead and desktop hero fit contract is missing");
 }
@@ -347,7 +347,7 @@ if (count(impeccableSpec, "720px maximum card") !== 1 || impeccableSpec.includes
   fail("Impeccable specification must pin the conversion card maximum to 720px");
 }
 if (!/\.meaning__body\s*\{[^}]*max-inline-size:\s*58ch;/.test(conceptCss)
-  || !/@media \(min-width: 86rem\)\s*\{[\s\S]*?\.meaning__body-line\s*\{[^}]*display:\s*block;[^}]*white-space:\s*nowrap;[\s\S]*?\.meaning__body\s*\{[^}]*max-inline-size:\s*none;/.test(conceptCss)) {
+  || !/@media \(min-width: 88rem\)\s*\{[\s\S]*?\.meaning__body-line\s*\{[^}]*display:\s*block;[^}]*white-space:\s*nowrap;[\s\S]*?\.meaning__body\s*\{[^}]*max-inline-size:\s*none;/.test(conceptCss)) {
   fail("Desktop manifesto body must hold its two deliberate lines");
 }
 if (count(home, 'class="conversion__body-line"') !== 2
