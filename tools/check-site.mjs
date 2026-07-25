@@ -9,11 +9,11 @@ const toolsDirectory = path.dirname(fileURLToPath(import.meta.url));
 const rootDirectory = path.resolve(toolsDirectory, "..");
 const failures = [];
 const strictImages = process.argv.includes("--strict-images");
-const approvedHomeSha256 = "31ef9c3b607134b68bc7e9789c422856419c8d6f032b882d9603005f7dd3eedd";
+const approvedHomeSha256 = "076062e9d7ff9094d0dbc4f8f61c7db4af9597fb552538791fd6465025aa5f34";
 const approvedAssets = Object.freeze({
   "assets/styles/brand.css": "a80fc3111bf8b07398eb344d855e302a1e748678d6164c0f1999cee842cf25f6",
   "assets/styles/shared.css": "08a5b71a930dc7456584603481000fb721ab72a4bfaab642e546bce4bbcefd0c",
-  "assets/styles/concept-base.css": "284d2a3ed683ed8c1d322fb070f6d200f443d7999e4facdcc9f4ee7692f3285a",
+  "assets/styles/concept-base.css": "68b8e5ceccf29f6dcf14ae1a405a633b30c0f90176a4f3303dc800e156d7c4d0",
   "assets/scripts/boot.js": "7d7ce8cadca26959367c68f2ac381e0fe661a3a7a1f4eeb3b514c07326f90f1e",
   "assets/scripts/shared.js": "c15703cd87d196be855dd729dc2c4b4f48a33e11e6d42b8db7cbd6f6b67e97fc",
   "assets/art/blue-corner-reference-ring.webp": "22bbe8a535d1707c6d7724f9a2d71ea9f1ff8e924d50ea690d2a251062cd07f2",
@@ -314,8 +314,14 @@ if (!/@media \(min-width: 64\.0625rem\)\s*\{\s*\.concept-hero\s*\{[\s\S]*?min-bl
   || !/--header-h:\s*clamp\(5\.5rem, 7vw, 6rem\);/.test(conceptCss)) {
   fail("Header plus hero must fit one desktop viewport (svh-based hero height)");
 }
-if (!/@media \(min-width: 82\.0625rem\)\s*\{[\s\S]*?\.concept-hero h1\s*\{[^}]*font-size:\s*clamp\(7\.5rem, 8\.3vw, 11rem\);/.test(conceptCss)) {
-  fail("Wide-desktop hero display must scale from 7.5rem so the copy column holds against the image");
+if (!/@media \(min-width: 82\.0625rem\)\s*\{[\s\S]*?\.concept-hero h1\s*\{[^}]*font-size:\s*clamp\(7\.5rem, 7\.7vw, 10\.2rem\);/.test(conceptCss)
+  || !/@media \(min-width: 75rem\)\s*\{\s*\.roadmap__heading h2\s*\{\s*font-size:\s*clamp\(3\.75rem, 6\.94vw, 7\.9rem\);\s*\}[\s\S]*?\.roadmap__heading h2 span\s*\{\s*white-space:\s*nowrap;/.test(conceptCss)) {
+  fail("Wide-desktop hero and roadmap display must preserve their locked lines with at least 12px container safety");
+}
+if (/html\s*\{[^}]*overflow-x:\s*(?:hidden|clip);/.test(sharedCss)
+  || /\.concept-hero h1\s*\{[^}]*overflow(?:-x)?:\s*(?:hidden|clip);/.test(conceptCss)
+  || /\.roadmap__heading h2\s*\{[^}]*overflow(?:-x)?:\s*(?:hidden|clip);/.test(conceptCss)) {
+  fail("Desktop headline fit must come from responsive typography, not root or heading overflow clipping");
 }
 if (!/\.site-header__actions \.button\s*\{[^}]*min-block-size:\s*2\.75rem;[^}]*font-size:\s*1rem;/.test(conceptCss)
   || !/\.concept-hero__inner\s*\{[^}]*row-gap:\s*clamp\(0\.75rem, 1\.2vw, 1rem\);[^}]*min-block-size:\s*clamp\(35rem, 43vw, 39\.5rem\);/.test(conceptCss)) {

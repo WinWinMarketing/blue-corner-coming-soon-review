@@ -504,6 +504,10 @@
 }
 
 @media (min-width: 75rem) {
+  .roadmap__heading h2 {
+    font-size: clamp(3.75rem, 6.94vw, 7.9rem);
+  }
+
   .roadmap__heading h2 span {
     white-space: nowrap;
   }
@@ -836,7 +840,7 @@
      copy column half empty against a 656px-tall hero image. The ceiling is set
      by "Fights Alone." staying on one line inside the 46fr column. */
   .concept-hero h1 {
-    font-size: clamp(7.5rem, 8.3vw, 11rem);
+    font-size: clamp(7.5rem, 7.7vw, 10.2rem);
   }
 
   .conversion__inner {
