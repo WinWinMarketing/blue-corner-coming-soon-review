@@ -9,16 +9,19 @@ const toolsDirectory = path.dirname(fileURLToPath(import.meta.url));
 const rootDirectory = path.resolve(toolsDirectory, "..");
 const failures = [];
 const strictImages = process.argv.includes("--strict-images");
-const approvedHomeSha256 = "54a6e904e7d5fc8dc989ef92a5e446dbb96b26622fcd817576398dd8d89f7dad";
+const approvedHomeSha256 = "31ef9c3b607134b68bc7e9789c422856419c8d6f032b882d9603005f7dd3eedd";
 const approvedAssets = Object.freeze({
   "assets/styles/brand.css": "a80fc3111bf8b07398eb344d855e302a1e748678d6164c0f1999cee842cf25f6",
-  "assets/styles/shared.css": "68d8af37dd07de7e90a256d3ef7472d2330d03f80dbaccfe858e9b54b84fb835",
-  "assets/styles/concept-base.css": "2032fdaa924ef29b140b1141254f0858b901a7d5832d3c8cbbdee669434f1a6b",
-  "assets/scripts/shared.js": "4a4bf5f3e576e51b644d73ed4c2c16e060e526532b0cc4f9af8426a1e7720c48",
+  "assets/styles/shared.css": "08a5b71a930dc7456584603481000fb721ab72a4bfaab642e546bce4bbcefd0c",
+  "assets/styles/concept-base.css": "284d2a3ed683ed8c1d322fb070f6d200f443d7999e4facdcc9f4ee7692f3285a",
+  "assets/scripts/boot.js": "7d7ce8cadca26959367c68f2ac381e0fe661a3a7a1f4eeb3b514c07326f90f1e",
+  "assets/scripts/shared.js": "c15703cd87d196be855dd729dc2c4b4f48a33e11e6d42b8db7cbd6f6b67e97fc",
   "assets/art/blue-corner-reference-ring.webp": "22bbe8a535d1707c6d7724f9a2d71ea9f1ff8e924d50ea690d2a251062cd07f2",
   "assets/art/blue-corner-reference-ring-brand-v3.webp": "ac190f623adc1e2f7cd474853c39917912ea381c8657a69c8c278ebbd497ea84",
 });
+const bootScriptCacheKey = approvedAssets["assets/scripts/boot.js"].slice(0, 8);
 const sharedScriptCacheKey = approvedAssets["assets/scripts/shared.js"].slice(0, 8);
+const sharedCssCacheKey = approvedAssets["assets/styles/shared.css"].slice(0, 8);
 const conceptCssCacheKey = approvedAssets["assets/styles/concept-base.css"].slice(0, 8);
 const heroCacheKey = approvedAssets["assets/art/blue-corner-reference-ring-brand-v3.webp"].slice(0, 8);
 
@@ -95,6 +98,14 @@ if (count(home, 'href="https://use.typekit.net/ciy6txz.css"') !== 1
 if (count(home, `href="assets/styles/concept-base.css?v=${conceptCssCacheKey}"`) !== 1) {
   fail("Homepage must version the corrected core stylesheet for cache refresh");
 }
+if (count(home, `href="assets/styles/shared.css?v=${sharedCssCacheKey}"`) !== 1) {
+  fail("Homepage must version reveal styles with the first eight characters of their approved SHA-256");
+}
+if (count(home, `src="assets/scripts/boot.js?v=${bootScriptCacheKey}"`) !== 1
+  || home.indexOf(`src="assets/scripts/boot.js?v=${bootScriptCacheKey}"`) > home.indexOf('<link rel="stylesheet"')
+  || /<script[^>]+src="assets\/scripts\/boot\.js[^"]*"[^>]+(?:async|defer)/.test(home)) {
+  fail("Homepage must load the versioned reveal boot synchronously before styles");
+}
 if (count(home, `src="assets/scripts/shared.js?v=${sharedScriptCacheKey}"`) !== 1) {
   fail("Homepage must version shared.js with the first eight characters of its approved SHA-256");
 }
@@ -116,7 +127,9 @@ for (const [relativePath, expectedHash] of Object.entries(approvedAssets)) {
 const brandCss = await readFile(path.join(rootDirectory, "assets/styles/brand.css"), "utf8");
 const sharedCss = await readFile(path.join(rootDirectory, "assets/styles/shared.css"), "utf8");
 const conceptCss = await readFile(path.join(rootDirectory, "assets/styles/concept-base.css"), "utf8");
+const bootScript = await readFile(path.join(rootDirectory, "assets/scripts/boot.js"), "utf8");
 const sharedScript = await readFile(path.join(rootDirectory, "assets/scripts/shared.js"), "utf8");
+const impeccableSpec = await readFile(path.join(rootDirectory, ".impeccable.md"), "utf8");
 const recolorScript = await readFile(path.join(rootDirectory, "tools/recolor-hero.mjs"), "utf8");
 if (/(?:\.concept-addition(?:__[\w-]+)?|data-print-plan|data-plan-(?:form|preview))/.test(`${conceptCss}\n${sharedCss}`)) {
   fail("Retired concept-addition selectors must not remain in the canonical stylesheets");
@@ -138,18 +151,44 @@ if (!/scrollbar-color:\s*transparent transparent;/.test(sharedCss)
   || /scrollbar-gutter/.test(`${conceptCss}\n${sharedCss}`)) {
   fail("Scrollbar must remain native/draggable, transparent at rest, and visible only while scrolling or near the right edge");
 }
+const bootGuard = bootScript.indexOf("if (reducedMotion.matches");
+const prepActivation = bootScript.indexOf('classList.add("reveal-prep")');
 const observerConstruction = sharedScript.indexOf("new IntersectionObserver");
-const revealReadiness = sharedScript.indexOf('classList.add("reveal-ready")');
-if (observerConstruction < 0 || revealReadiness < observerConstruction
-  || !/if \(reducedMotion\.matches \|\| !\("IntersectionObserver" in window\)\) return;/.test(sharedScript)
-  || !/const disableReveals = \(\) => \{[\s\S]*?classList\.remove\("reveal-ready"\);[\s\S]*?disconnect\(\);/.test(sharedScript)
-  || !/catch \{\s*disableReveals\(\);\s*\}/.test(sharedScript)) {
-  fail("Reveal readiness must begin only after observer construction and fail open for reduced motion, missing APIs, and runtime errors");
+const firstActivationFrame = sharedScript.indexOf("revealActivationFrame = window.requestAnimationFrame");
+const secondActivationFrame = sharedScript.indexOf("revealActivationFrame = window.requestAnimationFrame", firstActivationFrame + 1);
+const initialMeasurement = sharedScript.indexOf("const initialRevealTargets", secondActivationFrame);
+const revealReadiness = sharedScript.indexOf('classList.add("reveal-ready")', initialMeasurement);
+const prepRelease = sharedScript.indexOf('classList.remove("reveal-prep")', revealReadiness);
+const revealFrame = sharedScript.indexOf("revealActivationFrame = window.requestAnimationFrame", prepRelease);
+const initialReveal = sharedScript.indexOf("initialRevealTargets.forEach", revealFrame);
+if (bootGuard < 0 || prepActivation < bootGuard
+  || bootScript.indexOf('classList.add("js")') < 0
+  || !/if \(reducedMotion\.matches \|\| !\("IntersectionObserver" in window\) \|\| !\("requestAnimationFrame" in window\)\) return;/.test(bootScript)
+  || !/fallbackTimer = window\.setTimeout\(release, 1500\);/.test(bootScript)
+  || !/const release = \(\) => \{[\s\S]*?classList\.remove\("reveal-prep"\);/.test(bootScript)) {
+  fail("Reveal boot must prepare before first paint only when motion and browser capabilities allow, then fail open on timeout");
 }
-if (!/\.reveal-ready \[data-reveal\][\s\S]*?opacity:\s*0;[\s\S]*?transform:\s*translateY\(1rem\);/.test(sharedCss)
-  || !/@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.reveal-ready \[data-reveal\][\s\S]*?opacity:\s*1 !important;[\s\S]*?transform:\s*none !important;/.test(sharedCss)
+if (observerConstruction < 0
+  || firstActivationFrame < observerConstruction
+  || secondActivationFrame <= firstActivationFrame
+  || initialMeasurement < secondActivationFrame
+  || revealReadiness < initialMeasurement
+  || prepRelease < revealReadiness
+  || revealFrame < prepRelease
+  || initialReveal < revealFrame
+  || !/if \(!root\.classList\.contains\("reveal-ready"\)\) return;/.test(sharedScript)
+  || !/if \(typeof window\.cancelAnimationFrame === "function"\) window\.cancelAnimationFrame\(revealActivationFrame\);/.test(sharedScript)
+  || !/const disableReveals = \(\) => \{[\s\S]*?classList\.remove\("reveal-ready"\);[\s\S]*?disconnect\(\);[\s\S]*?releaseRevealPrep\(\);/.test(sharedScript)
+  || !/\|\| !root\.classList\.contains\("reveal-prep"\)\) \{\s*disableReveals\(\);/.test(sharedScript)
+  || !/initialRevealTargets\.forEach\(\(target\) => \{[\s\S]*?classList\.add\("is-visible"\);[\s\S]*?observer\.unobserve\(target\);/.test(sharedScript)
+  || !/catch \{\s*disableReveals\(\);\s*\}/.test(sharedScript)) {
+  fail("Reveal activation must observe first, preserve a rendered prep frame, enable transitions, then animate only initially visible targets and fail open");
+}
+if (!/\.reveal-prep \[data-reveal\],[\s\S]*?opacity:\s*0;[\s\S]*?transform:\s*translateY\(1rem\);[\s\S]*?transition:\s*none !important;/.test(sharedCss)
+  || !/\.reveal-ready \[data-reveal\][\s\S]*?opacity:\s*0;[\s\S]*?transform:\s*translateY\(1rem\);/.test(sharedCss)
+  || !/@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.reveal-prep \[data-reveal\],[\s\S]*?opacity:\s*1 !important;[\s\S]*?transform:\s*none !important;[\s\S]*?transition:\s*none !important;/.test(sharedCss)
   || /\.js\s+\[data-reveal\]/.test(sharedCss)) {
-  fail("Reveal CSS must be readiness-gated, visible by default, and explicitly neutralized for reduced motion");
+  fail("Reveal CSS must freeze the early prep state, remain readiness-gated, and immediately neutralize under reduced motion");
 }
 for (const staggerContract of [
   /\.stats__grid \.stat:nth-child\(4\)/,
@@ -186,6 +225,11 @@ for (const readabilityRule of [
 if (!/\.eyebrow\s*\{[^}]*max-inline-size:\s*min\(100%, 34ch\);[^}]*background:\s*var\(--brand-yellow\);[^}]*color:\s*var\(--brand-navy\);[^}]*font-size:\s*clamp\([^;]*\);/.test(sharedCss)) {
   fail("Eyebrows must use the readable navy-on-yellow two-line treatment");
 }
+if (!/html\s*\{[^}]*min-inline-size:\s*20rem;/.test(sharedCss)
+  || !/body\s*\{[^}]*min-inline-size:\s*20rem;/.test(sharedCss)
+  || !/@media \(max-width: 20rem\)\s*\{\s*html,\s*body\s*\{\s*min-inline-size:\s*0;\s*\}\s*\}/.test(sharedCss)) {
+  fail("The desktop width floor must release exactly at 20rem so 320px viewports do not overflow");
+}
 if (count(home, 'class="marker-band"') !== 5
   || !home.includes('<span class="marker-band">worse.</span>')
   || !home.includes('<span class="marker-band">A Corner.</span>')
@@ -199,7 +243,7 @@ if (!/\.section-heading h2 > span\s*\{[^}]*display:\s*block;/.test(conceptCss)
   fail("Heading line locks must not force nested marker bands into full-width rows");
 }
 if (!/\.marker-band\s*\{[^}]*position:\s*relative;[^}]*padding-inline:\s*0;[^}]*white-space:\s*nowrap;/.test(conceptCss)
-  || !/\.marker-band::before\s*\{[^}]*z-index:\s*-1;[^}]*inset-block:\s*0;[^}]*inset-inline:\s*-0\.075em;[^}]*background:\s*var\(--brand-yellow\);/.test(conceptCss)
+  || !/\.marker-band::before\s*\{[^}]*z-index:\s*-1;[^}]*inset-block:\s*0;[^}]*inset-inline:\s*-0\.125em;[^}]*background:\s*var\(--brand-yellow\);/.test(conceptCss)
   || /transparent 0 14%|--marker-band-height/.test(`${conceptCss}\n${brandCss}`)) {
   fail("Marker highlights must preserve the no-padding selection box with balanced visual inline breathing room");
 }
@@ -284,10 +328,13 @@ if (!/\.stats__sources\s*\{[^}]*grid-template-columns:\s*1fr;/.test(conceptCss)
 if (!/\.roadmap__list\s*\{[^}]*grid-template-columns:[^}]*\}[^@]*?\.roadmap-item\s*\{[^}]*border-inline-end:\s*1px solid var\(--brand-navy\);/.test(conceptCss)
   || /\.roadmap__list\s*\{[^}]*border-block/.test(conceptCss)
   || !/\.roadmap__list\s*\{[^}]*margin:\s*clamp\(1\.5rem, 2\.4vw, 2\.25rem\) 0 clamp\(0\.75rem, 1\.4svh, 1\.25rem\);/.test(conceptCss)
-  || !/@media \(min-width: 64\.0625rem\)[\s\S]*?\.roadmap__list\s*\{[^}]*flex:\s*0 0 auto;[^}]*block-size:\s*clamp\(20rem, 44\.5svh, 25rem\);[^}]*max-block-size:\s*25rem;/.test(conceptCss)
+  || !/@media \(min-width: 64\.0625rem\)[\s\S]*?\.roadmap__list\s*\{[^}]*flex:\s*0 0 auto;[^}]*block-size:\s*clamp\(22rem, 48svh, 27rem\);[^}]*max-block-size:\s*27rem;/.test(conceptCss)
   || !/@media \(min-width: 64\.0625rem\) and \(max-height: 55rem\)\s*\{\s*\.roadmap\s*\{[^}]*padding-block:\s*clamp\(2rem, 4svh, 3rem\);/.test(conceptCss)
   || !/\.roadmap-item--future\s*\{[^}]*background:\s*color-mix\(in oklch, var\(--brand-navy\) 13%, var\(--brand-off-white\)\);[^}]*color:\s*color-mix\(in oklch, var\(--brand-navy\) 78%, var\(--brand-off-white\)\);/.test(conceptCss)) {
-  fail("Roadmap must keep five columns and a bounded 44.5svh desktop table with short-height breathing room");
+  fail("Roadmap must keep five columns and the exact bounded 48svh desktop table with short-height breathing room");
+}
+if (count(impeccableSpec, "720px maximum card") !== 1 || impeccableSpec.includes("680px maximum card")) {
+  fail("Impeccable specification must pin the conversion card maximum to 720px");
 }
 if (!/\.meaning__body\s*\{[^}]*max-inline-size:\s*58ch;/.test(conceptCss)
   || !/@media \(min-width: 86rem\)\s*\{[\s\S]*?\.meaning__body-line\s*\{[^}]*display:\s*block;[^}]*white-space:\s*nowrap;[\s\S]*?\.meaning__body\s*\{[^}]*max-inline-size:\s*none;/.test(conceptCss)) {

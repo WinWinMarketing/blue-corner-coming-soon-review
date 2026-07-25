@@ -33,20 +33,35 @@
 
   const revealTargets = [...document.querySelectorAll("[data-reveal]")];
   let revealObserver = null;
+  let revealActivationFrame = 0;
+  const revealPrepController = window.blueCornerRevealPrep;
+  const releaseRevealPrep = () => {
+    revealPrepController?.release?.();
+    root.classList.remove("reveal-prep");
+  };
 
   const disableReveals = () => {
     root.classList.remove("reveal-ready");
     revealObserver?.disconnect();
     revealObserver = null;
+    if (typeof window.cancelAnimationFrame === "function") window.cancelAnimationFrame(revealActivationFrame);
+    revealActivationFrame = 0;
+    releaseRevealPrep();
   };
 
   const enableReveals = () => {
-    disableReveals();
-    if (reducedMotion.matches || !("IntersectionObserver" in window)) return;
+    if (reducedMotion.matches
+      || !("IntersectionObserver" in window)
+      || !("requestAnimationFrame" in window)
+      || !root.classList.contains("reveal-prep")) {
+      disableReveals();
+      return;
+    }
 
     try {
       const observer = new IntersectionObserver((entries) => {
         try {
+          if (!root.classList.contains("reveal-ready")) return;
           entries.forEach((entry) => {
             if (!entry.isIntersecting) return;
             entry.target.classList.add("is-visible");
@@ -58,10 +73,41 @@
       }, { rootMargin: "0px 0px -8%", threshold: 0.12 });
 
       revealObserver = observer;
-      root.classList.add("reveal-ready");
-      revealTargets.forEach((target) => {
-        target.classList.remove("is-visible");
-        observer.observe(target);
+      revealTargets.forEach((target) => observer.observe(target));
+      revealActivationFrame = window.requestAnimationFrame(() => {
+        revealActivationFrame = window.requestAnimationFrame(() => {
+          try {
+            if (reducedMotion.matches || !root.classList.contains("reveal-prep")) {
+              disableReveals();
+              return;
+            }
+
+            const initialRevealTargets = revealTargets.filter((target) => {
+              const bounds = target.getBoundingClientRect();
+              return bounds.bottom > 0 && bounds.top < window.innerHeight * 0.92;
+            });
+            revealPrepController?.cancelFallback?.();
+            root.classList.add("reveal-ready");
+            root.classList.remove("reveal-prep");
+            revealActivationFrame = window.requestAnimationFrame(() => {
+              try {
+                if (reducedMotion.matches || !root.classList.contains("reveal-ready")) {
+                  disableReveals();
+                  return;
+                }
+                initialRevealTargets.forEach((target) => {
+                  target.classList.add("is-visible");
+                  observer.unobserve(target);
+                });
+                revealActivationFrame = 0;
+              } catch {
+                disableReveals();
+              }
+            });
+          } catch {
+            disableReveals();
+          }
+        });
       });
     } catch {
       disableReveals();

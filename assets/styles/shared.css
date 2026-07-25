@@ -354,6 +354,21 @@ button {
   line-height: 1.5;
 }
 
+.reveal-prep [data-reveal],
+.reveal-prep .stats__grid[data-reveal] .stat,
+.reveal-prep .roadmap__list[data-reveal] .roadmap-item,
+.reveal-prep .conversion-path[data-reveal] > .eyebrow,
+.reveal-prep .conversion-path[data-reveal] > h3,
+.reveal-prep .conversion-path[data-reveal] > .prototype-disclosure,
+.reveal-prep .conversion-path[data-reveal] .prototype-role,
+.reveal-prep .conversion-path[data-reveal] .field-grid,
+.reveal-prep .conversion-path[data-reveal] [data-submit],
+.reveal-prep .conversion-path[data-reveal] .conversion-path__note {
+  opacity: 0;
+  transform: translateY(1rem);
+  transition: none !important;
+}
+
 .reveal-ready [data-reveal],
 .reveal-ready .stats__grid[data-reveal] .stat,
 .reveal-ready .roadmap__list[data-reveal] .roadmap-item {
@@ -525,6 +540,13 @@ button {
   }
 }
 
+@media (max-width: 20rem) {
+  html,
+  body {
+    min-inline-size: 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -539,6 +561,16 @@ button {
     animation-iteration-count: 1 !important;
   }
 
+  .reveal-prep [data-reveal],
+  .reveal-prep .stats__grid[data-reveal] .stat,
+  .reveal-prep .roadmap__list[data-reveal] .roadmap-item,
+  .reveal-prep .conversion-path[data-reveal] > .eyebrow,
+  .reveal-prep .conversion-path[data-reveal] > h3,
+  .reveal-prep .conversion-path[data-reveal] > .prototype-disclosure,
+  .reveal-prep .conversion-path[data-reveal] .prototype-role,
+  .reveal-prep .conversion-path[data-reveal] .field-grid,
+  .reveal-prep .conversion-path[data-reveal] [data-submit],
+  .reveal-prep .conversion-path[data-reveal] .conversion-path__note,
   .reveal-ready [data-reveal],
   .reveal-ready .stats__grid[data-reveal] .stat,
   .reveal-ready .roadmap__list[data-reveal] .roadmap-item,
