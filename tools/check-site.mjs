@@ -9,11 +9,11 @@ const toolsDirectory = path.dirname(fileURLToPath(import.meta.url));
 const rootDirectory = path.resolve(toolsDirectory, "..");
 const failures = [];
 const strictImages = process.argv.includes("--strict-images");
-const approvedHomeSha256 = "62f1717f71869c0d31dfa61ba2c31786a1b641b90f9c9552541bfa4f105dc5b9";
+const approvedHomeSha256 = "27d200ee592bd2a3ec60a9f8f19c21a74b49008cd0476588bee63bdd3e8e822e";
 const approvedAssets = Object.freeze({
   "assets/styles/brand.css": "a80fc3111bf8b07398eb344d855e302a1e748678d6164c0f1999cee842cf25f6",
   "assets/styles/shared.css": "a5fafa418c782ea2fa02805674c50e202f9f8f0814a1d2a012ef5b69c5c7799b",
-  "assets/styles/concept-base.css": "395c8ef658e670737c3058e8ab4ef1e49d1b143b4232d951ae84da26d26447b9",
+  "assets/styles/concept-base.css": "0953a52faa311e312fc51e34d1b4f39d8cc8cbcef1fbfd6a9f0c0c4e92618f2f",
   "assets/scripts/shared.js": "5d77e4a770625571bd3e97257be4e2be0f1e303503cc813d5d98ded91618cd36",
   "assets/art/blue-corner-reference-ring-brand-v3.webp": "0d921a25360f1a36d23bbb48ce401b723b95bb7959f1439d7548d9350c450829",
 });
@@ -88,7 +88,7 @@ if (count(home, 'href="https://use.typekit.net/ciy6txz.css"') !== 1
   || !home.includes("font-src 'self' https://use.typekit.net;")) {
   fail("Typekit stylesheet and constrained style/font CSP are required");
 }
-if (count(home, 'href="assets/styles/concept-base.css?v=395c8ef6"') !== 1) {
+if (count(home, 'href="assets/styles/concept-base.css?v=0953a52f"') !== 1) {
   fail("Homepage must version the corrected core stylesheet for cache refresh");
 }
 if (!home.includes(`src="assets/art/${referenceHero.image}"`) || /(?:href|src)="\/assets\//.test(home)) {
@@ -177,7 +177,7 @@ if (count(home, "roadmap-item--current") !== 1 || count(home, "roadmap-item--fut
 if (!/\.concept-hero__accent\s*\{[^}]*color:\s*var\(--brand-blue\);/.test(conceptCss) || !/letter-spacing:\s*-0\.035em;/.test(conceptCss)) {
   fail("Hero accent and restrained condensed-display tracking are required");
 }
-if (!/@media \(min-width: 64\.0625rem\)\s*\{\s*\.conversion__heading h2\s*\{[^}]*font-size:\s*clamp\(4\.5rem, 9\.17vw, 11rem\);/.test(conceptCss)) {
+if (!/@media \(min-width: 64\.0625rem\)\s*\{\s*\.conversion__heading h2\s*\{[^}]*font-size:\s*clamp\(4\.5rem, 9\.17vw, 12rem\);/.test(conceptCss)) {
   fail("Desktop conversion headline must use the locked hero display scale");
 }
 if (!/@media \(min-width: 48\.0625rem\) and \(max-width: 64rem\)\s*\{\s*\.conversion__heading h2\s*\{[^}]*font-size:\s*clamp\(4rem, 7\.2vw, 4\.75rem\);/.test(conceptCss)) {

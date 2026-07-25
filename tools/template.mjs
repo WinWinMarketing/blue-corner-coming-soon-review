@@ -92,7 +92,7 @@ export const renderHomePage = () => {
     <link rel="stylesheet" href="https://use.typekit.net/ciy6txz.css">
     <link rel="stylesheet" href="assets/styles/brand.css">
     <link rel="stylesheet" href="assets/styles/shared.css">
-    <link rel="stylesheet" href="assets/styles/concept-base.css?v=395c8ef6">
+    <link rel="stylesheet" href="assets/styles/concept-base.css?v=0953a52f">
     <script src="assets/scripts/shared.js" defer></script>
   </head>
   <body class="concept-page">

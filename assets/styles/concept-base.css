@@ -78,6 +78,10 @@
   padding-block: clamp(1.75rem, 2.2vw, 2.25rem);
 }
 
+/* Centred, not end-aligned. Bottom-aligning to close the gap under the headline
+   drove "Alone."'s yellow underline into the lead line below it: the underline
+   sits 0.16em past the baseline, which already overflows the h1 box, and the
+   16px row-gap is not enough clearance once the slack is removed. */
 .concept-hero__copy {
   grid-area: copy;
   align-self: center;
@@ -182,6 +186,9 @@
   grid-area: media;
   inline-size: 100%;
   aspect-ratio: 3 / 2;
+  /* The 3:2 image is width-driven, so on a short window it alone pushed the
+     hero past one screen. Cap it against the viewport and let object-fit crop. */
+  max-block-size: calc(100svh - 23rem);
   margin: 0;
   overflow: hidden;
   background: var(--brand-navy);
@@ -275,18 +282,18 @@
   /* padding-block only — the inline padding is .page-frame's gutter. The old
      `padding: … 0` shorthand zeroed it, which was invisible while the inner was
      84% wide and auto-centred, but flush to the viewport edge at 100%. */
-  padding-block: clamp(2rem, 3vw, 3rem);
+  padding-block: clamp(1.25rem, 3.2svh, 3rem);
 }
 
 .stats__grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  margin-block-start: clamp(1.75rem, 2.6vw, 2.75rem);
+  margin-block-start: clamp(1rem, 4svh, 2.75rem);
 }
 
 .stat {
-  min-block-size: clamp(13rem, 17vw, 15.5rem);
-  padding: clamp(1.25rem, 2.1vw, 2rem);
+  min-block-size: clamp(10.5rem, 24svh, 15.5rem);
+  padding: clamp(1rem, 2.1vw, 2rem);
   border-inline-end: 1px solid var(--brand-navy);
 }
 
@@ -343,7 +350,7 @@
   min-block-size: 0;
   align-items: center;
   align-content: center;
-  padding-block: clamp(1.75rem, 2.4vw, 2.5rem);
+  padding-block: clamp(1.25rem, 4svh, 2.5rem);
 }
 
 .symptoms__heading {
@@ -363,7 +370,7 @@
   grid-template-columns: auto minmax(0, 1fr);
   align-items: center;
   gap: clamp(1.5rem, 2.6vw, 2.75rem);
-  padding-block: clamp(0.85rem, 1.05vw, 1.5rem);
+  padding-block: clamp(0.6rem, 2.2svh, 1.5rem);
   border-block-start: 2px solid color-mix(in oklch, var(--brand-navy) 26%, var(--brand-off-white));
 }
 
@@ -425,7 +432,7 @@
   min-inline-size: 0;
   flex-direction: column;
   justify-content: center;
-  padding: clamp(1.75rem, 2.6vw, 3rem) 5vw clamp(1.75rem, 2.6vw, 3rem) 7.4vw;
+  padding: clamp(1.25rem, 4svh, 3rem) 5vw clamp(1.25rem, 4svh, 3rem) 7.4vw;
   color: var(--brand-off-white);
 }
 
@@ -472,12 +479,14 @@
 
 .roadmap-item__name {
   isolation: isolate;
-  font-size: clamp(1.4rem, 2.15vw, 2.5rem);
+  font-size: clamp(1.4rem, 2.9vw, 4rem);
   font-weight: var(--font-weight-bold);
+  letter-spacing: -0.03em;
+  line-height: 0.95;
 }
 
 .roadmap-item--current .roadmap-item__name {
-  font-size: clamp(2.1rem, 3.2vw, 3.75rem);
+  font-size: clamp(2.1rem, 4.4vw, 6rem);
 }
 
 .roadmap-item--future {
@@ -485,13 +494,17 @@
   color: var(--color-muted);
 }
 
+/* Tinted, not bare. Left transparent it read as a hole punched in the band —
+   the only cell whose empty middle sat against the page rather than a fill.
+   Yellow stays functional here: it marks the one service that is open. */
 .roadmap-item--current {
   border-block-start: 0.5rem solid var(--brand-yellow);
+  background: color-mix(in oklch, var(--brand-yellow) 16%, var(--brand-off-white));
 }
 
 .roadmap-item strong {
-  font-size: var(--font-size-small);
-  letter-spacing: 0.12em;
+  font-size: var(--font-size-support);
+  letter-spacing: 0.14em;
   line-height: 1.35;
   text-transform: uppercase;
 }
@@ -836,7 +849,7 @@
 
 @media (min-width: 64.0625rem) {
   .conversion__heading h2 {
-    font-size: clamp(4.5rem, 9.17vw, 11rem);
+    font-size: clamp(4.5rem, 9.17vw, 12rem);
   }
 }
 
@@ -1013,12 +1026,13 @@
   line-height: 1;
 }
 
+/* Full wordmark, gutter to gutter. At 124% it was clipped mid-R — an oversized
+   bleed that loses exactly one letter reads as a mistake, not a crop. */
 .concept-footer__wordmark {
-  inline-size: 124%;
+  inline-size: 100%;
   max-inline-size: none;
   height: auto;
-  margin-inline-start: -1.5%;
-  opacity: 0.2;
+  opacity: 0.22;
 }
 
 @media (min-width: 64.0625rem) {
@@ -1067,11 +1081,13 @@
   /* The roadmap is a page of its own; the service columns take the slack. */
   .roadmap {
     min-block-size: 100svh;
+    padding-block: clamp(2rem, 3vw, 3.25rem);
   }
 
+  /* No cap: the band takes whatever the headline leaves, so the section is
+     filled by construction rather than floating in the middle of the page. */
   .roadmap__list {
     flex: 1;
-    max-block-size: 38svh;
   }
 
   .roadmap-item {
@@ -1276,8 +1292,11 @@
     min-block-size: 18rem;
   }
 
+  /* Narrow screens keep the oversized treatment, but cropped evenly on both
+     sides so it reads as a deliberate blow-up rather than a clipped logo. */
   .concept-footer__wordmark {
-    inline-size: 150%;
+    inline-size: 160%;
+    margin-inline-start: -30%;
   }
 }
 
