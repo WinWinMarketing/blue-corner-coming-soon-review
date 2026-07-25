@@ -1,6 +1,10 @@
 import { referenceHero, safetyCopy, sourceCopy } from "./source-copy.mjs";
 
 const HERO_CACHE_KEY = "ac190f62";
+const BOOT_SCRIPT_CACHE_KEY = "7d7ce8ca";
+const CONCEPT_CSS_CACHE_KEY = "284d2a3e";
+const SHARED_CSS_CACHE_KEY = "08a5b71a";
+const SHARED_SCRIPT_CACHE_KEY = "c15703cd";
 
 const escapeHtml = (value) => String(value)
   .replaceAll("&", "&amp;")
@@ -99,12 +103,12 @@ export const renderHomePage = () => {
     <meta property="og:type" content="website">
     <meta property="og:image" content="https://winwinmarketing.github.io/blue-corner-coming-soon-review/assets/art/${escapeHtml(referenceHero.image)}?v=${HERO_CACHE_KEY}">
     <link rel="icon" href="assets/brand/mark-blue.png" type="image/png">
-    <script src="assets/scripts/boot.js"></script>
+    <script src="assets/scripts/boot.js?v=${BOOT_SCRIPT_CACHE_KEY}"></script>
     <link rel="stylesheet" href="https://use.typekit.net/ciy6txz.css">
     <link rel="stylesheet" href="assets/styles/brand.css">
-    <link rel="stylesheet" href="assets/styles/shared.css">
-    <link rel="stylesheet" href="assets/styles/concept-base.css?v=2032fdaa">
-    <script src="assets/scripts/shared.js?v=4a4bf5f3" defer></script>
+    <link rel="stylesheet" href="assets/styles/shared.css?v=${SHARED_CSS_CACHE_KEY}">
+    <link rel="stylesheet" href="assets/styles/concept-base.css?v=${CONCEPT_CSS_CACHE_KEY}">
+    <script src="assets/scripts/shared.js?v=${SHARED_SCRIPT_CACHE_KEY}" defer></script>
   </head>
   <body class="concept-page">
     <a class="skip-link" href="#main">Skip to main content</a>
