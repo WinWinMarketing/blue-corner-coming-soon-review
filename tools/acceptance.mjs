@@ -353,6 +353,37 @@ for (const viewport of VIEWPORTS) {
   await page.context().close();
 }
 
+// ------------------------------------------------ one screen at ANY height
+// Testing a single height hides cliff bugs: spacing that steps at a max-height
+// breakpoint fits at the tested height and overflows 20px above it. Sweeping
+// the realistic desktop window range is what catches that.
+{
+  const failures = [];
+  for (const height of [830, 860, 890, 920, 960, 1020, 1080, 1200]) {
+    const page = await openPage(2048, height);
+    await page.goto(target, { waitUntil: "networkidle" });
+    await page.evaluate(() => document.fonts.ready);
+    await page.waitForTimeout(500);
+    const blocks = await page.evaluate(() => {
+      const h = (sel) => { const el = document.querySelector(sel); return el ? Math.round(el.getBoundingClientRect().height) : 0; };
+      return {
+        viewport: window.innerHeight,
+        "header+hero": h(".site-header") + h(".concept-hero"),
+        stats: h(".stats"),
+        "corner block": h(".corner-block"),
+        roadmap: h(".roadmap"),
+      };
+    });
+    for (const [name, value] of Object.entries(blocks)) {
+      if (name === "viewport") continue;
+      if (value > blocks.viewport + 1) failures.push(`${height}px: ${name} +${value - blocks.viewport}`);
+    }
+    await page.context().close();
+  }
+  check("layout: every block is one screen at 830-1200px tall", failures.length === 0,
+    failures.join(", ") || "830, 860, 890, 920, 960, 1020, 1080, 1200 all fit");
+}
+
 // ------------------------------------- keyboard, validation, and cache keys
 {
   const page = await openPage(2048, 989);

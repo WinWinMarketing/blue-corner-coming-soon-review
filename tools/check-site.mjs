@@ -9,11 +9,11 @@ const toolsDirectory = path.dirname(fileURLToPath(import.meta.url));
 const rootDirectory = path.resolve(toolsDirectory, "..");
 const failures = [];
 const strictImages = process.argv.includes("--strict-images");
-const approvedHomeSha256 = "29716de9238a99e8b3b2958ed59b20384e1ddc70d23c35e721dbcf436fd08f06";
+const approvedHomeSha256 = "42803b9da38234129ba295adf77f842ca3fab1324915a09460e5bfc612928b25";
 const approvedAssets = Object.freeze({
   "assets/styles/brand.css": "a80fc3111bf8b07398eb344d855e302a1e748678d6164c0f1999cee842cf25f6",
   "assets/styles/shared.css": "96271ccef58c41144f4124397f7984792afb4928011deeaa26d6b0ef3842ec68",
-  "assets/styles/concept-base.css": "5b0f978d61fcc2ee2c3d401a1049e124f8cadc76061f410a2dee483dc2cceb8c",
+  "assets/styles/concept-base.css": "ce0e7d3b7e2d3a8a742287ede2c8692edeff8d82628f9f0dc550100701191660",
   "assets/scripts/boot.js": "7d7ce8cadca26959367c68f2ac381e0fe661a3a7a1f4eeb3b514c07326f90f1e",
   "assets/scripts/shared.js": "c15703cd87d196be855dd729dc2c4b4f48a33e11e6d42b8db7cbd6f6b67e97fc",
   "assets/art/blue-corner-reference-ring.webp": "22bbe8a535d1707c6d7724f9a2d71ea9f1ff8e924d50ea690d2a251062cd07f2",
@@ -285,8 +285,15 @@ if (!/<div class="corner-block">[\s\S]*?<section class="symptoms page-frame"[\s\
   || !/@media \(min-width: 64\.0625rem\)[\s\S]*?\.corner-block\s*\{[^}]*min-block-size:\s*100svh;/.test(conceptCss)) {
   fail("Symptoms and the manifesto must share one desktop page inside .corner-block");
 }
-if (!/@media \(min-width: 64\.0625rem\) and \(max-height: 50rem\)\s*\{\s*\.stats__inner\s*\{\s*padding-block:\s*clamp\(0\.75rem, 1\.8svh, 3rem\);\s*\}\s*\.meaning\s*\{\s*min-block-size:\s*21rem;\s*\}\s*\.meaning__copy\s*\{\s*padding-block:\s*clamp\(0\.75rem, 1\.8svh, 3rem\);\s*\}\s*\}/.test(conceptCss)) {
-  fail("Short desktop viewports must compact only stats/manifesto padding and the manifesto height floor");
+// Vertical rhythm must scale CONTINUOUSLY with svh. A max-height breakpoint
+// compacts spacing below its threshold and leaves it full size just above, so
+// the section overflows one screen in the band immediately over the cliff —
+// which is exactly where a real browser window sits. Measured: the retired
+// 55rem cliff overflowed the roadmap by 39px at 890px tall.
+if (/@media[^{]*max-height:/.test(conceptCss)
+  || !/\.stats__inner\s*\{[^}]*padding-block:\s*clamp\([^)]*svh[^)]*\);/.test(conceptCss)
+  || !/\.meaning__copy\s*\{[^}]*padding:\s*clamp\([^)]*svh[^)]*\)[^;]*;/.test(conceptCss)) {
+  fail("Desktop vertical rhythm must scale continuously with svh, never step at a max-height breakpoint");
 }
 if (!/\.meaning__inner\s*\{[^}]*grid-template-columns:\s*12\.6% minmax\(0, 87\.4%\);/.test(conceptCss)
   || !/\.stats__heading h2\s*\{[^}]*font-size:\s*clamp\(3\.75rem, min\(7\.6vw, 16svh\), 10rem\);/.test(conceptCss)) {
@@ -339,7 +346,7 @@ if (!/\.roadmap__list\s*\{[^}]*grid-template-columns:[^}]*\}[^@]*?\.roadmap-item
   || /\.roadmap__list\s*\{[^}]*border-block/.test(conceptCss)
   || !/\.roadmap__list\s*\{[^}]*margin:\s*clamp\(1\.5rem, 2\.4vw, 2\.25rem\) 0 clamp\(0\.75rem, 1\.4svh, 1\.25rem\);/.test(conceptCss)
   || !/@media \(min-width: 64\.0625rem\)[\s\S]*?\.roadmap__list\s*\{[^}]*flex:\s*0 0 auto;[^}]*block-size:\s*clamp\(22rem, 48svh, 27rem\);[^}]*max-block-size:\s*27rem;/.test(conceptCss)
-  || !/@media \(min-width: 64\.0625rem\) and \(max-height: 55rem\)\s*\{\s*\.roadmap\s*\{[^}]*padding-block:\s*clamp\(2rem, 4svh, 3rem\);/.test(conceptCss)
+  || !/@media \(min-width: 64\.0625rem\)[\s\S]*?\.roadmap\s*\{[^}]*min-block-size:\s*100svh;[^}]*padding-block:\s*clamp\(1\.5rem, 3\.5svh, 4\.5rem\);/.test(conceptCss)
   || !/\.roadmap-item--future\s*\{[^}]*background:\s*color-mix\(in oklch, var\(--brand-navy\) 13%, var\(--brand-off-white\)\);[^}]*color:\s*color-mix\(in oklch, var\(--brand-navy\) 78%, var\(--brand-off-white\)\);/.test(conceptCss)) {
   fail("Roadmap must keep five columns and the exact bounded 48svh desktop table with short-height breathing room");
 }
