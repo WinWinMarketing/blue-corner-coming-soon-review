@@ -6,7 +6,7 @@
 
 html {
   min-inline-size: 20rem;
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
   scrollbar-color: transparent transparent;
   scrollbar-width: thin;
   text-size-adjust: 100%;
