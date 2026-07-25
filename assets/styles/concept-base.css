@@ -284,7 +284,7 @@
   /* padding-block only — the inline padding is .page-frame's gutter. The old
      `padding: … 0` shorthand zeroed it, which was invisible while the inner was
      84% wide and auto-centred, but flush to the viewport edge at 100%. */
-  padding-block: clamp(1.25rem, 2.6svh, 3rem);
+  padding-block: clamp(1rem, 2.1svh, 3rem);
 }
 
 .stats__grid {
@@ -294,7 +294,7 @@
 }
 
 .stat {
-  min-block-size: clamp(10.5rem, 20svh, 15.5rem);
+  min-block-size: clamp(9.5rem, 19svh, 15.5rem);
   padding: clamp(1rem, 2.1vw, 2rem);
   border-inline-end: 1px solid var(--brand-navy);
 }
@@ -434,7 +434,7 @@
   min-inline-size: 0;
   flex-direction: column;
   justify-content: center;
-  padding: clamp(1.25rem, 4svh, 3rem) 5vw clamp(1.25rem, 4svh, 3rem) 7.4vw;
+  padding: clamp(1rem, 3.1svh, 3rem) 5vw clamp(1rem, 3.1svh, 3rem) 7.4vw;
   color: var(--brand-off-white);
 }
 
@@ -793,6 +793,12 @@
      they were filling — reverted 2026-07-25. */
   .roadmap {
     min-block-size: 100svh;
+    /* Scales continuously with the viewport instead of stepping at a
+       max-height breakpoint. The old cliff compacted this padding at 880px and
+       below but left it at the full 72px just above, while the table cap kept
+       growing with svh — so the section overflowed one screen between roughly
+       875px and 940px, which is exactly where a real browser window lands. */
+    padding-block: clamp(1.5rem, 3.5svh, 4.5rem);
   }
 
   .roadmap__list {
@@ -808,26 +814,6 @@
   .conversion__inner {
     min-block-size: calc(100svh - var(--signal-bar));
     align-content: center;
-  }
-}
-
-@media (min-width: 64.0625rem) and (max-height: 55rem) {
-  .roadmap {
-    padding-block: clamp(2rem, 4svh, 3rem);
-  }
-}
-
-@media (min-width: 64.0625rem) and (max-height: 50rem) {
-  .stats__inner {
-    padding-block: clamp(0.75rem, 1.8svh, 3rem);
-  }
-
-  .meaning {
-    min-block-size: 21rem;
-  }
-
-  .meaning__copy {
-    padding-block: clamp(0.75rem, 1.8svh, 3rem);
   }
 }
 
