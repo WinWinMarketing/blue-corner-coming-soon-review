@@ -65,7 +65,6 @@ export const renderHomePage = () => {
             <article class="symptom" data-reveal>
               <span class="symptom__number" aria-hidden="true">0${index + 1}</span>
               <h3>${escapeHtml(item.heading)}</h3>
-              <p>${escapeHtml(item.body)}</p>
             </article>`).join("");
   const roadmap = sourceCopy.roadmap.items.map((item, index) => `
             <li class="roadmap-item ${index === 0 ? "roadmap-item--current" : "roadmap-item--future"}">
@@ -93,7 +92,7 @@ export const renderHomePage = () => {
     <link rel="stylesheet" href="https://use.typekit.net/ciy6txz.css">
     <link rel="stylesheet" href="assets/styles/brand.css">
     <link rel="stylesheet" href="assets/styles/shared.css">
-    <link rel="stylesheet" href="assets/styles/concept-base.css?v=706bf816">
+    <link rel="stylesheet" href="assets/styles/concept-base.css?v=b7d508e3">
     <script src="assets/scripts/shared.js" defer></script>
   </head>
   <body class="concept-page">
@@ -144,27 +143,29 @@ export const renderHomePage = () => {
         </div>
       </section>
 
-      <section class="symptoms page-frame" aria-labelledby="symptoms-title">
-        <header class="section-heading symptoms__heading" data-reveal>
-          <p class="eyebrow">${escapeHtml(sourceCopy.symptoms.eyebrow)}</p>
-          <h2 id="symptoms-title" aria-label="${escapeHtml(sourceCopy.symptoms.heading)}"><span aria-hidden="true">It looks</span><span aria-hidden="true">like this.</span></h2>
-        </header>
-        <div class="symptoms__grid">${symptoms}
-        </div>
-      </section>
+      <div class="corner-block">
+        <section class="symptoms page-frame" aria-labelledby="symptoms-title">
+          <header class="section-heading symptoms__heading" data-reveal>
+            <p class="eyebrow">${escapeHtml(sourceCopy.symptoms.eyebrow)}</p>
+            <h2 id="symptoms-title" aria-label="${escapeHtml(sourceCopy.symptoms.heading)}"><span aria-hidden="true">It looks</span><span aria-hidden="true">like this.</span></h2>
+          </header>
+          <div class="symptoms__grid">${symptoms}
+          </div>
+        </section>
 
-      <section class="meaning" aria-labelledby="meaning-title">
-        <div class="meaning__inner page-frame">
-          <div class="meaning__mark" aria-hidden="true">
-            <img src="assets/brand/corner-off-white.png" width="255" height="248" alt="">
+        <section class="meaning" aria-labelledby="meaning-title">
+          <div class="meaning__inner page-frame">
+            <div class="meaning__mark" aria-hidden="true">
+              <img src="assets/brand/corner-off-white.png" width="255" height="248" alt="">
+            </div>
+            <div class="meaning__copy" data-reveal>
+              <p class="eyebrow">${escapeHtml(sourceCopy.meaning.eyebrow)}</p>
+              <h2 id="meaning-title" aria-label="${escapeHtml(sourceCopy.meaning.heading)}"><span aria-hidden="true">Not a clinic. <span class="marker-band">A Corner.</span></span></h2>
+              <p class="meaning__body"><span class="meaning__body-line">${escapeHtml(sourceCopy.meaning.bodyFirst)}</span> <span class="meaning__body-line">${escapeHtml(sourceCopy.meaning.bodySecond)}</span></p>
+            </div>
           </div>
-          <div class="meaning__copy" data-reveal>
-            <p class="eyebrow">${escapeHtml(sourceCopy.meaning.eyebrow)}</p>
-            <h2 id="meaning-title" aria-label="${escapeHtml(sourceCopy.meaning.heading)}"><span aria-hidden="true">Not a clinic. <span class="marker-band">A Corner.</span></span></h2>
-            <p class="meaning__body"><span class="meaning__body-line">${escapeHtml(sourceCopy.meaning.bodyFirst)}</span> <span class="meaning__body-line">${escapeHtml(sourceCopy.meaning.bodySecond)}</span></p>
-          </div>
-        </div>
-      </section>
+        </section>
+      </div>
 
       <section class="roadmap page-frame" aria-labelledby="roadmap-title">
         <header class="section-heading roadmap__heading" data-reveal>

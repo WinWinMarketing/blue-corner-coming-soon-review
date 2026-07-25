@@ -181,10 +181,10 @@ button {
   inline-size: fit-content;
   max-inline-size: min(100%, 34ch);
   margin: 0;
-  padding: 0.4rem 0.7rem 0.34rem;
+  padding: 0.42rem 0.72rem 0.36rem;
   background: var(--brand-yellow);
   color: var(--brand-navy);
-  font-size: clamp(1.0625rem, 0.94rem + 0.5vw, 1.3125rem);
+  font-size: clamp(1.125rem, 0.95rem + 0.65vw, 1.4375rem);
   font-weight: 700;
   letter-spacing: 0.075em;
   line-height: 1.25;

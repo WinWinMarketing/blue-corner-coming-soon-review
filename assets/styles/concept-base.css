@@ -2,7 +2,9 @@
   --section-space: clamp(4rem, 6.5vw, 6.5rem);
   --signal-bar: clamp(2.375rem, 2.9vw, 2.75rem);
   --page-gutter: clamp(1rem, 3.8889vw, 3.5rem);
-  --header-h: 8rem;
+  /* Mirrors .site-header__inner min-block-size so the hero fills exactly the
+     rest of the viewport with no sliver of the next block showing. */
+  --header-h: clamp(5.5rem, 7vw, 6rem);
   background: var(--brand-off-white);
 }
 
@@ -122,13 +124,11 @@
 
 .marker-band {
   display: inline;
-  padding-inline: 0.1em;
-  background-image: linear-gradient(
-    to bottom,
-    transparent 0 14%,
-    var(--brand-yellow) 14% 84%,
-    transparent 84% 100%
-  );
+  padding-inline: 0.13em;
+  background-image: linear-gradient(var(--brand-yellow), var(--brand-yellow));
+  background-repeat: no-repeat;
+  background-size: 100% var(--marker-band-height);
+  background-position: 0 var(--marker-band-offset);
   color: var(--brand-navy);
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
@@ -139,7 +139,7 @@
   align-self: start;
   max-inline-size: 33ch;
   margin: 0;
-  font-size: clamp(1.25rem, 1.55vw, 1.5rem);
+  font-size: clamp(1.375rem, 1.78vw, 1.75rem);
   font-weight: var(--font-weight-bold);
   line-height: 1.2;
 }
@@ -220,10 +220,13 @@
 .section-heading h2,
 .meaning h2 {
   margin-block-start: var(--space-lg);
-  font-size: clamp(3.75rem, 6.3889vw, 5.75rem);
+  font-size: clamp(3.75rem, 6.94vw, 6.25rem);
 }
 
 .stats {
+  /* Flex so the inner stretches to the section's content box. Inheriting the
+     min-block-size instead would push the signal bar past the fold. */
+  display: flex;
   min-block-size: clamp(44rem, 60.55vw, 54.5rem);
   border-block-end: var(--signal-bar) solid var(--brand-yellow);
   background: var(--brand-off-white);
@@ -232,23 +235,22 @@
 
 .stats__inner {
   display: flex;
-  min-block-size: inherit;
   inline-size: 84%;
   max-inline-size: none;
   flex-direction: column;
   justify-content: center;
-  padding: clamp(4rem, 7vw, 6.5rem) 0;
+  padding: clamp(2rem, 3vw, 3rem) 0;
 }
 
 .stats__grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  margin-block-start: clamp(3rem, 5vw, 4.5rem);
+  margin-block-start: clamp(1.75rem, 2.6vw, 2.75rem);
 }
 
 .stat {
-  min-block-size: clamp(15rem, 19vw, 17rem);
-  padding: clamp(1.5rem, 2.5vw, 2.25rem);
+  min-block-size: clamp(13rem, 17vw, 15.5rem);
+  padding: clamp(1.25rem, 2.1vw, 2rem);
   border-inline-end: 1px solid var(--brand-navy);
 }
 
@@ -271,8 +273,8 @@
 
 .stat p {
   max-inline-size: 24ch;
-  margin: clamp(1.5rem, 2.4vw, 2.5rem) 0 0;
-  font-size: clamp(1.0625rem, 0.85rem + 0.6vw, 1.3rem);
+  margin: clamp(1rem, 1.6vw, 1.6rem) 0 0;
+  font-size: clamp(1.1875rem, 0.95rem + 0.65vw, 1.45rem);
   font-weight: var(--font-weight-semibold);
   line-height: 1.4;
   text-wrap: balance;
@@ -282,7 +284,7 @@
   display: grid;
   grid-template-columns: 1fr;
   gap: var(--space-xs);
-  margin-block-start: var(--space-xl);
+  margin-block-start: var(--space-lg);
   font-size: var(--font-size-support);
   line-height: 1.5;
 }
@@ -291,13 +293,21 @@
   margin: 0;
 }
 
+/* Symptoms and the manifesto share one viewport: the list flexes, the
+   manifesto takes exactly the height its copy needs. */
+.corner-block {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+}
+
 .symptoms {
   display: grid;
   grid-template-columns: minmax(0, 36fr) minmax(0, 64fr);
   gap: 0;
   min-block-size: 0;
   align-items: center;
-  padding-block: clamp(3.5rem, 5vw, 5rem);
+  align-content: center;
+  padding-block: clamp(2.25rem, 3.2vw, 3.5rem);
 }
 
 .symptoms__heading {
@@ -314,10 +324,10 @@
 
 .symptom {
   display: grid;
-  grid-template-columns: 2.5rem minmax(11rem, 37%) minmax(0, 1fr);
-  align-items: start;
-  gap: var(--space-lg) var(--space-xl);
-  padding-block: clamp(1.9rem, 3vw, 2.75rem);
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(1.25rem, 2.2vw, 2.25rem);
+  padding-block: clamp(1.15rem, 1.9vw, 1.75rem);
   border-block-start: 1px solid color-mix(in oklch, var(--brand-navy) 18%, var(--brand-off-white));
 }
 
@@ -327,31 +337,28 @@
 
 .symptom__number {
   display: inline-grid;
-  min-inline-size: 2.5rem;
-  min-block-size: 2.5rem;
+  min-inline-size: 2.75rem;
+  min-block-size: 2.75rem;
   place-items: center;
   padding: var(--space-2xs);
   background: var(--brand-yellow);
   color: var(--brand-navy);
   font-size: var(--font-size-small);
   font-weight: var(--font-weight-bold);
+  letter-spacing: 0.04em;
 }
 
 .symptom h3 {
   margin: 0;
-  font-size: clamp(1.5rem, 2.2vw, 2.125rem);
+  font-size: clamp(1.75rem, 2.85vw, 3rem);
   font-weight: var(--font-weight-bold);
   letter-spacing: -0.035em;
-  line-height: 1;
-}
-
-.symptom p {
-  max-inline-size: 42ch;
-  margin: 0;
+  line-height: 1.02;
+  text-wrap: balance;
 }
 
 .meaning {
-  min-block-size: clamp(25rem, 33.2vw, 29.875rem);
+  min-block-size: clamp(18rem, 24vw, 22rem);
   background: var(--brand-blue);
 }
 
@@ -382,7 +389,7 @@
   min-inline-size: 0;
   flex-direction: column;
   justify-content: center;
-  padding: clamp(3rem, 6vw, 5.5rem) 5vw clamp(3rem, 6vw, 5.5rem) 7.4vw;
+  padding: clamp(2.25rem, 3.4vw, 3.5rem) 5vw clamp(2.25rem, 3.4vw, 3.5rem) 7.4vw;
   color: var(--brand-off-white);
 }
 
@@ -392,8 +399,8 @@
 
 .meaning__body {
   max-inline-size: none;
-  margin: var(--space-2xl) 0 0;
-  font-size: clamp(1.0625rem, 0.9rem + 0.5vw, 1.2rem);
+  margin: var(--space-xl) 0 0;
+  font-size: clamp(1.1875rem, 0.95rem + 0.7vw, 1.45rem);
 }
 
 .roadmap {
@@ -428,12 +435,12 @@
 }
 
 .roadmap-item__name {
-  font-size: clamp(1.2rem, 1.75vw, 1.7rem);
+  font-size: clamp(1.3rem, 1.95vw, 1.9rem);
   font-weight: var(--font-weight-bold);
 }
 
 .roadmap-item--current .roadmap-item__name {
-  font-size: clamp(1.75rem, 2.4vw, 2.5rem);
+  font-size: clamp(1.9rem, 2.7vw, 2.75rem);
 }
 
 .roadmap-item--future {
@@ -964,7 +971,9 @@
   .concept-hero {
     display: flex;
     align-items: stretch;
-    min-block-size: calc(100svh - var(--header-h) - var(--signal-bar));
+    /* The signal bar is this section's own border, so it is already inside the
+       border-box height — subtract the masthead only. */
+    min-block-size: calc(100svh - var(--header-h));
   }
 
   .concept-hero__inner {
@@ -974,37 +983,29 @@
     padding-block: clamp(1.25rem, 2.2vh, 2.5rem);
   }
 
-  /* Each block reads as its own page; scroll settles softly, never forced. */
-  html {
-    scroll-snap-type: y proximity;
-  }
-
+  /* Each block fills one viewport. Scrolling stays free — no snap, no lock. */
   .stats {
     min-block-size: 100svh;
   }
 
-  .symptoms {
+  /* Symptoms + manifesto read as a single page. */
+  .corner-block {
     min-block-size: 100svh;
-    align-items: start;
+  }
+
+  .symptoms {
+    align-items: center;
     align-content: center;
   }
 
+  /* Stretch keeps the blue rule level with the top of the statement list. */
   .symptoms__heading {
-    align-self: start;
+    align-self: stretch;
   }
 
   .conversion__inner {
-    min-block-size: 100svh;
+    min-block-size: calc(100svh - var(--signal-bar));
     align-content: center;
-  }
-
-  .concept-hero,
-  .stats,
-  .symptoms,
-  .meaning,
-  .roadmap,
-  .conversion {
-    scroll-snap-align: start;
   }
 }
 
@@ -1021,7 +1022,7 @@
 
 @media (min-width: 82.0625rem) {
   .concept-hero h1 {
-    font-size: 7.25rem;
+    font-size: 7.5rem;
   }
 
   .conversion__inner {
@@ -1049,7 +1050,6 @@
   }
 
   .symptom {
-    grid-template-columns: 2.5rem minmax(10rem, 37%) minmax(0, 1fr);
     column-gap: var(--space-lg);
   }
 
@@ -1127,7 +1127,6 @@
   }
 
   .symptoms__heading {
-    min-block-size: 20rem;
     padding-inline-end: 0;
   }
 
@@ -1246,18 +1245,6 @@
   .stat:nth-child(2) {
     min-block-size: 13rem;
     border-inline-end: 0;
-  }
-
-  .symptoms__heading {
-    min-block-size: 17rem;
-  }
-
-  .symptom {
-    grid-template-columns: 2.5rem minmax(0, 1fr);
-  }
-
-  .symptom p {
-    grid-column: 2;
   }
 
   .roadmap__list {

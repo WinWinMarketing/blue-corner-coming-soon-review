@@ -9,11 +9,11 @@ const toolsDirectory = path.dirname(fileURLToPath(import.meta.url));
 const rootDirectory = path.resolve(toolsDirectory, "..");
 const failures = [];
 const strictImages = process.argv.includes("--strict-images");
-const approvedHomeSha256 = "b647cce7e05850bfe8f195183650d1e98fa791800b8c5d24d0148c5d3aa3541e";
+const approvedHomeSha256 = "2f0754d33e2cbb2abbd0328989e98d7d9e6e69937b6c30374e9e3957d6e4fcca";
 const approvedAssets = Object.freeze({
-  "assets/styles/brand.css": "a49a7859dea92a8c092f751d61f68c6f86a3b82521c8bef868cf1e330697a478",
-  "assets/styles/shared.css": "3198759ed41f78f8719a9355f9c48868c8473f0fb9d10b71be368073921e20ad",
-  "assets/styles/concept-base.css": "706bf81692a4382bbb0221881178036d51aaa3b0e6f7f65ca999d72b5efcb34e",
+  "assets/styles/brand.css": "b7fb93de490f67f5cc0a827cb602e7af453961832e40467ff695ecaccb92c6dc",
+  "assets/styles/shared.css": "be92c4dbb96e4245df3b6e426be8a14c47fbd34533f63c9fc8ae4797b80d548b",
+  "assets/styles/concept-base.css": "b7d508e3ea241985ac15813e40f3695274a601e0e37f1ee87f390cdc60a0b4e2",
   "assets/scripts/shared.js": "5d77e4a770625571bd3e97257be4e2be0f1e303503cc813d5d98ded91618cd36",
   "assets/art/blue-corner-reference-ring-brand-v2.webp": "b7681e542ac272951e5be0d86ce6c6eae06f5e10a5fb73293a751da3ee4bf4db",
 });
@@ -88,7 +88,7 @@ if (count(home, 'href="https://use.typekit.net/ciy6txz.css"') !== 1
   || !home.includes("font-src 'self' https://use.typekit.net;")) {
   fail("Typekit stylesheet and constrained style/font CSP are required");
 }
-if (count(home, 'href="assets/styles/concept-base.css?v=706bf816"') !== 1) {
+if (count(home, 'href="assets/styles/concept-base.css?v=b7d508e3"') !== 1) {
   fail("Homepage must version the corrected core stylesheet for cache refresh");
 }
 if (!home.includes(`src="assets/art/${referenceHero.image}"`) || /(?:href|src)="\/assets\//.test(home)) {
@@ -105,7 +105,7 @@ const brandCss = await readFile(path.join(rootDirectory, "assets/styles/brand.cs
 const sharedCss = await readFile(path.join(rootDirectory, "assets/styles/shared.css"), "utf8");
 const conceptCss = await readFile(path.join(rootDirectory, "assets/styles/concept-base.css"), "utf8");
 const sharedScript = await readFile(path.join(rootDirectory, "assets/scripts/shared.js"), "utf8");
-if (!/--font-brand:\s*"proxima-nova-condensed"/.test(brandCss) || !/--font-weight-regular:\s*400;/.test(brandCss) || !/--font-weight-semibold:\s*700;/.test(brandCss) || !/--font-size-support:\s*1\.125rem;/.test(brandCss)) {
+if (!/--font-brand:\s*"proxima-nova-condensed"/.test(brandCss) || !/--font-weight-regular:\s*400;/.test(brandCss) || !/--font-weight-semibold:\s*700;/.test(brandCss) || !/--font-size-support:\s*1\.25rem;/.test(brandCss)) {
   fail("Brand typography must lead with Proxima Nova Condensed and use 400/700 weights");
 }
 for (const typographyRule of ["font-kerning: normal", "text-rendering: optimizeLegibility", 'font-feature-settings: "kern" 1, "liga" 1, "clig" 1']) {
@@ -136,6 +136,23 @@ if (!/\.section-heading h2 > span\s*\{[^}]*display:\s*block;/.test(conceptCss)
   || !/\.marker-band\s*\{[^}]*display:\s*inline;/.test(conceptCss)) {
   fail("Heading line locks must not force nested marker bands into full-width rows");
 }
+if (!/--marker-band-height:\s*1\.02em;/.test(brandCss)
+  || !/--marker-band-offset:\s*0\.316em;/.test(brandCss)
+  || !/\.marker-band\s*\{[^}]*background-size:\s*100% var\(--marker-band-height\);[^}]*background-position:\s*0 var\(--marker-band-offset\);/.test(conceptCss)
+  || /transparent 0 14%/.test(conceptCss)) {
+  fail("Marker highlights must use the measured em band that hugs ascenders and descenders");
+}
+if (/scroll-snap/.test(`${conceptCss}\n${sharedCss}\n${brandCss}`)) {
+  fail("Scroll snapping must stay off; scrolling is never locked to a block");
+}
+if (!/<div class="corner-block">[\s\S]*?<section class="symptoms page-frame"[\s\S]*?<section class="meaning"[\s\S]*?<\/div>/.test(home)
+  || !/@media \(min-width: 64\.0625rem\)[\s\S]*?\.corner-block\s*\{[^}]*min-block-size:\s*100svh;/.test(conceptCss)) {
+  fail("Symptoms and the manifesto must share one desktop page inside .corner-block");
+}
+const symptomsGrid = home.match(/<div class="symptoms__grid">([\s\S]*?)<\/div>/)?.[1] ?? "";
+if (/<p[\s>]/.test(symptomsGrid) || count(symptomsGrid, '<article class="symptom"') !== 4 || count(symptomsGrid, "<h3>") !== 4) {
+  fail("Symptoms must stay heading-only: four statements, no supporting paragraphs");
+}
 if (count(home, 'class="meaning__body-line"') !== 2 || !home.includes("That&#39;s what this is.</span>")) {
   fail("Manifesto body must retain its two deliberate desktop lines");
 }
@@ -154,11 +171,12 @@ if (!/@media \(min-width: 48\.0625rem\) and \(max-width: 64rem\)\s*\{\s*\.conver
 if (/inline-size:\s*min\(100%, 79rem\)/.test(conceptCss)) {
   fail("Hero and masthead must span the full page frame, not the retired 79rem width");
 }
-if (!/@media \(min-width: 64\.0625rem\)\s*\{\s*\.concept-hero\s*\{[^}]*min-block-size:\s*calc\(100svh - var\(--header-h\) - var\(--signal-bar\)\);/.test(conceptCss)) {
+if (!/@media \(min-width: 64\.0625rem\)\s*\{\s*\.concept-hero\s*\{[\s\S]*?min-block-size:\s*calc\(100svh - var\(--header-h\)\);/.test(conceptCss)
+  || !/--header-h:\s*clamp\(5\.5rem, 7vw, 6rem\);/.test(conceptCss)) {
   fail("Header plus hero must fit one desktop viewport (svh-based hero height)");
 }
-if (!/@media \(min-width: 82\.0625rem\)\s*\{[\s\S]*?\.concept-hero h1\s*\{[^}]*font-size:\s*7\.25rem;/.test(conceptCss)) {
-  fail("Wide-desktop hero display must cap at 7.25rem to preserve the image gap");
+if (!/@media \(min-width: 82\.0625rem\)\s*\{[\s\S]*?\.concept-hero h1\s*\{[^}]*font-size:\s*7\.5rem;/.test(conceptCss)) {
+  fail("Wide-desktop hero display must cap at 7.5rem to preserve the image gap");
 }
 if (!/\.site-header__actions \.button\s*\{[^}]*min-block-size:\s*2\.75rem;[^}]*font-size:\s*1rem;/.test(conceptCss)
   || !/\.concept-hero__inner\s*\{[^}]*row-gap:\s*clamp\(0\.75rem, 1\.2vw, 1rem\);[^}]*min-block-size:\s*clamp\(35rem, 43vw, 39\.5rem\);/.test(conceptCss)) {

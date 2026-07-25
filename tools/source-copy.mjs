@@ -32,10 +32,10 @@ export const sourceCopy = Object.freeze({
     eyebrow: "It doesn't always look like what you'd expect",
     heading: "It looks like this.",
     items: Object.freeze([
-      Object.freeze({ heading: "No drive. No sleep.", body: "Waking up already tired. A burnout nobody clocks, carried too quietly to name." }),
-      Object.freeze({ heading: "Numbing out to get through it.", body: "The drink. The doomscroll. The bet. Anything that turns the volume down." }),
-      Object.freeze({ heading: "Focus gone. Brain rot.", body: "Work slipping. Can't lock in. Walking into a room, forgetting why you're there." }),
-      Object.freeze({ heading: "The people closest to him paying for it.", body: "Distance from his partner and kids—the heaviest thing he carries, never named." }),
+      Object.freeze({ heading: "No drive. No sleep." }),
+      Object.freeze({ heading: "Numbing out to get through it." }),
+      Object.freeze({ heading: "Focus gone. Brain rot." }),
+      Object.freeze({ heading: "The people closest to him paying for it." }),
     ]),
   }),
   meaning: Object.freeze({
