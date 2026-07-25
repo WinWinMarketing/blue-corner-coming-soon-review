@@ -24,14 +24,6 @@
   --font-size-support: 1.25rem;
   --font-size-small: 1rem;
 
-  /* Marker highlight geometry, measured from Proxima Nova Condensed 700:
-     cap 0.674em above the baseline, descender 0.196em below it, and the inline
-     content box starts 1.0652em above the baseline. The band adds a 0.075em
-     bleed on both sides so it hugs ascenders and descenders instead of cutting
-     through them. */
-  --marker-band-height: 1.02em;
-  --marker-band-offset: 0.316em;
-
   --space-2xs: 0.25rem;
   --space-xs: 0.5rem;
   --space-sm: 0.75rem;
@@ -46,7 +38,10 @@
   --measure-copy: 68ch;
   --measure-narrow: 48ch;
   --page-gutter: clamp(1rem, 3.6vw, 4.5rem);
-  --page-max: 96rem;
+  /* Full bleed. Every band (manifesto, signal bars, footer) already spans the
+     viewport, so capping the text sections left them floating in a narrow
+     column on wide screens. Line length is held by per-element measures. */
+  --page-max: 100%;
   --radius-small: 0.25rem;
   --radius-round: 999rem;
 

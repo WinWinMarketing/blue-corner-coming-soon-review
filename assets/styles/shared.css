@@ -100,39 +100,30 @@ button {
   border: 0;
 }
 
+/* Crisis support is permanent footer content, not a focus-only affordance. On a
+   men's mental-health page these links have to be visible without a keyboard. */
 .concept-footer__support {
-  position: fixed;
-  z-index: 900;
-  inset-block-end: max(1rem, env(safe-area-inset-bottom));
-  inset-inline-start: max(1rem, env(safe-area-inset-left));
   display: flex;
-  max-inline-size: calc(100% - 2rem);
   flex-wrap: wrap;
-  gap: var(--space-2xs);
-  padding: var(--space-xs);
-  border: 1px solid var(--brand-navy);
-  background: var(--brand-yellow);
+  align-items: center;
+  gap: var(--space-2xs) var(--space-lg);
   color: var(--brand-navy);
-  opacity: 0;
-  pointer-events: none;
-  transform: translateY(calc(100% + 2rem));
-  transition: opacity var(--duration-fast) var(--ease-out), transform var(--duration-fast) var(--ease-out);
-}
-
-.concept-footer__support:focus-within {
-  opacity: 1;
-  pointer-events: auto;
-  transform: translateY(0);
 }
 
 .concept-footer__support a {
   display: inline-flex;
   min-block-size: 2.75rem;
   align-items: center;
-  padding-inline: var(--space-sm);
   font-size: var(--font-size-support);
   font-weight: var(--font-weight-bold);
   line-height: 1.35;
+  text-decoration-color: var(--brand-yellow);
+  text-decoration-thickness: 0.14em;
+  text-underline-offset: 0.28em;
+}
+
+.concept-footer__support a:hover {
+  text-decoration-color: currentColor;
 }
 
 .page-frame {

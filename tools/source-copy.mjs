@@ -1,5 +1,6 @@
 export const referenceHero = Object.freeze({
-  image: "blue-corner-reference-ring-brand-v2.webp",
+  // Recoloured from blue-corner-reference-ring.webp by tools/recolor-hero.mjs.
+  image: "blue-corner-reference-ring-brand-v3.webp",
   width: 1774,
   height: 887,
   alt: "An empty boxing-ring corner with yellow ropes, a bright-blue padded corner post, a black stool, and a deep blue backdrop.",
@@ -66,7 +67,7 @@ export const sourceCopy = Object.freeze({
       Object.freeze({ name: "phone", label: "Phone", type: "tel", inputmode: "tel", placeholder: "(000) 000 0000" }),
     ]),
   }),
-  footer: Object.freeze({ name: "The Blue Corner" }),
+  footer: Object.freeze({ name: "The Blue Corner", line: "Nobody fights alone." }),
 });
 
 export const safetyCopy = Object.freeze({

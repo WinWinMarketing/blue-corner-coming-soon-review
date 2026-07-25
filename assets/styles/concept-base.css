@@ -88,6 +88,10 @@
 .section-heading h2,
 .meaning h2 {
   margin: 0;
+  /* Own stacking context so a marker band's z-index:-1 layer stays above the
+     section background (the blue manifesto field) while still sitting under
+     every line of the heading. */
+  isolation: isolate;
   font-weight: var(--font-weight-bold);
   letter-spacing: -0.035em;
   line-height: 0.9;
@@ -122,16 +126,28 @@
   text-decoration-skip-ink: none;
 }
 
+/* Identical to a browser text selection, by request. A selection rect is
+   exactly the inline content box (font ascent + descent) with no padding —
+   measured against Range.getClientRects(), which matched the element box to
+   the pixel — so an absolutely positioned inset:0 layer reproduces it exactly.
+   It has to be a z-index:-1 layer rather than a plain background: the content
+   box is 1.43em tall against a 0.9 line-height, so a background would paint
+   over the line above and swallow the end of it. nowrap keeps the band to a
+   single fragment, which is what makes inset:0 equal the selection rect. */
 .marker-band {
+  position: relative;
   display: inline;
-  padding-inline: 0.13em;
-  background-image: linear-gradient(var(--brand-yellow), var(--brand-yellow));
-  background-repeat: no-repeat;
-  background-size: 100% var(--marker-band-height);
-  background-position: 0 var(--marker-band-offset);
+  padding-inline: 0;
   color: var(--brand-navy);
-  -webkit-box-decoration-break: clone;
-  box-decoration-break: clone;
+  white-space: nowrap;
+}
+
+.marker-band::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: var(--brand-yellow);
 }
 
 .concept-hero__lead {
@@ -220,7 +236,7 @@
 .section-heading h2,
 .meaning h2 {
   margin-block-start: var(--space-lg);
-  font-size: clamp(3.75rem, 6.94vw, 6.25rem);
+  font-size: clamp(3.75rem, 6.94vw, 8.5rem);
 }
 
 .stats {
@@ -260,7 +276,7 @@
 
 .stat__value {
   display: block;
-  font-size: clamp(4rem, 6vw, 5.75rem);
+  font-size: clamp(4rem, 6.6vw, 8rem);
   font-weight: var(--font-weight-bold);
   letter-spacing: -0.06em;
   line-height: 0.9;
@@ -307,7 +323,7 @@
   min-block-size: 0;
   align-items: center;
   align-content: center;
-  padding-block: clamp(2.25rem, 3.2vw, 3.5rem);
+  padding-block: clamp(1.75rem, 2.4vw, 3rem);
 }
 
 .symptoms__heading {
@@ -326,31 +342,31 @@
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
   align-items: center;
-  gap: clamp(1.25rem, 2.2vw, 2.25rem);
-  padding-block: clamp(1.15rem, 1.9vw, 1.75rem);
-  border-block-start: 1px solid color-mix(in oklch, var(--brand-navy) 18%, var(--brand-off-white));
+  gap: clamp(1.5rem, 2.6vw, 2.75rem);
+  padding-block: clamp(0.85rem, 1.05vw, 1.5rem);
+  border-block-start: 2px solid color-mix(in oklch, var(--brand-navy) 26%, var(--brand-off-white));
 }
 
 .symptom:last-child {
-  border-block-end: 1px solid color-mix(in oklch, var(--brand-navy) 18%, var(--brand-off-white));
+  border-block-end: 2px solid color-mix(in oklch, var(--brand-navy) 26%, var(--brand-off-white));
 }
 
 .symptom__number {
   display: inline-grid;
-  min-inline-size: 2.75rem;
-  min-block-size: 2.75rem;
+  min-inline-size: clamp(3rem, 3.6vw, 4.25rem);
+  min-block-size: clamp(3rem, 3.6vw, 4.25rem);
   place-items: center;
   padding: var(--space-2xs);
   background: var(--brand-yellow);
   color: var(--brand-navy);
-  font-size: var(--font-size-small);
+  font-size: clamp(1rem, 1.15vw, 1.375rem);
   font-weight: var(--font-weight-bold);
   letter-spacing: 0.04em;
 }
 
 .symptom h3 {
   margin: 0;
-  font-size: clamp(1.75rem, 2.85vw, 3rem);
+  font-size: clamp(1.85rem, 3.05vw, 3.75rem);
   font-weight: var(--font-weight-bold);
   letter-spacing: -0.035em;
   line-height: 1.02;
@@ -389,7 +405,7 @@
   min-inline-size: 0;
   flex-direction: column;
   justify-content: center;
-  padding: clamp(2.25rem, 3.4vw, 3.5rem) 5vw clamp(2.25rem, 3.4vw, 3.5rem) 7.4vw;
+  padding: clamp(1.75rem, 2.6vw, 3rem) 5vw clamp(1.75rem, 2.6vw, 3rem) 7.4vw;
   color: var(--brand-off-white);
 }
 
@@ -435,12 +451,13 @@
 }
 
 .roadmap-item__name {
-  font-size: clamp(1.3rem, 1.95vw, 1.9rem);
+  isolation: isolate;
+  font-size: clamp(1.4rem, 2.15vw, 2.5rem);
   font-weight: var(--font-weight-bold);
 }
 
 .roadmap-item--current .roadmap-item__name {
-  font-size: clamp(1.9rem, 2.7vw, 2.75rem);
+  font-size: clamp(2.1rem, 3.2vw, 3.75rem);
 }
 
 .roadmap-item--future {
@@ -948,14 +965,32 @@
   line-height: 1.5;
 }
 
+/* The footer starts above the wordmark: a real bar of content sits between the
+   yellow signal border and the oversized logo, which bleeds off the bottom. */
 .concept-footer {
-  display: flex;
-  min-block-size: clamp(20rem, 27.4vw, 24.625rem);
-  align-items: flex-end;
+  display: grid;
+  grid-template-rows: auto auto;
   overflow: hidden;
   border-block-start: clamp(2.5rem, 3.3vw, 2.9375rem) solid var(--brand-yellow);
   background: var(--brand-off-white);
   color: var(--brand-navy);
+}
+
+.concept-footer__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-md) clamp(1.5rem, 3vw, 3rem);
+  padding-block: clamp(1.75rem, 2.6vw, 2.75rem) clamp(1.25rem, 2vw, 2rem);
+}
+
+.concept-footer__line {
+  margin: 0;
+  font-size: clamp(1.5rem, 2.2vw, 2.5rem);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: -0.03em;
+  line-height: 1;
 }
 
 .concept-footer__wordmark {
@@ -964,7 +999,6 @@
   height: auto;
   margin-inline-start: -1.5%;
   opacity: 0.2;
-  transform: translateY(0);
 }
 
 @media (min-width: 64.0625rem) {
@@ -993,14 +1027,35 @@
     min-block-size: 100svh;
   }
 
+  /* The four statements share the page evenly instead of clustering, so the
+     block actually fills the screen. min-content floors stop the rows
+     collapsing on a short viewport. */
   .symptoms {
-    align-items: center;
-    align-content: center;
+    align-items: stretch;
+    align-content: stretch;
+  }
+
+  .symptoms__grid {
+    grid-template-rows: repeat(4, minmax(min-content, 1fr));
   }
 
   /* Stretch keeps the blue rule level with the top of the statement list. */
   .symptoms__heading {
     align-self: stretch;
+  }
+
+  /* The roadmap is a page of its own; the service columns take the slack. */
+  .roadmap {
+    min-block-size: 100svh;
+  }
+
+  .roadmap__list {
+    flex: 1;
+    max-block-size: 38svh;
+  }
+
+  .roadmap-item {
+    min-block-size: 0;
   }
 
   .conversion__inner {

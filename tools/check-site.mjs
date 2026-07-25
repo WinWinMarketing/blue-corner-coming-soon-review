@@ -9,13 +9,13 @@ const toolsDirectory = path.dirname(fileURLToPath(import.meta.url));
 const rootDirectory = path.resolve(toolsDirectory, "..");
 const failures = [];
 const strictImages = process.argv.includes("--strict-images");
-const approvedHomeSha256 = "2f0754d33e2cbb2abbd0328989e98d7d9e6e69937b6c30374e9e3957d6e4fcca";
+const approvedHomeSha256 = "9d9459862a1b7d54e6ba57662f5c72f4442105e6e7ab30c9d011f56434e111ea";
 const approvedAssets = Object.freeze({
-  "assets/styles/brand.css": "b7fb93de490f67f5cc0a827cb602e7af453961832e40467ff695ecaccb92c6dc",
-  "assets/styles/shared.css": "be92c4dbb96e4245df3b6e426be8a14c47fbd34533f63c9fc8ae4797b80d548b",
-  "assets/styles/concept-base.css": "b7d508e3ea241985ac15813e40f3695274a601e0e37f1ee87f390cdc60a0b4e2",
+  "assets/styles/brand.css": "a80fc3111bf8b07398eb344d855e302a1e748678d6164c0f1999cee842cf25f6",
+  "assets/styles/shared.css": "a5fafa418c782ea2fa02805674c50e202f9f8f0814a1d2a012ef5b69c5c7799b",
+  "assets/styles/concept-base.css": "ae518b9e3447995f7510d451a1c79515445c2f8263240e30e260a99035a0d779",
   "assets/scripts/shared.js": "5d77e4a770625571bd3e97257be4e2be0f1e303503cc813d5d98ded91618cd36",
-  "assets/art/blue-corner-reference-ring-brand-v2.webp": "b7681e542ac272951e5be0d86ce6c6eae06f5e10a5fb73293a751da3ee4bf4db",
+  "assets/art/blue-corner-reference-ring-brand-v3.webp": "0d921a25360f1a36d23bbb48ce401b723b95bb7959f1439d7548d9350c450829",
 });
 
 const fail = (message) => failures.push(message);
@@ -88,7 +88,7 @@ if (count(home, 'href="https://use.typekit.net/ciy6txz.css"') !== 1
   || !home.includes("font-src 'self' https://use.typekit.net;")) {
   fail("Typekit stylesheet and constrained style/font CSP are required");
 }
-if (count(home, 'href="assets/styles/concept-base.css?v=b7d508e3"') !== 1) {
+if (count(home, 'href="assets/styles/concept-base.css?v=ae518b9e"') !== 1) {
   fail("Homepage must version the corrected core stylesheet for cache refresh");
 }
 if (!home.includes(`src="assets/art/${referenceHero.image}"`) || /(?:href|src)="\/assets\//.test(home)) {
@@ -136,11 +136,26 @@ if (!/\.section-heading h2 > span\s*\{[^}]*display:\s*block;/.test(conceptCss)
   || !/\.marker-band\s*\{[^}]*display:\s*inline;/.test(conceptCss)) {
   fail("Heading line locks must not force nested marker bands into full-width rows");
 }
-if (!/--marker-band-height:\s*1\.02em;/.test(brandCss)
-  || !/--marker-band-offset:\s*0\.316em;/.test(brandCss)
-  || !/\.marker-band\s*\{[^}]*background-size:\s*100% var\(--marker-band-height\);[^}]*background-position:\s*0 var\(--marker-band-offset\);/.test(conceptCss)
-  || /transparent 0 14%/.test(conceptCss)) {
-  fail("Marker highlights must use the measured em band that hugs ascenders and descenders");
+if (!/\.marker-band\s*\{[^}]*position:\s*relative;[^}]*padding-inline:\s*0;[^}]*white-space:\s*nowrap;/.test(conceptCss)
+  || !/\.marker-band::before\s*\{[^}]*z-index:\s*-1;[^}]*inset:\s*0;[^}]*background:\s*var\(--brand-yellow\);/.test(conceptCss)
+  || /transparent 0 14%|--marker-band-height/.test(`${conceptCss}\n${brandCss}`)) {
+  fail("Marker highlights must reproduce a browser text selection: inset:0 layer behind the text, no padding");
+}
+if (!/\.concept-hero h1,\s*\.section-heading h2,\s*\.meaning h2\s*\{[^}]*isolation:\s*isolate;/.test(conceptCss)
+  || !/\.roadmap-item__name\s*\{[^}]*isolation:\s*isolate;/.test(conceptCss)) {
+  fail("Headings holding a marker band must isolate, or the band sinks behind the section background");
+}
+if (!/--page-max:\s*100%;/.test(brandCss)) {
+  fail("Sections must run full bleed; the retired 96rem page cap left them narrow on wide screens");
+}
+if (/\.concept-footer__support\s*\{[^}]*position:\s*fixed/.test(sharedCss)) {
+  fail("Crisis support must be permanent, visible footer content, not a focus-only overlay");
+}
+if (!/<footer class="concept-footer">\s*<div class="concept-footer__bar page-frame">[\s\S]*?<\/div>\s*<img class="concept-footer__wordmark"/.test(home)) {
+  fail("Footer must open with its content bar above the wordmark");
+}
+if (!/@media \(min-width: 64\.0625rem\)[\s\S]*?\.roadmap\s*\{[^}]*min-block-size:\s*100svh;/.test(conceptCss)) {
+  fail("The roadmap must be its own full desktop page");
 }
 if (/scroll-snap/.test(`${conceptCss}\n${sharedCss}\n${brandCss}`)) {
   fail("Scroll snapping must stay off; scrolling is never locked to a block");

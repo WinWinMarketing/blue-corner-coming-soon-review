@@ -92,7 +92,7 @@ export const renderHomePage = () => {
     <link rel="stylesheet" href="https://use.typekit.net/ciy6txz.css">
     <link rel="stylesheet" href="assets/styles/brand.css">
     <link rel="stylesheet" href="assets/styles/shared.css">
-    <link rel="stylesheet" href="assets/styles/concept-base.css?v=b7d508e3">
+    <link rel="stylesheet" href="assets/styles/concept-base.css?v=ae518b9e">
     <script src="assets/scripts/shared.js" defer></script>
   </head>
   <body class="concept-page">
@@ -190,13 +190,16 @@ export const renderHomePage = () => {
     </main>
 
     <footer class="concept-footer">
+      <div class="concept-footer__bar page-frame">
+        <p class="concept-footer__line">${escapeHtml(sourceCopy.footer.line)}</p>
+        <nav class="concept-footer__support" aria-label="Crisis support">
+          <a href="tel:988">Call 9-8-8</a>
+          <a href="sms:988">Text 9-8-8</a>
+          <a href="https://www.canada.ca/en/public-health/services/mental-health-services/mental-health-get-help.html" target="_blank" rel="noopener noreferrer">Crisis resources</a>
+          <a href="tel:911">Call 9-1-1 for immediate danger</a>
+        </nav>
+      </div>
       <img class="concept-footer__wordmark" src="assets/brand/logo-horizontal-blue.png" width="1655" height="170" alt="${escapeHtml(sourceCopy.footer.name)}">
-      <nav class="concept-footer__support" aria-label="Crisis support">
-        <a href="tel:988">Call 9-8-8</a>
-        <a href="sms:988">Text 9-8-8</a>
-        <a href="https://www.canada.ca/en/public-health/services/mental-health-services/mental-health-get-help.html" target="_blank" rel="noopener noreferrer">Crisis resources</a>
-        <a href="tel:911">Call 9-1-1 for immediate danger</a>
-      </nav>
     </footer>
   </body>
 </html>
