@@ -9,10 +9,10 @@ const toolsDirectory = path.dirname(fileURLToPath(import.meta.url));
 const rootDirectory = path.resolve(toolsDirectory, "..");
 const failures = [];
 const strictImages = process.argv.includes("--strict-images");
-const approvedHomeSha256 = "076062e9d7ff9094d0dbc4f8f61c7db4af9597fb552538791fd6465025aa5f34";
+const approvedHomeSha256 = "ab5b85d208a719949ce5e5ecba2ad150ff47aa8837090ab4c685145ea75cdce2";
 const approvedAssets = Object.freeze({
   "assets/styles/brand.css": "a80fc3111bf8b07398eb344d855e302a1e748678d6164c0f1999cee842cf25f6",
-  "assets/styles/shared.css": "08a5b71a930dc7456584603481000fb721ab72a4bfaab642e546bce4bbcefd0c",
+  "assets/styles/shared.css": "a03410e29dd42c0ab36726e2ff389b2c4d5f132daef5d0da2146724c663ae0e4",
   "assets/styles/concept-base.css": "68b8e5ceccf29f6dcf14ae1a405a633b30c0f90176a4f3303dc800e156d7c4d0",
   "assets/scripts/boot.js": "7d7ce8cadca26959367c68f2ac381e0fe661a3a7a1f4eeb3b514c07326f90f1e",
   "assets/scripts/shared.js": "c15703cd87d196be855dd729dc2c4b4f48a33e11e6d42b8db7cbd6f6b67e97fc",
@@ -276,6 +276,10 @@ if (!/@media \(min-width: 64\.0625rem\)[\s\S]*?\.roadmap\s*\{[^}]*min-block-size
 }
 if (/scroll-snap/.test(`${conceptCss}\n${sharedCss}\n${brandCss}`)) {
   fail("Scroll snapping must stay off; scrolling is never locked to a block");
+}
+if (!/html\s*\{[^}]*scroll-behavior:\s*auto;/.test(sharedCss)
+  || /scroll-behavior:\s*smooth/.test(`${conceptCss}\n${sharedCss}\n${brandCss}`)) {
+  fail("Page scrolling must remain native and immediate; forced smooth scrolling is not allowed");
 }
 if (!/<div class="corner-block">[\s\S]*?<section class="symptoms page-frame"[\s\S]*?<section class="meaning"[\s\S]*?<\/div>/.test(home)
   || !/@media \(min-width: 64\.0625rem\)[\s\S]*?\.corner-block\s*\{[^}]*min-block-size:\s*100svh;/.test(conceptCss)) {

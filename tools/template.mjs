@@ -3,7 +3,7 @@ import { referenceHero, safetyCopy, sourceCopy } from "./source-copy.mjs";
 const HERO_CACHE_KEY = "ac190f62";
 const BOOT_SCRIPT_CACHE_KEY = "7d7ce8ca";
 const CONCEPT_CSS_CACHE_KEY = "68b8e5ce";
-const SHARED_CSS_CACHE_KEY = "08a5b71a";
+const SHARED_CSS_CACHE_KEY = "a03410e2";
 const SHARED_SCRIPT_CACHE_KEY = "c15703cd";
 
 const escapeHtml = (value) => String(value)
