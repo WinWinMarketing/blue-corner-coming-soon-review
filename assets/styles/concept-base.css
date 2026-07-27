@@ -1243,6 +1243,10 @@
     font-size: clamp(2.625rem, 13.5vw, 3.375rem);
   }
 
+  .rooms__heading h2 > span:last-child {
+    letter-spacing: -0.11em;
+  }
+
   .prose h1 {
     font-size: clamp(2.625rem, 13.5vw, 3.375rem);
   }
