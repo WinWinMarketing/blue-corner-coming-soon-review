@@ -1,11 +1,8 @@
 export const referenceHero = Object.freeze({
-  // Recoloured from blue-corner-reference-ring.webp by tools/recolor-hero.mjs.
-  // v4 carries the design-review change: the corner pad is --brand-blue, the
-  // same blue as the wordmark, instead of --brand-navy.
-  image: "blue-corner-reference-ring-brand-v4.webp",
-  width: 1774,
-  height: 887,
-  alt: "An empty boxing-ring corner with yellow ropes, a bright blue corner pad, a black wall, a gray floor, and a black stool.",
+  image: "blue-corner-reference-ring-human-v1.webp",
+  width: 2400,
+  height: 1600,
+  alt: "A solemn man seated in a boxing-ring corner holds a sign reading “HELP IS ON THE WAY,” framed by yellow ropes and a blue corner pad.",
 });
 
 export const sourceCopy = Object.freeze({
@@ -31,35 +28,45 @@ export const sourceCopy = Object.freeze({
     source: "Sources: Statistics Canada · Public Health Agency of Canada · CMAJ · Cogent Mental Health.",
     gamblingSource: "Gambling figure: help-seeking among men aged 15 to 24 in Ontario after online betting was legalized in 2022 (CMAJ, 2026).",
   }),
-  // Four rooms. Each item is a scene the reader recognises rather than a
-  // category, and each photograph is deliberately empty so the viewer supplies
-  // the man himself. `slot` and `brief` render the commissioning brief inside
-  // the frame until the four shots are delivered.
+  // Four rooms. Each image is deliberately empty so the viewer supplies the man
+  // himself; explicit dimensions reserve the decoded image geometry.
   rooms: Object.freeze({
     eyebrow: "Depression in men rarely looks like depression",
     heading: "It looks like an ordinary week.",
     items: Object.freeze([
       Object.freeze({
         slot: "Photo 01",
-        brief: Object.freeze(["unmade bed, phone lit,", "3am light"]),
+        image: "room-01-unmade-bed.webp",
+        width: 1800,
+        height: 2400,
+        alt: "An unmade bed in blue predawn light, with a lit phone on the bedside table.",
         heading: "Wired at 3am. Flat by 9.",
         support: "No rest, no drive.",
       }),
       Object.freeze({
         slot: "Photo 02",
-        brief: Object.freeze(["garage, cans lined up,", "TV glow"]),
+        image: "room-02-garage-tv-glow.webp",
+        width: 1800,
+        height: 2400,
+        alt: "A dim garage with an empty chair, drink cans on a workbench, and a television glowing in the background.",
         heading: "Numb is the only setting.",
         support: "Drink, bet, scroll, repeat.",
       }),
       Object.freeze({
         slot: "Photo 03",
-        brief: Object.freeze(["desk at dusk, screen on,", "chair empty"]),
+        image: "room-03-desk-at-dusk.webp",
+        width: 1800,
+        height: 2400,
+        alt: "An empty desk at dusk with a lit monitor, an open notebook, and a chair pulled away.",
         heading: "Ten tabs. Nothing finished.",
         support: "Hours gone, nothing kept.",
       }),
       Object.freeze({
         slot: "Photo 04",
-        brief: Object.freeze(["kitchen table, two mugs,", "one chair pushed back"]),
+        image: "room-04-kitchen-table.webp",
+        width: 1800,
+        height: 2400,
+        alt: "A quiet kitchen table with two mugs and one chair pushed back from the table.",
         heading: "Fine at work. Short at home.",
         support: "They pay for it first.",
       }),
