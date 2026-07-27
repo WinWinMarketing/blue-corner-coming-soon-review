@@ -24,14 +24,14 @@ The light sign-off row (wordmark, links, copyright) runs once, at the end.
 
 `node tools/acceptance.mjs` drives the rendered pages in headless Chromium at 2048x870, 2048x1020, 2048x989, 390x844 and 320x700. `check-site.mjs` is static analysis and can only prove the source says the right thing; the acceptance run proves the runtime facts it cannot reach — that the hero actually animates on first paint, that scrolling stops when the wheel stops, that the scrollbar thumb reveals and hides without shifting layout, that a crisis band closes all five screens with fifteen 44px tap targets, that the statistics kicker holds one line, that every highlight carries optical bleed on both sides, that nothing overflows horizontally at 320px, that keyboard focus and form validation survive, and that every `?v=` cache key matches its file's content hash. It also sweeps 830–1200px viewport heights, because spacing that steps at a breakpoint fits at the tested height and overflows 20px above it. Add `--target <url>` to run it against a deployed build and `--shots <dir>` to capture screenshots. It SKIPS cleanly when playwright-core or a local Chromium is unavailable.
 
-`node tools/recolor-hero.mjs` regenerates the retained empty-corner reference from the original photograph. It recolours only two masks — the ropes to brand yellow and the corner pad to brand blue — and asserts that every decoded pixel outside those masks is byte-identical to the source. Never hand-edit the generated `-brand-v4.webp`; the live hero is the separate versioned human-and-card image.
+`node tools/recolor-hero.mjs` regenerates the hero art from the original reference photograph. It recolours only two masks — the ropes to brand yellow and the corner pad to brand blue — and asserts that every decoded pixel outside those masks is byte-identical to the source. Never hand-edit the generated `-brand-v4.webp`.
 
-## Outstanding — commissioned photography for launch
+## Outstanding — needs photography, not code
 
-The five missing design-review images now use generated editorial placeholders, so the review layout is complete and every slot resolves in strict-image checks. Before a public launch, replace them with commissioned or properly licensed photography in the same crops and grade; the layout does not need to change.
+Two items from the 2026-07-26 design review cannot be finished without a shoot. The layouts are built and locked; each is a one-element swap when the images land.
 
-- **Hero brief:** a man seated in the ring holding a card reading HELP IS ON THE WAY; level and unperformed, with no smile or campaign-stunt tone.
-- **Four-room brief:** one consistent grade, rooms empty so the viewer supplies the man: (01) unmade bed and lit phone in predawn light; (02) garage, drink cans, empty chair and TV glow; (03) empty desk at dusk with the screen on; (04) kitchen table, two mugs and one chair pushed back.
+- **Hero — a man in the chair holding a ring card reading HELP IS ON THE WAY.** Same corner, same lighting, same crop; a real-looking man 30s–50s in ordinary clothes, seated leaning slightly forward, holding the card at chest height with both hands, looking down the lens. Level and unperformed — a smile turns a suicide-prevention page into a stunt. The lettered-chair placeholder currently shipping is temporary pending commissioned casting; it keeps the identical layout and is not the final hero.
+- **Four rooms — four commissioned or licensed shots in one consistent grade**, rooms with the man absent so the viewer supplies him: (01) unmade bed, phone lit, 3am light; (02) garage, cans lined up, TV glow; (03) desk at dusk, screen on, chair empty; (04) kitchen table, two mugs, one chair pushed back. Each slot renders its own brief until the shot arrives; drop an `<img>` inside `.room__slot` to replace it.
 
 ## Privacy and safety
 
