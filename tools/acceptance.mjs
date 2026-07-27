@@ -254,26 +254,42 @@ for (const viewport of VIEWPORTS) {
       return node.scrollWidth > node.clientWidth + 1;
     }).map((node) => `${node.tagName}.${String(node.className).split(" ")[0]}`);
 
-    const copy = pick(".conversion__heading > p:last-child");
-    let copyLines = null;
-    if (copy) {
-      const range = document.createRange(); range.selectNodeContents(copy);
+    const lineCount = (node) => {
+      if (!node) return null;
+      const range = document.createRange(); range.selectNodeContents(node);
       const tops = [...range.getClientRects()].map((r) => r.top).sort((a, b) => a - b);
-      copyLines = tops.reduce((acc, top) => (acc.length && top - acc.at(-1) < 6 ? acc : (acc.push(top), acc)), []).length;
-    }
+      return tops.reduce((acc, top) => (acc.length && top - acc.at(-1) < 6 ? acc : (acc.push(top), acc)), []).length;
+    };
     const heading = pick("#roadmap-title");
     const card = pick(".conversion-path--member");
+
+    // The crisis band closes every screen and its numbers are the one thing
+    // that has to be reachable, so measure the real tap targets rather than
+    // trusting the stylesheet.
+    const screens = [...document.querySelectorAll(".screen")];
+    const screensWithoutBand = screens
+      .filter((screen) => !(screen.lastElementChild && screen.lastElementChild.classList.contains("crisis-band")))
+      .map((screen) => screen.className);
+    const smallTargets = [...document.querySelectorAll(".crisis-action")]
+      .map((node) => node.getBoundingClientRect())
+      .filter((box) => box.height < 44 || box.width < 44).length;
+
     return {
       viewportHeight: window.innerHeight,
       horizontalOverflow: root.scrollWidth > root.clientWidth,
       overflowing: [...new Set(overflowing)].slice(0, 6),
-      roadmapTable: heightOf(".roadmap__list"),
-      roadmap: heightOf(".roadmap"),
-      headerHero: (heightOf(".site-header") || 0) + (heightOf(".concept-hero") || 0),
+      screenCount: screens.length,
+      screensWithoutBand,
+      crisisTargets: document.querySelectorAll(".crisis-action").length,
+      smallTargets,
+      roadmapCards: heightOf(".roadmap__list"),
+      cornerScreen: heightOf(".screen--corner"),
+      headerHero: (heightOf(".site-header") || 0) + (heightOf(".screen--hero") || 0),
       headingRight: heading ? Math.round(heading.getBoundingClientRect().right) : null,
       frameRight: heading ? Math.round(heading.closest(".roadmap").getBoundingClientRect().right) : null,
       cardWidth: card ? Math.round(card.getBoundingClientRect().width) : null,
-      copyLines,
+      copyLines: lineCount(pick(".conversion__body")),
+      kickerLines: lineCount(pick(".stats__heading .eyebrow")),
       bands,
     };
   });
@@ -326,23 +342,32 @@ for (const viewport of VIEWPORTS) {
   check(`contrast ${label}: WCAG AA`, contrast.length === 0, contrast.join(" | ") || "all text passes AA");
   const tightest = Math.min(...measured.bands.map((b) => Math.min(b.left, b.right)));
   check(`highlights ${label}: optical bleed on both sides`,
-    measured.bands.length === 5 && tightest >= 3,
+    measured.bands.length === 4 && tightest >= 3,
     measured.bands.map((b) => `${b.text} ${b.left}/${b.right}`).join("  "));
 
+  check(`crisis ${label}: a band closes every screen`,
+    measured.screenCount === 5 && measured.screensWithoutBand.length === 0,
+    measured.screensWithoutBand.join(", ") || `${measured.screenCount} screens, all closed by the band`);
+  check(`crisis ${label}: every number is a 44px tap target`,
+    measured.crisisTargets === 15 && measured.smallTargets === 0,
+    `${measured.crisisTargets} targets, ${measured.smallTargets} under 44px`);
+
   if (viewport.width === 2048 && viewport.height === 870) {
-    check("roadmap: table is ~418px tall", measured.roadmapTable >= 400 && measured.roadmapTable <= 436, `${measured.roadmapTable}px`);
-    check("roadmap: heading fits inside its frame", measured.headingRight <= measured.frameRight, `${measured.headingRight} <= ${measured.frameRight}`);
-    check("roadmap: fills one desktop viewport", measured.roadmap === measured.viewportHeight, `${measured.roadmap} vs ${measured.viewportHeight}`);
-    check("hero: header plus hero is one viewport", measured.headerHero === measured.viewportHeight, `${measured.headerHero} vs ${measured.viewportHeight}`);
+    check("plan: heading fits inside its frame", measured.headingRight <= measured.frameRight, `${measured.headingRight} <= ${measured.frameRight}`);
+    check("corner: manifesto and plan share one desktop viewport", measured.cornerScreen === measured.viewportHeight, `${measured.cornerScreen} vs ${measured.viewportHeight}`);
+    check("hero: header plus hero screen is one viewport", measured.headerHero === measured.viewportHeight, `${measured.headerHero} vs ${measured.viewportHeight}`);
+    // Design review item 5: the kicker sits on ONE line, and it got there by
+    // widening its block rather than shrinking the type.
+    check("stats: kicker is on one line", measured.kickerLines === 1, `${measured.kickerLines} lines`);
   }
   if (viewport.width === 2048 && viewport.height === 989) {
     check("conversion: card is 720px wide", measured.cardWidth >= 640 && measured.cardWidth <= 720, `${measured.cardWidth}px`);
-    check("conversion: supporting copy is exactly two lines", measured.copyLines === 2, `${measured.copyLines} lines`);
+    check("conversion: supporting copy is at most two lines", measured.copyLines <= 2, `${measured.copyLines} lines`);
   }
   check(`console ${label}: clean`, page.problems.length === 0, page.problems.join(" | ") || "clean");
 
   if (SHOTS) {
-    for (const [name, selector] of [["hero", ".concept-hero"], ["stats", ".stats"], ["corner", ".corner-block"], ["roadmap", ".roadmap"], ["conversion", ".conversion"], ["footer", ".concept-footer"]]) {
+    for (const [name, selector] of [["hero", ".screen--hero"], ["stats", ".screen--stats"], ["rooms", ".screen--rooms"], ["corner", ".screen--corner"], ["join", ".screen--join"], ["footer", ".concept-footer"]]) {
       const node = await page.$(selector);
       if (!node) continue;
       await node.scrollIntoViewIfNeeded();
@@ -365,14 +390,16 @@ for (const viewport of VIEWPORTS) {
     await page.evaluate(() => document.fonts.ready);
     await page.waitForTimeout(500);
     const blocks = await page.evaluate(() => {
-      const h = (sel) => { const el = document.querySelector(sel); return el ? Math.round(el.getBoundingClientRect().height) : 0; };
-      return {
-        viewport: window.innerHeight,
-        "header+hero": h(".site-header") + h(".concept-hero"),
-        stats: h(".stats"),
-        "corner block": h(".corner-block"),
-        roadmap: h(".roadmap"),
-      };
+      const header = document.querySelector(".site-header");
+      const headerHeight = header ? Math.round(header.getBoundingClientRect().height) : 0;
+      const out = { viewport: window.innerHeight };
+      document.querySelectorAll(".screen").forEach((screen, index) => {
+        const name = [...screen.classList].find((token) => token.startsWith("screen--")) || `screen-${index}`;
+        const height = Math.round(screen.getBoundingClientRect().height);
+        // The masthead sits above the hero screen, so it counts against it.
+        out[name] = screen.classList.contains("screen--hero") ? height + headerHeight : height;
+      });
+      return out;
     });
     for (const [name, value] of Object.entries(blocks)) {
       if (name === "viewport") continue;

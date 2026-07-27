@@ -11,7 +11,7 @@ const sharp = require("sharp");
 
 const ROOT = "c:/Users/sanja/Projects/blue-corner-coming-soon-review";
 const SOURCE = path.join(ROOT, "assets/art/blue-corner-reference-ring.webp");
-const OUTPUT = path.resolve(ROOT, process.argv[2] || "assets/art/blue-corner-reference-ring-brand-v3.webp");
+const OUTPUT = path.resolve(ROOT, process.argv[2] || "assets/art/blue-corner-reference-ring-brand-v4.webp");
 
 if (path.resolve(SOURCE) === OUTPUT) throw new Error("Refusing to overwrite the original reference image");
 
@@ -47,11 +47,19 @@ const YELLOW = [
   [1, [253, 240, 168]],
 ];
 
-const NAVY = [
-  [0, [2, 15, 48]],
-  [0.035, [4, 40, 116]],
-  [0.12, [25, 63, 137]],
-  [0.3, [67, 104, 166]],
+/* The pad reads as the chair back in the frame. Design review 2026-07-26: it
+   was matching --brand-navy, which reads as a different, darker blue than the
+   wordmark. The base stop is now exactly --brand-blue #197CE3 so the chair and
+   the logo are the same colour; the surrounding stops only carry its shading. */
+/* Tuned so the DOMINANT pad tone decodes to #197CE3, not the base stop. Most
+   pad pixels sit near 0.055 source luminance, i.e. a quarter of the way into
+   the 0.035 -> 0.12 span, so the stops are biased down to land the mode on the
+   wordmark blue exactly. Verified by sampling the decoded output. */
+const PAD_BLUE = [
+  [0, [5, 40, 88]],
+  [0.035, [16, 116, 222]],
+  [0.12, [58, 146, 234]],
+  [0.3, [132, 192, 245]],
 ];
 
 // Each segment follows the photographed rope centreline. Endpoints stop before
@@ -118,7 +126,7 @@ for (let y = 0; y < height; y += 1) {
 
     let colour = null;
     if (isInsidePolygon(x + 0.5, y + 0.5, PAD_POLYGON)) {
-      colour = colourRamp(NAVY, value);
+      colour = colourRamp(PAD_BLUE, value);
       changedMask[pixel] = 2;
       padPixels += 1;
     } else if (isRopePixel(x, y, r, g, b)) {

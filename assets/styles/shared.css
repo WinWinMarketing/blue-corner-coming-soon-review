@@ -127,17 +127,19 @@ button {
   border: 0;
 }
 
-/* Crisis support is permanent footer content, not a focus-only affordance. On a
-   men's mental-health page these links have to be visible without a keyboard. */
-.concept-footer__support {
+/* Crisis support is permanent content on every screen, not a focus-only
+   affordance. On a men's mental-health page the numbers have to be visible
+   without a keyboard, so .crisis-band ships in the flow of each block. These
+   are the secondary sign-off links that follow it once, at the end. */
+.concept-footer__links {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--space-2xs) var(--space-lg);
+  gap: var(--space-2xs) clamp(1.25rem, 2.4vw, 2rem);
   color: var(--brand-navy);
 }
 
-.concept-footer__support a {
+.concept-footer__links a {
   display: inline-flex;
   min-block-size: 2.75rem;
   align-items: center;
@@ -170,6 +172,16 @@ button {
   line-height: 1.25;
   text-wrap: balance;
   text-transform: uppercase;
+}
+
+/* Design review item 5: the kicker must sit on ONE line and must not shrink to
+   get there, so it drops the 34ch measure instead of the type size. It still
+   wraps below 64rem, where a 40-character line genuinely will not fit. */
+@media (min-width: 64.0625rem) {
+  .eyebrow--wide {
+    max-inline-size: none;
+    white-space: nowrap;
+  }
 }
 
 .button {
@@ -212,8 +224,9 @@ button {
 }
 
 .site-header__brand:active,
+.concept-footer__brand:active,
 .prototype-role__choice:active,
-.concept-footer__support a:active {
+.concept-footer__links a:active {
   transform: translateY(0.0625rem);
 }
 
@@ -251,7 +264,8 @@ button {
 
 .field input {
   inline-size: 100%;
-  min-block-size: 3rem;
+  /* 2.75rem is the 44px floor. Coarse pointers get 3.25rem below. */
+  min-block-size: 2.75rem;
   padding: 0.75rem 0.875rem;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-small);
@@ -405,25 +419,21 @@ button {
 }
 
 .reveal-ready .stats__grid .stat:nth-child(2),
-.reveal-ready .symptoms .symptom:nth-child(2),
+.reveal-ready .rooms__grid .room:nth-child(2),
 .reveal-ready .roadmap__list .roadmap-item:nth-child(2) {
   --reveal-delay: 95ms;
 }
 
 .reveal-ready .stats__grid .stat:nth-child(3),
-.reveal-ready .symptoms .symptom:nth-child(3),
+.reveal-ready .rooms__grid .room:nth-child(3),
 .reveal-ready .roadmap__list .roadmap-item:nth-child(3) {
   --reveal-delay: 140ms;
 }
 
 .reveal-ready .stats__grid .stat:nth-child(4),
-.reveal-ready .symptoms .symptom:nth-child(4),
+.reveal-ready .rooms__grid .room:nth-child(4),
 .reveal-ready .roadmap__list .roadmap-item:nth-child(4) {
   --reveal-delay: 185ms;
-}
-
-.reveal-ready .roadmap__list .roadmap-item:nth-child(5) {
-  --reveal-delay: 230ms;
 }
 
 [data-nav-panel][hidden] {
@@ -445,12 +455,17 @@ button {
     transform: translateY(-0.125rem);
   }
 
-  .site-header__brand:hover {
+  .site-header__brand:hover,
+  .concept-footer__brand:hover {
     opacity: 0.82;
   }
 
-  .concept-footer__support a:hover {
+  .concept-footer__links a:hover {
     text-decoration-color: currentColor;
+  }
+
+  .crisis-action:hover {
+    transform: translateY(-0.125rem);
   }
 
   .field input:hover {
@@ -464,27 +479,28 @@ button {
 
 @media (pointer: coarse) {
   .button,
-  .field input {
+  .field input,
+  .crisis-action {
     min-block-size: 3.25rem;
   }
 }
 
 @media (max-width: 47.99rem) {
-  .concept-footer__support {
+  .concept-footer__links {
     display: grid;
     inline-size: 100%;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--space-2xs) var(--space-md);
   }
 
-  .concept-footer__support a {
+  .concept-footer__links a {
     min-block-size: 2.75rem;
     padding-block: var(--space-xs);
   }
 }
 
 @media (max-width: 30rem) {
-  .concept-footer__support {
+  .concept-footer__links {
     grid-template-columns: 1fr;
   }
 }
@@ -557,8 +573,15 @@ button {
   .field input,
   .prototype-role__choice,
   .prototype-disclosure,
-  .conversion-path {
+  .conversion-path,
+  .crisis-action--outline {
     border-color: CanvasText;
+  }
+
+  /* Yellow-on-navy tap targets lose their fill in forced colours, so give them
+     a border or the three crisis numbers stop reading as separate targets. */
+  .crisis-action--signal {
+    border: 2px solid CanvasText;
   }
 
   .prototype-role__choice:has(input:checked) {

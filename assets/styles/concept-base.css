@@ -1,6 +1,5 @@
 .concept-page {
   --section-space: clamp(4rem, 6.5vw, 6.5rem);
-  --signal-bar: clamp(2.375rem, 2.9vw, 2.75rem);
   --page-gutter: clamp(1rem, 3.8889vw, 3.5rem);
   /* Mirrors .site-header__inner min-block-size so the hero fills exactly the
      rest of the viewport with no sliver of the next block showing. */
@@ -61,14 +60,115 @@
   white-space: nowrap;
 }
 
+/* Every block is one screen, and the navy crisis band closes each one — design
+   review 2026-07-26: "the navy crisis band should repeat on every page; the
+   light row only at the end." The content row takes the slack (minmax(0, 1fr))
+   so adding the band shrinks the section instead of overflowing the viewport. */
+.screen {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+}
+
+.screen > :first-child {
+  min-block-size: 0;
+}
+
+.crisis-band {
+  background: var(--brand-navy);
+  color: var(--brand-off-white);
+  border-block-start: clamp(0.5rem, 0.85vw, 0.75rem) solid var(--brand-yellow);
+}
+
+.crisis-band__inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: clamp(1rem, 2.4vw, 2.5rem);
+  padding-block: clamp(0.75rem, 1.9svh, 1.75rem);
+}
+
+.crisis-band__line {
+  max-inline-size: 14ch;
+  margin: 0;
+  font-size: clamp(1.75rem, min(3vw, 5.4svh), 3.25rem);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: -0.035em;
+  line-height: 0.98;
+}
+
+.crisis-band__accent {
+  color: var(--brand-yellow);
+}
+
+.crisis-band__support {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(0.4rem, 0.9svh, 0.75rem);
+}
+
+.crisis-band__label {
+  margin: 0;
+  color: var(--brand-yellow);
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.16em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.crisis-band__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+/* Tap targets, not underlined links. 44px minimum on every pointer type. */
+.crisis-action {
+  display: inline-flex;
+  min-block-size: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  padding: 0.6rem clamp(0.9rem, 1.4vw, 1.5rem);
+  font-size: clamp(1.125rem, 1.15vw, 1.375rem);
+  font-weight: var(--font-weight-bold);
+  line-height: 1.1;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: transform var(--duration-fast) var(--ease-out), opacity var(--duration-fast) var(--ease-out);
+}
+
+.crisis-action--signal {
+  background: var(--brand-yellow);
+  color: var(--brand-navy);
+}
+
+.crisis-action--outline {
+  border: 2px solid var(--brand-off-white);
+  color: var(--brand-off-white);
+}
+
+.crisis-action:active {
+  transform: translateY(0.0625rem);
+}
+
+.crisis-band__note {
+  margin: 0;
+  color: var(--color-dark-muted);
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.4;
+}
+
 .concept-hero {
+  display: flex;
   overflow: hidden;
-  border-block-end: var(--signal-bar) solid var(--brand-blue);
   background: var(--brand-off-white);
 }
 
 .concept-hero__inner {
   display: grid;
+  flex: 1;
   grid-template-areas:
     "copy media"
     "lead details";
@@ -77,8 +177,7 @@
   align-items: start;
   column-gap: 2%;
   row-gap: clamp(0.75rem, 1.2vw, 1rem);
-  min-block-size: clamp(35rem, 43vw, 39.5rem);
-  padding-block: clamp(1.75rem, 2.2vw, 2.25rem);
+  padding-block: clamp(1.5rem, 2.2vw, 2.25rem);
 }
 
 /* Centred, not end-aligned. Bottom-aligning to close the gap under the headline
@@ -177,9 +276,16 @@
   align-self: start;
 }
 
+/* Design review item 4: this line was set at body weight and body leading in a
+   55ch measure, so it read as a different voice from the left column. It now
+   takes the same family, weight, size and leading as .concept-hero__lead and a
+   short measure, and it starts at the image's left edge. */
 .concept-hero__body {
-  max-inline-size: 55ch;
+  max-inline-size: 34ch;
   margin: 0;
+  font-size: clamp(1.375rem, 1.78vw, 1.75rem);
+  font-weight: var(--font-weight-bold);
+  line-height: 1.2;
 }
 
 .concept-hero__media {
@@ -189,8 +295,10 @@
   inline-size: 100%;
   aspect-ratio: 3 / 2;
   /* The 3:2 image is width-driven, so on a short window it alone pushed the
-     hero past one screen. Cap it against the viewport and let object-fit crop. */
-  max-block-size: calc(100svh - 23rem);
+     hero past one screen. Cap it against the viewport and let object-fit crop.
+     The reserve covers the masthead, the hero's own copy rows and the crisis
+     band that now closes the screen. */
+  max-block-size: calc(100svh - 30rem);
   margin: 0;
   overflow: hidden;
   background: var(--brand-navy);
@@ -201,17 +309,6 @@
   block-size: 100%;
   object-fit: cover;
   object-position: center;
-}
-
-.concept-hero__corner {
-  position: absolute;
-  z-index: 2;
-  inset-block-start: clamp(1.5rem, 3vw, 2.5rem);
-  inset-inline-end: clamp(1.5rem, 3vw, 2.5rem);
-  inline-size: clamp(3.5rem, 5.5vw, 5.25rem);
-  block-size: clamp(3.5rem, 5.5vw, 5.25rem);
-  border-block-start: clamp(0.75rem, 1.2vw, 1.25rem) solid var(--brand-blue);
-  border-inline-end: clamp(0.75rem, 1.2vw, 1.25rem) solid var(--brand-blue);
 }
 
 .image-frame {
@@ -251,24 +348,29 @@
   font-size: clamp(3.75rem, 6.94vw, 8.5rem);
 }
 
-/* Per-section display scale. The shared cap is set by the roadmap, whose
-   longest line is locked to one line and already fills 81% of the frame; the
-   stats and symptoms headings have far more room and looked undersized on a
-   wide screen, so they get their own ceilings. */
-.stats__heading h2 {
-  font-size: clamp(3.75rem, min(7.6vw, 16svh), 10rem);
+/* The same overhang runs DOWNWARD off the last line. Without this the yellow
+   butted straight into whatever followed — measured at 7px above the statistics
+   band and flush against the room tiles and the manifesto line. Only headings
+   whose final line actually carries a band pay for the clearance. */
+.section-heading h2:has(> span:last-child > .marker-band:last-child),
+.meaning h2:has(> span:last-child > .marker-band:last-child) {
+  padding-block-end: 0.32em;
 }
 
-.symptoms__heading h2 {
-  font-size: clamp(3.75rem, min(8.2vw, 17svh), 10.5rem);
+/* Per-section display scale. The shared cap is set by the roadmap, whose
+   longest line is locked to one line and already fills 81% of the frame; the
+   stats and rooms headings have far more room and looked undersized on a
+   wide screen, so they get their own ceilings. */
+.stats__heading h2 {
+  font-size: clamp(3.25rem, min(6.4vw, 13svh), 8.5rem);
+}
+
+.rooms__heading h2 {
+  font-size: clamp(3rem, min(6vw, 11svh), 7.5rem);
 }
 
 .stats {
-  /* Flex so the inner stretches to the section's content box. Inheriting the
-     min-block-size instead would push the signal bar past the fold. */
   display: flex;
-  min-block-size: clamp(44rem, 60.55vw, 54.5rem);
-  border-block-end: var(--signal-bar) solid var(--brand-yellow);
   background: var(--brand-off-white);
   color: var(--brand-navy);
 }
@@ -276,7 +378,7 @@
 .stats__inner {
   display: flex;
   /* Full bleed like every other section. The retired 84% inset put the stats
-     left edge 170px inboard of the symptoms one on a wide screen. */
+     left edge 170px inboard of the rooms one on a wide screen. */
   inline-size: 100%;
   max-inline-size: none;
   flex-direction: column;
@@ -284,126 +386,177 @@
   /* padding-block only — the inline padding is .page-frame's gutter. The old
      `padding: … 0` shorthand zeroed it, which was invisible while the inner was
      84% wide and auto-centred, but flush to the viewport edge at 100%. */
-  padding-block: clamp(1rem, 2.1svh, 3rem);
+  padding-block: clamp(1rem, 2.1svh, 2.5rem);
 }
 
+/* Design review item 7: the four yellow rules under the figures and the navy
+   vertical dividers are gone. The whole row is one navy band with yellow
+   figures and white captions, which also stops the yellow competing with the
+   single highlighted word in the heading above it. */
 .stats__grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  margin-block-start: clamp(1rem, 3svh, 2.75rem);
+  gap: clamp(1.5rem, 2.6vw, 2.5rem);
+  margin-block-start: clamp(1rem, 2.6svh, 2.25rem);
+  padding: clamp(1.5rem, 3.4svh, 2.75rem) clamp(1.25rem, 2vw, 2rem);
+  background: var(--brand-navy);
+  color: var(--brand-off-white);
 }
 
 .stat {
-  min-block-size: clamp(9.5rem, 19svh, 15.5rem);
-  padding: clamp(1rem, 2.1vw, 2rem);
-  border-inline-end: 1px solid var(--brand-navy);
-}
-
-.stat:last-child {
-  border-inline-end: 0;
+  min-inline-size: 0;
 }
 
 .stat__value {
   display: block;
-  font-size: clamp(4rem, 6.6vw, 8rem);
+  color: var(--brand-yellow);
+  font-size: clamp(3rem, min(5.4vw, 10svh), 6.5rem);
   font-weight: var(--font-weight-bold);
-  letter-spacing: -0.06em;
+  letter-spacing: -0.05em;
   line-height: 0.9;
-  text-decoration: underline;
-  text-decoration-color: var(--brand-yellow);
-  text-decoration-thickness: 0.12em;
-  text-underline-offset: 0.12em;
-  text-decoration-skip-ink: none;
 }
 
 .stat p {
   max-inline-size: 24ch;
-  margin: clamp(1rem, 1.6vw, 1.6rem) 0 0;
-  font-size: clamp(1.1875rem, 0.95rem + 0.65vw, 1.45rem);
+  margin: clamp(0.6rem, 1.4svh, 1.1rem) 0 0;
+  color: var(--brand-off-white);
+  font-size: clamp(1.0625rem, 0.9rem + 0.5vw, 1.3125rem);
   font-weight: var(--font-weight-semibold);
-  line-height: 1.4;
+  line-height: 1.35;
   text-wrap: balance;
 }
 
+/* Design review item 8: noticeably smaller than body copy, and the two lines
+   sit tight with no gap between them. */
 .stats__sources {
   display: grid;
   grid-template-columns: 1fr;
-  gap: var(--space-xs);
-  margin-block-start: var(--space-lg);
-  font-size: var(--font-size-support);
-  line-height: 1.5;
+  gap: 0;
+  margin-block-start: clamp(0.75rem, 1.8svh, 1.25rem);
+  font-size: var(--font-size-small);
+  line-height: 1.35;
 }
 
 .stats__sources p {
   margin: 0;
 }
 
-/* Symptoms and the manifesto share one viewport: the list flexes, the
-   manifesto takes exactly the height its copy needs. */
-.corner-block {
-  display: grid;
-  grid-template-rows: minmax(0, 1fr) auto;
+/* -------------------------------------------------------------- four rooms */
+/* Design review, page 3: the giant left column and the thin right rows never
+   met and the rules read as a table of contents. Each item is now a scene —
+   a room with the man absent, so the viewer supplies him. */
+.rooms {
+  display: flex;
+  background: var(--brand-off-white);
 }
 
-.symptoms {
+.rooms__inner {
+  display: flex;
+  inline-size: 100%;
+  max-inline-size: none;
+  flex-direction: column;
+  justify-content: center;
+  padding-block: clamp(1rem, 2.1svh, 2.5rem);
+}
+
+.rooms__grid {
   display: grid;
-  grid-template-columns: minmax(0, 36fr) minmax(0, 64fr);
-  gap: 0;
   min-block-size: 0;
-  align-items: center;
-  align-content: center;
-  padding-block: clamp(1.25rem, 3.2svh, 2.5rem);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(1rem, 1.4vw, 1.25rem);
+  margin-block-start: clamp(1rem, 2.6svh, 2.25rem);
 }
 
-.symptoms__heading {
-  align-self: stretch;
-  padding-block-start: var(--space-xl);
-  padding-inline-end: clamp(2rem, 6vw, 5rem);
-  border-block-start: clamp(0.75rem, 1.2vw, 1rem) solid var(--brand-blue);
+.room {
+  display: flex;
+  min-inline-size: 0;
+  flex-direction: column;
 }
 
-.symptoms__grid {
-  display: grid;
-  grid-template-columns: 1fr;
+/* The commissioning brief renders inside the frame until the four shots land.
+   Swapping in a photograph is one element per tile; nothing else moves. */
+.room__slot {
+  position: relative;
+  display: flex;
+  min-block-size: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: clamp(0.75rem, 1vw, 1rem);
+  background:
+    repeating-linear-gradient(
+      135deg,
+      color-mix(in oklch, var(--brand-blue) 18%, var(--brand-off-white)) 0 0.625rem,
+      color-mix(in oklch, var(--brand-blue) 26%, var(--brand-off-white)) 0.625rem 1.25rem
+    );
 }
 
-.symptom {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  align-items: center;
-  gap: clamp(1.5rem, 2.6vw, 2.75rem);
-  padding-block: clamp(0.6rem, 1.7svh, 1.5rem);
-  border-block-start: 2px solid color-mix(in oklch, var(--brand-navy) 26%, var(--brand-off-white));
+.room__slot img {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
 }
 
-.symptom:last-child {
-  border-block-end: 2px solid color-mix(in oklch, var(--brand-navy) 26%, var(--brand-off-white));
-}
-
-.symptom__number {
-  display: inline-grid;
-  min-inline-size: clamp(3rem, 3.6vw, 4.25rem);
-  min-block-size: clamp(3rem, 3.6vw, 4.25rem);
-  place-items: center;
-  padding: var(--space-2xs);
-  background: var(--brand-yellow);
+.room__slot-label {
+  position: absolute;
+  inset-block-start: clamp(0.75rem, 1vw, 1rem);
+  inset-inline-start: clamp(0.75rem, 1vw, 1rem);
   color: var(--brand-navy);
-  font-size: clamp(1rem, 1.15vw, 1.375rem);
+  font-size: var(--font-size-small);
   font-weight: var(--font-weight-bold);
-  letter-spacing: 0.04em;
+  letter-spacing: 0.14em;
+  line-height: 1.2;
+  text-transform: uppercase;
 }
 
-.symptom h3 {
+.room__slot-brief {
+  color: var(--brand-navy);
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.4;
+}
+
+.room__copy {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  gap: clamp(0.25rem, 0.8svh, 0.5rem);
+  padding: clamp(0.85rem, 1.9svh, 1.35rem) clamp(0.9rem, 1.2vw, 1.15rem) clamp(1rem, 2.2svh, 1.5rem);
+  background: var(--brand-navy);
+}
+
+.room__copy h3 {
   margin: 0;
-  font-size: clamp(1.85rem, 3.05vw, 3.75rem);
+  color: var(--brand-yellow);
+  font-size: clamp(1.25rem, min(1.85vw, 3.1svh), 2rem);
   font-weight: var(--font-weight-bold);
-  letter-spacing: -0.035em;
-  line-height: 1.02;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
   text-wrap: balance;
 }
 
+.room__copy p {
+  margin: 0;
+  color: var(--color-dark-muted);
+  font-size: clamp(1rem, 0.9rem + 0.25vw, 1.1875rem);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.35;
+}
+
+/* ------------------------------------------------- corner: manifesto + plan */
+/* Design review, pages 4 + 5: "Not a clinic. A Corner." is the strongest line
+   on the site and two sentences of explanation talked over it. Both pages say
+   one thing each, so they are one screen — this is a corner, and therapy is
+   the first thing in it. */
+.corner-block {
+  display: grid;
+  min-block-size: 0;
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
 .meaning {
-  min-block-size: clamp(18rem, 24vw, 22rem);
   background: var(--brand-blue);
 }
 
@@ -425,7 +578,7 @@
 }
 
 .meaning__mark img {
-  inline-size: clamp(4.5rem, 7vw, 6.5rem);
+  inline-size: clamp(3.25rem, 5vw, 5rem);
   block-size: auto;
 }
 
@@ -434,59 +587,92 @@
   min-inline-size: 0;
   flex-direction: column;
   justify-content: center;
-  padding: clamp(1rem, 3.1svh, 3rem) 5vw clamp(1rem, 3.1svh, 3rem) 7.4vw;
+  padding: clamp(1rem, 3.1svh, 2.5rem) 5vw clamp(1rem, 3.1svh, 2.5rem) 7.4vw;
   color: var(--brand-off-white);
 }
 
 .meaning h2 {
   white-space: nowrap;
+  font-size: clamp(3rem, min(5.6vw, 11svh), 7rem);
 }
 
 .meaning__body {
-  max-inline-size: 58ch;
-  margin: var(--space-lg) 0 0;
-  font-size: 1.5rem;
+  max-inline-size: 46ch;
+  margin: clamp(0.75rem, 1.8svh, 1.25rem) 0 0;
+  font-size: clamp(1.375rem, 1.55vw, 1.875rem);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.35;
 }
 
 .roadmap {
   display: flex;
   min-block-size: 0;
-  flex-direction: column;
-  justify-content: center;
-  padding-block: clamp(3rem, 4.5vw, 4.5rem);
+  background: var(--brand-off-white);
 }
 
+.roadmap__inner {
+  display: flex;
+  inline-size: 100%;
+  max-inline-size: none;
+  flex-direction: column;
+  justify-content: center;
+  padding-block: clamp(1rem, 2.6svh, 2.75rem);
+}
+
+.roadmap__heading h2 {
+  font-size: clamp(2.75rem, min(5.4vw, 10svh), 6.5rem);
+}
+
+.roadmap__support {
+  max-inline-size: 46ch;
+  margin: clamp(0.4rem, 1.2svh, 0.85rem) 0 0;
+  font-size: clamp(1.25rem, 1.4vw, 1.625rem);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.3;
+}
+
+/* Cards, not tabs. Tabs imply you can click them today; only therapy is live,
+   so it is the one dark card and everything else is labelled Next. */
 .roadmap__list {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(0.75rem, 1.1vw, 1rem);
   padding: 0;
-  margin: clamp(1.5rem, 2.4vw, 2.25rem) 0 clamp(0.75rem, 1.4svh, 1.25rem);
+  margin: clamp(1rem, 2.4svh, 2rem) 0 0;
   list-style: none;
 }
 
 .roadmap-item {
-  position: relative;
   display: flex;
-  min-block-size: clamp(8.5rem, 10vw, 10rem);
+  min-block-size: clamp(6rem, 14svh, 8.5rem);
   flex-direction: column;
-  justify-content: space-between;
-  gap: var(--space-lg);
-  padding: clamp(1rem, 1.5vw, 1.5rem);
-  border-inline-end: 1px solid var(--brand-navy);
+  justify-content: flex-start;
+  gap: clamp(0.35rem, 1vh, 0.65rem);
+  padding: clamp(0.9rem, 2vh, 1.4rem) clamp(0.9rem, 1.4vw, 1.4rem) clamp(1rem, 2.2vh, 1.5rem);
 }
 
-.roadmap-item:last-child {
-  border-inline-end: 0;
+.roadmap-item__status {
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.14em;
+  line-height: 1.2;
+  text-transform: uppercase;
 }
 
 .roadmap-item__name {
-  isolation: isolate;
-  font-size: clamp(1.4rem, 2.15vw, 2.5rem);
+  font-size: clamp(1.375rem, min(2.05vw, 3.6svh), 2.25rem);
   font-weight: var(--font-weight-bold);
+  letter-spacing: -0.025em;
+  line-height: 1.05;
 }
 
-.roadmap-item--current .roadmap-item__name {
-  font-size: clamp(2.1rem, 3.2vw, 3.75rem);
+.roadmap-item--current {
+  background: var(--brand-navy);
+  color: var(--brand-off-white);
+}
+
+.roadmap-item--current .roadmap-item__status {
+  color: var(--brand-yellow);
 }
 
 .roadmap-item--future {
@@ -494,40 +680,20 @@
   color: color-mix(in oklch, var(--brand-navy) 78%, var(--brand-off-white));
 }
 
-.roadmap-item--current {
-  border-block-start: 0.5rem solid var(--brand-yellow);
-}
-
-.roadmap-item strong {
-  font-size: var(--font-size-small);
-  letter-spacing: 0.12em;
-  line-height: 1.35;
-  text-transform: uppercase;
-}
-
-@media (min-width: 75rem) {
-  .roadmap__heading h2 {
-    font-size: clamp(3.75rem, 6.94vw, 7.9rem);
-  }
-
-  .roadmap__heading h2 span {
-    white-space: nowrap;
-  }
-}
-
 .conversion {
-  border-block-start: var(--signal-bar) solid var(--brand-yellow);
+  display: flex;
   background: var(--brand-blue);
   color: var(--brand-off-white);
 }
 
 .conversion__inner {
   display: grid;
+  flex: 1;
   grid-template-columns: minmax(0, 42fr) minmax(0, 53fr);
+  align-content: center;
   align-items: start;
   gap: 5%;
-  min-block-size: clamp(34rem, 42vw, 39rem);
-  padding-block: clamp(2rem, 3vw, 2.5rem);
+  padding-block: clamp(0.5rem, 1.6svh, 2.5rem);
 }
 
 .conversion__heading {
@@ -535,41 +701,38 @@
 }
 
 .conversion__heading h2 {
-  font-size: clamp(4rem, 6.2vw, 5.75rem);
+  font-size: clamp(3.5rem, 6.2vw, 5.75rem);
 }
 
 @media (min-width: 64.0625rem) {
   .conversion__heading h2 {
-    font-size: clamp(4.5rem, 9.17vw, 12rem);
+    font-size: clamp(4rem, min(8.4vw, 17svh), 11rem);
   }
 }
 
 @media (min-width: 48.0625rem) and (max-width: 64rem) {
   .conversion__heading h2 {
-    font-size: clamp(4rem, 7.2vw, 4.75rem);
+    font-size: clamp(3.5rem, 7.2vw, 4.75rem);
   }
 
   /* Four columns are still in play in this band but each is only ~185px wide,
      and the 4rem floor pushed "~300%" past its content box. Scale the numeral
-     with the column here; mobile keeps the 4rem floor. */
+     with the column here; mobile keeps the floor. */
   .stat__value {
-    font-size: clamp(3rem, 6.2vw, 4rem);
+    font-size: clamp(2.5rem, 6.2vw, 3.5rem);
   }
 }
 
-.conversion__heading > p:last-child {
-  max-inline-size: 48ch;
-  margin: var(--space-xl) 0 0;
+/* Design review, page 6: one sub-line, not two. */
+.conversion__body {
+  max-inline-size: 38ch;
+  margin: var(--space-lg) 0 0;
   /* Pinned to the 24px WCAG large-text threshold for the same reason as
      .meaning__body: muted off-white on the brand blue field is 3.13:1, which
-     clears the 3:1 large-text rule but not the 4.5:1 small-text one. Below
-     1440px --font-size-body drops under 24px and the copy stopped passing. */
+     clears the 3:1 large-text rule but not the 4.5:1 small-text one. */
   font-size: 1.5rem;
+  line-height: 1.4;
   color: var(--color-dark-muted);
-}
-
-.conversion__body-line {
-  display: inline;
 }
 
 .conversion__forms {
@@ -582,9 +745,15 @@
   justify-self: end;
 }
 
+/* The card is the tallest thing on the sign-up screen, so its rhythm scales
+   with svh like every other block. Fixed rem spacing here made it a rigid
+   711px at every window height and overflowed the screen by 113px at 830px
+   tall — exactly the cliff the max-height breakpoints were banned for. The
+   error slots stay reserved at full size: collapsing them would reclaim the
+   same space but shift the submit button under the cursor mid-validation. */
 .conversion-path {
   align-self: start;
-  padding: 1.25rem clamp(1.5rem, 2vw, 1.75rem);
+  padding: clamp(0.5rem, 1.4svh, 1.25rem) clamp(1.5rem, 2vw, 1.75rem);
   border: 1px solid var(--brand-navy);
   background: var(--brand-off-white);
   color: var(--brand-navy);
@@ -595,15 +764,15 @@
 }
 
 .conversion-path h3 {
-  margin: var(--space-sm) 0;
-  font-size: clamp(2rem, 3vw, 3rem);
+  margin: 0 0 clamp(0.25rem, 0.9svh, 0.75rem);
+  font-size: clamp(1.75rem, min(3vw, 5svh), 3rem);
   font-weight: var(--font-weight-bold);
   letter-spacing: -0.04em;
   line-height: 0.98;
 }
 
 .prototype-disclosure {
-  margin: 0 0 var(--space-md);
+  margin: 0 0 clamp(0.4rem, 1.2svh, 1rem);
   padding: 0.375rem var(--space-sm);
   border: 1px solid color-mix(in oklch, var(--brand-navy) 38%, var(--brand-off-white));
   background: color-mix(in oklch, var(--brand-yellow) 9%, var(--brand-off-white));
@@ -631,7 +800,7 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--space-sm);
-  margin-block-start: var(--space-sm);
+  margin-block-start: clamp(0.35rem, 0.9svh, 0.75rem);
 }
 
 .prototype-role__choice {
@@ -671,11 +840,11 @@
 
 .conversion .prototype-form,
 .conversion .prototype-form fieldset {
-  gap: var(--space-md);
+  gap: clamp(0.4rem, 1.1svh, 1rem);
 }
 
 .conversion .field-grid {
-  gap: var(--space-sm);
+  gap: clamp(0.35rem, 1svh, 0.75rem);
 }
 
 .conversion .field {
@@ -707,133 +876,146 @@
   line-height: 1.5;
 }
 
-/* The footer starts above the wordmark: a real bar of content sits between the
-   yellow signal border and the oversized logo, which bleeds off the bottom. */
-.concept-footer {
+/* ------------------------------------------------------------ privacy page */
+.prose {
+  display: flex;
+  background: var(--brand-off-white);
+}
+
+.prose__inner {
+  display: flex;
+  inline-size: 100%;
+  max-inline-size: none;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding-block: clamp(2.5rem, 6vh, 4.5rem);
+}
+
+.prose h1 {
+  margin: max(var(--space-lg), 0.32em) 0 0;
+  font-size: clamp(3rem, 6vw, 6rem);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: -0.035em;
+  line-height: 0.9;
+}
+
+.prose__lead {
+  max-inline-size: 34ch;
+  margin: var(--space-xl) 0 0;
+  font-size: clamp(1.5rem, 1.9vw, 2rem);
+  font-weight: var(--font-weight-bold);
+  line-height: 1.2;
+}
+
+.prose__body {
   display: grid;
-  grid-template-rows: auto auto;
-  overflow: hidden;
-  border-block-start: clamp(2.5rem, 3.3vw, 2.9375rem) solid var(--brand-yellow);
+  grid-template-columns: repeat(auto-fit, minmax(min(22rem, 100%), 1fr));
+  gap: var(--space-xl) clamp(2rem, 4vw, 4rem);
+  margin-block-start: var(--space-2xl);
+  padding-block-start: var(--space-xl);
+  border-block-start: 2px solid color-mix(in oklch, var(--brand-navy) 26%, var(--brand-off-white));
+}
+
+.prose__section h2 {
+  margin: 0;
+  font-size: clamp(1.5rem, 1.9vw, 1.875rem);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.prose__section p {
+  margin: var(--space-sm) 0 0;
+  max-inline-size: 46ch;
+  font-size: var(--font-size-support);
+  line-height: 1.5;
+}
+
+/* ------------------------------------------------------ sign-off, once only */
+/* Design review, page 7: the ghost wordmark is gone. It was the only decorative
+   element on the site and it competed with the one piece of information that
+   has to be found fast. The lockup is now a sign-off line under the crisis
+   band, at the end of the page and nowhere else. */
+.concept-footer {
   background: var(--brand-off-white);
   color: var(--brand-navy);
 }
 
-.concept-footer__bar {
+.concept-footer__signoff {
   display: flex;
   flex-wrap: wrap;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
-  gap: var(--space-md) clamp(1.5rem, 3vw, 3rem);
-  padding-block: clamp(1.75rem, 2.6vw, 2.75rem) clamp(1.25rem, 2vw, 2rem);
+  gap: var(--space-lg) clamp(1.5rem, 3vw, 3rem);
+  padding-block: clamp(1.25rem, 2.2vw, 2rem);
 }
 
-.concept-footer__line {
-  margin: 0;
-  font-size: clamp(1.5rem, 2.2vw, 2.5rem);
-  font-weight: var(--font-weight-bold);
-  letter-spacing: -0.03em;
-  line-height: 1;
+.concept-footer__brand {
+  display: inline-flex;
+  min-block-size: 2.75rem;
+  align-items: center;
+  inline-size: clamp(11rem, 15vw, 14rem);
+  transition: transform var(--duration-fast) var(--ease-out), opacity var(--duration-fast) var(--ease-out);
 }
 
-/* Full wordmark, gutter to gutter. At 124% it was clipped mid-R — an oversized
-   bleed that loses exactly one letter reads as a mistake, not a crop. */
-.concept-footer__wordmark {
+.concept-footer__brand img {
   inline-size: 100%;
-  max-inline-size: none;
-  height: auto;
-  opacity: 0.22;
+  block-size: auto;
+}
+
+.concept-footer__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-xs) clamp(1.25rem, 2.4vw, 2rem);
+}
+
+.concept-footer__legal {
+  margin: 0;
+  color: color-mix(in oklch, var(--brand-navy) 74%, var(--brand-off-white));
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.4;
 }
 
 @media (min-width: 64.0625rem) {
-  .concept-hero {
-    display: flex;
-    align-items: stretch;
-    /* The signal bar is this section's own border, so it is already inside the
-       border-box height — subtract the masthead only. */
+  /* Each block fills one viewport. Scrolling stays free — no snap, no lock. */
+  .screen {
+    min-block-size: 100svh;
+  }
+
+  /* The hero screen also carries the masthead above it. */
+  .screen--hero {
     min-block-size: calc(100svh - var(--header-h));
   }
 
   .concept-hero__inner {
+    padding-block: clamp(1rem, 2.2vh, 2.25rem);
+  }
+
+  .rooms__grid {
+    min-block-size: 0;
     flex: 1;
-    align-content: center;
-    min-block-size: 0;
-    padding-block: clamp(1.25rem, 2.2vh, 2.5rem);
   }
 
-  /* Each block fills one viewport. Scrolling stays free — no snap, no lock. */
-  .stats {
-    min-block-size: 100svh;
-  }
-
-  /* Symptoms + manifesto read as a single page. */
-  .corner-block {
-    min-block-size: 100svh;
-  }
-
-  /* The four statements share the page evenly instead of clustering, so the
-     block actually fills the screen. min-content floors stop the rows
-     collapsing on a short viewport. */
-  .symptoms {
-    align-items: stretch;
-    align-content: stretch;
-  }
-
-  .symptoms__grid {
-    grid-template-rows: repeat(4, minmax(min-content, 1fr));
-  }
-
-  /* Stretch keeps the blue rule level with the top of the statement list. */
-  .symptoms__heading {
-    align-self: stretch;
-  }
-
-  /* The roadmap is a page of its own; the service columns take the slack.
-     The band stays CAPPED. Uncapping it to fill the page stretched the cells
-     into tall empty colour columns, which read far worse than the whitespace
-     they were filling — reverted 2026-07-25. */
-  .roadmap {
-    min-block-size: 100svh;
-    /* Scales continuously with the viewport instead of stepping at a
-       max-height breakpoint. The old cliff compacted this padding at 880px and
-       below but left it at the full 72px just above, while the table cap kept
-       growing with svh — so the section overflowed one screen between roughly
-       875px and 940px, which is exactly where a real browser window lands. */
-    padding-block: clamp(1.5rem, 3.5svh, 4.5rem);
-  }
-
-  .roadmap__list {
-    flex: 0 0 auto;
-    block-size: clamp(22rem, 48svh, 27rem);
-    max-block-size: 27rem;
-  }
-
-  .roadmap-item {
-    min-block-size: 0;
-  }
-
-  .conversion__inner {
-    min-block-size: calc(100svh - var(--signal-bar));
-    align-content: center;
+  /* The manifesto takes exactly the height its one line needs; the plan below
+     takes the slack, so the two together are one page. */
+  .meaning {
+    min-block-size: clamp(13rem, 30svh, 19rem);
   }
 }
 
-/* 88rem, not 86rem: the manifesto body is pinned at 24px (the WCAG large-text
-   threshold, which is what lets off-white on brand blue pass at 3.75:1), so its
-   longest locked line needs 1092px. The copy column is ~0.789 of the viewport,
-   so it only clears that from ~1384px. Measured: 1376 overflows by 6px, 1400+
-   is clean; 88rem leaves 19px of margin. */
+/* 88rem, not 86rem: the manifesto body is pinned at the WCAG large-text
+   threshold, which is what lets off-white on brand blue pass at 3.75:1, so its
+   locked line needs room. Measured: 1376 overflows by 6px, 1400+ is clean. */
 @media (min-width: 88rem) {
   .meaning__copy {
     padding-inline: 4.5vw 4vw;
   }
 
-  .meaning__body-line {
-    display: block;
-    white-space: nowrap;
-  }
-
   .meaning__body {
     max-inline-size: none;
+    white-space: nowrap;
   }
 }
 
@@ -842,7 +1024,7 @@
      copy column half empty against a 656px-tall hero image. The ceiling is set
      by "Fights Alone." staying on one line inside the 46fr column. */
   .concept-hero h1 {
-    font-size: clamp(7.5rem, 7.7vw, 10.2rem);
+    font-size: clamp(6.5rem, min(7.7vw, 15svh), 10.2rem);
   }
 
   .conversion__inner {
@@ -852,11 +1034,6 @@
 
   .conversion__forms {
     max-inline-size: 45rem;
-  }
-
-  .conversion__body-line {
-    display: block;
-    white-space: nowrap;
   }
 }
 
@@ -874,19 +1051,30 @@
     font-size: clamp(4rem, 7.2vw, 4.75rem);
   }
 
-  .symptom {
-    column-gap: var(--space-lg);
+  .meaning h2 {
+    font-size: clamp(3rem, 6.6vw, 4.5rem);
   }
 
-  .meaning h2 {
-    font-size: clamp(3.5rem, 6.6vw, 4.5rem);
+  .rooms__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .room__slot {
+    min-block-size: 11rem;
+  }
+
+  .roadmap__list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .crisis-band__line {
+    max-inline-size: none;
   }
 }
 
 @media (max-width: 48rem) {
   .concept-page {
     --page-gutter: 1.75rem;
-    --signal-bar: 1rem;
   }
 
   .site-header {
@@ -912,7 +1100,6 @@
       "details";
     grid-template-columns: 1fr;
     gap: var(--space-xl);
-    min-block-size: 0;
     padding-block: var(--space-3xl);
   }
 
@@ -923,17 +1110,23 @@
     max-inline-size: 100%;
   }
 
+  .concept-hero__media {
+    max-block-size: none;
+  }
+
   .concept-hero h1 {
     font-size: clamp(3.75rem, 12.5vw, 5.5rem);
   }
 
-  .stats {
-    min-block-size: 0;
+  .concept-hero__body {
+    max-inline-size: 100%;
   }
 
-  .stats__inner {
+  .stats__inner,
+  .rooms__inner,
+  .roadmap__inner {
     inline-size: 100%;
-    padding: var(--space-4xl) var(--page-gutter);
+    padding-block: var(--space-4xl);
   }
 
   .stats__grid {
@@ -943,27 +1136,12 @@
   .stats__sources,
   .prototype-disclosure,
   .conversion-path__note {
-    font-size: var(--font-size-support);
     line-height: 1.55;
   }
 
-  .stat:nth-child(2) {
-    border-inline-end: 0;
-  }
-
-  .symptoms {
-    grid-template-columns: 1fr;
-    gap: var(--space-3xl);
-    min-block-size: 0;
-    padding-block: var(--space-4xl);
-  }
-
-  .symptoms__heading {
-    padding-inline-end: 0;
-  }
-
-  .meaning {
-    min-block-size: 0;
+  .prototype-disclosure,
+  .conversion-path__note {
+    font-size: var(--font-size-support);
   }
 
   .meaning__inner {
@@ -991,50 +1169,20 @@
     white-space: normal;
   }
 
-  .roadmap {
-    min-block-size: 0;
-    padding-block: var(--space-4xl);
-  }
-
-  .roadmap__list {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .roadmap-item:nth-child(3) {
-    border-inline-end: 0;
-  }
-
-  .roadmap-item {
-    border-block-end: 0;
-  }
-
-  .roadmap-item:nth-child(n + 4) {
-    border-block-end: 0;
-  }
-
   .conversion__inner {
     grid-template-columns: 1fr;
-  }
-
-  .conversion__inner {
     gap: var(--space-2xl);
-    min-block-size: 0;
     padding-block: var(--space-3xl);
   }
 
-  .concept-footer {
-    min-block-size: 18rem;
+  .crisis-band__inner {
+    flex-direction: column;
+    align-items: flex-start;
+    padding-block: var(--space-xl);
   }
 
-  .concept-footer__bar {
-    align-items: stretch;
-  }
-
-  /* Narrow screens keep the oversized treatment, but cropped evenly on both
-     sides so it reads as a deliberate blow-up rather than a clipped logo. */
-  .concept-footer__wordmark {
-    inline-size: 160%;
-    margin-inline-start: -30%;
+  .concept-footer__signoff {
+    align-items: flex-start;
   }
 }
 
@@ -1070,28 +1218,18 @@
     grid-template-columns: 1fr;
   }
 
-  .stat,
-  .stat:nth-child(2) {
-    min-block-size: 13rem;
-    border-inline-end: 0;
-  }
-
+  .rooms__grid,
   .roadmap__list {
     grid-template-columns: 1fr;
   }
 
-  .roadmap-item,
-  .roadmap-item:nth-child(3),
-  .roadmap-item:nth-child(n + 4) {
-    min-block-size: 7rem;
-    border-inline-end: 0;
-    border-block-end: 0;
+  .crisis-band__actions {
+    inline-size: 100%;
   }
 
-  .roadmap-item:last-child {
-    border-block-end: 0;
+  .crisis-action {
+    flex: 1 1 9rem;
   }
-
 }
 
 @media (max-width: 24.375rem) {
@@ -1105,10 +1243,7 @@
     font-size: clamp(2.625rem, 13.5vw, 3.375rem);
   }
 
-  .concept-hero__corner {
-    inset-block-start: 1rem;
-    inset-inline-end: 1rem;
-    inline-size: 3rem;
-    block-size: 3rem;
+  .prose h1 {
+    font-size: clamp(2.625rem, 13.5vw, 3.375rem);
   }
 }

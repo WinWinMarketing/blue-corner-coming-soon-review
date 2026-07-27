@@ -1,10 +1,33 @@
-import { referenceHero, safetyCopy, sourceCopy } from "./source-copy.mjs";
+import { readFile } from "node:fs/promises";
+import { createHash } from "node:crypto";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { privacyCopy, referenceHero, safetyCopy, sourceCopy } from "./source-copy.mjs";
 
-const HERO_CACHE_KEY = "ac190f62";
-const BOOT_SCRIPT_CACHE_KEY = "7d7ce8ca";
-const CONCEPT_CSS_CACHE_KEY = "ce0e7d3b";
-const SHARED_CSS_CACHE_KEY = "96271cce";
-const SHARED_SCRIPT_CACHE_KEY = "c15703cd";
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+
+/* Every ?v= key is the first eight characters of its file's SHA-256, derived
+   from the file itself rather than pasted by hand. Hand-maintained keys drifted
+   from their contents twice and shipped a stale stylesheet to warm caches. */
+export const CACHE_KEYED_ASSETS = Object.freeze({
+  hero: `assets/art/${referenceHero.image}`,
+  boot: "assets/scripts/boot.js",
+  sharedScript: "assets/scripts/shared.js",
+  sharedCss: "assets/styles/shared.css",
+  conceptCss: "assets/styles/concept-base.css",
+});
+
+const cacheKeys = { hero: "", boot: "", sharedScript: "", sharedCss: "", conceptCss: "" };
+
+export const fileCacheKey = async (relativePath) =>
+  createHash("sha256").update(await readFile(path.join(ROOT, relativePath))).digest("hex").slice(0, 8);
+
+export const syncCacheKeys = async () => {
+  for (const [name, relativePath] of Object.entries(CACHE_KEYED_ASSETS)) {
+    cacheKeys[name] = await fileCacheKey(relativePath);
+  }
+  return { ...cacheKeys };
+};
 
 const escapeHtml = (value) => String(value)
   .replaceAll("&", "&amp;")
@@ -12,6 +35,52 @@ const escapeHtml = (value) => String(value)
   .replaceAll(">", "&gt;")
   .replaceAll('"', "&quot;")
   .replaceAll("'", "&#39;");
+
+const CSP = "default-src 'self'; script-src 'self'; style-src 'self' https://use.typekit.net; img-src 'self' data:; font-src 'self' https://use.typekit.net; connect-src 'none'; form-action 'none'; object-src 'none'; base-uri 'none'; media-src 'none'; worker-src 'none'; upgrade-insecure-requests";
+
+const documentHead = ({ title, description, canonicalStyles = true }) => `    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="robots" content="noindex, nofollow, noarchive">
+    <meta name="referrer" content="no-referrer">
+    <meta http-equiv="Content-Security-Policy" content="${CSP}">
+    <title>${escapeHtml(title)}</title>
+    <meta name="description" content="${escapeHtml(description)}">
+    <meta name="theme-color" content="#197CE3">${canonicalStyles ? `
+    <meta property="og:title" content="The Blue Corner — Nobody Fights Alone.">
+    <meta property="og:description" content="${escapeHtml(sourceCopy.hero.body)}">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://winwinmarketing.github.io/blue-corner-coming-soon-review/assets/art/${escapeHtml(referenceHero.image)}?v=${cacheKeys.hero}">` : ""}
+    <link rel="icon" href="assets/brand/mark-blue.png" type="image/png">
+    <script src="assets/scripts/boot.js?v=${cacheKeys.boot}"></script>
+    <link rel="stylesheet" href="https://use.typekit.net/ciy6txz.css">
+    <link rel="stylesheet" href="assets/styles/brand.css">
+    <link rel="stylesheet" href="assets/styles/shared.css?v=${cacheKeys.sharedCss}">
+    <link rel="stylesheet" href="assets/styles/concept-base.css?v=${cacheKeys.conceptCss}">
+    <script src="assets/scripts/shared.js?v=${cacheKeys.sharedScript}" defer></script>`;
+
+/* The navy crisis band closes every screen. The numbers are the single most
+   important thing on the page, so they are large yellow tap targets rather than
+   a row of underlines, and the helpline is named so nobody has to guess who
+   answers. Nothing inside carries an id: the band is emitted five times. */
+const renderCrisisBand = () => {
+  const { crisis } = sourceCopy;
+  const [line, accent] = [crisis.line, crisis.lineAccent];
+  const lead = line.slice(0, line.length - accent.length);
+  const actions = crisis.actions.map((action) => `
+            <a class="crisis-action crisis-action--${escapeHtml(action.tone)}" href="${escapeHtml(action.href)}">${escapeHtml(action.label)}</a>`).join("");
+  return `
+        <aside class="crisis-band" aria-label="Crisis support">
+          <div class="crisis-band__inner page-frame">
+            <p class="crisis-band__line">${escapeHtml(lead)}<span class="crisis-band__accent">${escapeHtml(accent)}</span></p>
+            <div class="crisis-band__support">
+              <p class="crisis-band__label">${escapeHtml(crisis.label)}</p>
+              <div class="crisis-band__actions">${actions}
+              </div>
+              <p class="crisis-band__note">${escapeHtml(crisis.note)}</p>
+            </div>
+          </div>
+        </aside>`;
+};
 
 const renderFields = () => sourceCopy.conversion.fields.map((field) => {
   const id = `member-${field.name}`;
@@ -28,12 +97,11 @@ const renderMemberForm = () => {
   const { member } = sourceCopy.conversion;
   return `
             <article class="conversion-path conversion-path--member" id="member-form" data-reveal>
-              <p class="eyebrow">${escapeHtml(member.eyebrow)}</p>
               <h3>${escapeHtml(member.heading)}</h3>
               <p class="prototype-disclosure" id="member-prototype-disclosure">${escapeHtml(safetyCopy.prototypeDisclosure)}</p>
               <form class="prototype-form" data-prototype-form data-loading-label="${escapeHtml(safetyCopy.prototypeLoading)}" data-success-title="${escapeHtml(safetyCopy.prototypeSuccessTitle)}" data-success-body="${escapeHtml(safetyCopy.prototypeSuccessBody)}" method="post" autocomplete="off" aria-describedby="member-prototype-disclosure" novalidate>
                 <fieldset data-form-fields>
-                  <legend class="sr-only">Men's early-access interest</legend>
+                  <legend class="sr-only">Early-access interest</legend>
                   <fieldset class="prototype-role" data-role-group>
                     <legend>I'm joining as</legend>
                     <div class="prototype-role__choices">
@@ -61,61 +129,72 @@ const renderMemberForm = () => {
             </article>`;
 };
 
-const renderConversionBody = () => {
-  const copy = sourceCopy.conversion.body;
-  const sentenceBreak = copy.indexOf(". ");
-  if (sentenceBreak < 0) return escapeHtml(copy);
-  const first = copy.slice(0, sentenceBreak + 1);
-  const second = copy.slice(sentenceBreak + 2);
-  return `<span class="conversion__body-line">${escapeHtml(first)}</span> <span class="conversion__body-line">${escapeHtml(second)}</span>`;
+/* `home` is false on any page that is not the landing page: an in-page anchor
+   like #roadmap-title only resolves there, so elsewhere it has to be rewritten
+   to ./#roadmap-title or the link silently goes nowhere. */
+const renderSignOff = ({ home = true } = {}) => {
+  const { footer } = sourceCopy;
+  const links = footer.links.map((link) => {
+    const inPage = !link.external && link.href.startsWith("#");
+    const href = inPage && !home ? `./${link.href}` : link.href;
+    const attributes = link.external
+      ? ' target="_blank" rel="noopener noreferrer"'
+      : (inPage && home ? " data-scroll-link" : "");
+    return `
+            <a href="${escapeHtml(href)}"${attributes}>${escapeHtml(link.label)}</a>`;
+  }).join("");
+  return `
+    <footer class="concept-footer">
+      <div class="concept-footer__signoff page-frame">
+        <a class="concept-footer__brand" href="./" aria-label="${escapeHtml(footer.name)} home">
+          <img src="assets/brand/logo-horizontal-blue.png" width="1655" height="170" alt="${escapeHtml(footer.name)}">
+        </a>
+        <div class="concept-footer__meta">
+          <nav class="concept-footer__links" aria-label="Site information">${links}
+          </nav>
+          <p class="concept-footer__legal">${escapeHtml(footer.legal)}</p>
+        </div>
+      </div>
+    </footer>`;
 };
 
 export const renderHomePage = () => {
   const stats = sourceCopy.stats.items.map((item) => `
-            <article class="stat">
-              <strong class="stat__value">${escapeHtml(item.value)}</strong>
-              <p>${escapeHtml(item.label)}</p>
-            </article>`).join("");
-  const symptoms = sourceCopy.symptoms.items.map((item, index) => `
-            <article class="symptom" data-reveal>
-              <span class="symptom__number" aria-hidden="true">0${index + 1}</span>
-              <h3>${escapeHtml(item.heading)}</h3>
-            </article>`).join("");
+              <article class="stat">
+                <strong class="stat__value">${escapeHtml(item.value)}</strong>
+                <p>${escapeHtml(item.label)}</p>
+              </article>`).join("");
+  const rooms = sourceCopy.rooms.items.map((item) => `
+              <article class="room" data-reveal>
+                <div class="room__slot" data-room-slot aria-hidden="true">
+                  <span class="room__slot-label">${escapeHtml(item.slot)}</span>
+                  <span class="room__slot-brief">${item.brief.map(escapeHtml).join("<br>")}</span>
+                </div>
+                <div class="room__copy">
+                  <h3>${escapeHtml(item.heading)}</h3>
+                  <p>${escapeHtml(item.support)}</p>
+                </div>
+              </article>`).join("");
   const roadmap = sourceCopy.roadmap.items.map((item, index) => `
-            <li class="roadmap-item ${index === 0 ? "roadmap-item--current" : "roadmap-item--future"}">
-              <span class="roadmap-item__name">${index === 0 ? `<span class="marker-band">${escapeHtml(item.name)}</span>` : escapeHtml(item.name)}</span>
-              <strong>${escapeHtml(item.status)}</strong>
-            </li>`).join("");
+              <li class="roadmap-item ${index === 0 ? "roadmap-item--current" : "roadmap-item--future"}">
+                <span class="roadmap-item__status">${escapeHtml(item.status)}</span>
+                <span class="roadmap-item__name">${escapeHtml(item.name)}</span>
+              </li>`).join("");
 
   return `<!doctype html>
 <html lang="en-CA">
   <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <meta name="robots" content="noindex, nofollow, noarchive">
-    <meta name="referrer" content="no-referrer">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' https://use.typekit.net; img-src 'self' data:; font-src 'self' https://use.typekit.net; connect-src 'none'; form-action 'none'; object-src 'none'; base-uri 'none'; media-src 'none'; worker-src 'none'; upgrade-insecure-requests">
-    <title>The Blue Corner — Nobody Fights Alone.</title>
-    <meta name="description" content="${escapeHtml(sourceCopy.hero.heading)} A Canadian men's mental-health coming-soon concept.">
-    <meta name="theme-color" content="#197CE3">
-    <meta property="og:title" content="The Blue Corner — Nobody Fights Alone.">
-    <meta property="og:description" content="${escapeHtml(sourceCopy.hero.body)}">
-    <meta property="og:type" content="website">
-    <meta property="og:image" content="https://winwinmarketing.github.io/blue-corner-coming-soon-review/assets/art/${escapeHtml(referenceHero.image)}?v=${HERO_CACHE_KEY}">
-    <link rel="icon" href="assets/brand/mark-blue.png" type="image/png">
-    <script src="assets/scripts/boot.js?v=${BOOT_SCRIPT_CACHE_KEY}"></script>
-    <link rel="stylesheet" href="https://use.typekit.net/ciy6txz.css">
-    <link rel="stylesheet" href="assets/styles/brand.css">
-    <link rel="stylesheet" href="assets/styles/shared.css?v=${SHARED_CSS_CACHE_KEY}">
-    <link rel="stylesheet" href="assets/styles/concept-base.css?v=${CONCEPT_CSS_CACHE_KEY}">
-    <script src="assets/scripts/shared.js?v=${SHARED_SCRIPT_CACHE_KEY}" defer></script>
+${documentHead({
+    title: "The Blue Corner — Nobody Fights Alone.",
+    description: `${sourceCopy.hero.heading} A Canadian men's mental-health coming-soon concept.`,
+  })}
   </head>
   <body class="concept-page">
     <a class="skip-link" href="#main">Skip to main content</a>
 
     <header class="site-header">
       <div class="site-header__inner page-frame">
-        <a class="site-header__brand" href="./" aria-label="The Blue Corner home">
+        <a class="site-header__brand" href="./" aria-label="${escapeHtml(sourceCopy.header.name)} home">
           <img src="assets/brand/logo-horizontal-white.png" width="1655" height="170" alt="${escapeHtml(sourceCopy.header.name)}">
         </a>
         <nav class="site-header__actions" aria-label="Blue Corner access">
@@ -126,96 +205,151 @@ export const renderHomePage = () => {
     </header>
 
     <main id="main" tabindex="-1">
-      <section class="concept-hero" aria-labelledby="hero-title">
-        <div class="concept-hero__inner page-frame">
-          <div class="concept-hero__copy" data-reveal>
-            <p class="eyebrow">${escapeHtml(sourceCopy.hero.eyebrow)}</p>
-            <h1 id="hero-title" aria-label="Nobody Fights Alone."><span class="concept-hero__headline-line" aria-hidden="true">Nobody</span><span class="concept-hero__headline-line" aria-hidden="true">Fights <span class="concept-hero__accent concept-hero__underline">Alone.</span></span></h1>
-          </div>
-          <figure class="concept-hero__media image-frame" data-image-frame data-image-fallback-label="Blue Corner hero image">
-            <img class="concept-hero__image" src="assets/art/${escapeHtml(referenceHero.image)}?v=${HERO_CACHE_KEY}" width="${escapeHtml(referenceHero.width)}" height="${escapeHtml(referenceHero.height)}" alt="${escapeHtml(referenceHero.alt)}" fetchpriority="high" data-fallback-image>
-            <span class="concept-hero__corner" aria-hidden="true"></span>
-          </figure>
-          <p class="concept-hero__lead" data-reveal><span class="concept-hero__lead-line"><span class="concept-hero__underline">Three</span> in four suicides in Canada are men.</span> <span class="concept-hero__lead-line">${escapeHtml(sourceCopy.hero.leadSecond)}</span></p>
-          <div class="concept-hero__details" data-reveal>
-            <p class="concept-hero__body">${escapeHtml(sourceCopy.hero.body)}</p>
-          </div>
-        </div>
-      </section>
-
-      <section class="stats" aria-labelledby="stats-title">
-        <div class="stats__inner page-frame">
-          <header class="section-heading stats__heading" data-reveal>
-            <p class="eyebrow">${escapeHtml(sourceCopy.stats.eyebrow)}</p>
-            <h2 id="stats-title" aria-label="${escapeHtml(sourceCopy.stats.heading)}"><span aria-hidden="true">It isn’t just bad.</span><span aria-hidden="true">It’s getting <span class="marker-band">worse.</span></span></h2>
-          </header>
-          <div class="stats__grid" data-reveal>${stats}
-          </div>
-          <div class="stats__sources" data-reveal>
-            <p>${escapeHtml(sourceCopy.stats.source)}</p>
-            <p>${escapeHtml(sourceCopy.stats.gamblingSource)}</p>
-          </div>
-        </div>
-      </section>
-
-      <div class="corner-block">
-        <section class="symptoms page-frame" aria-labelledby="symptoms-title">
-          <header class="section-heading symptoms__heading" data-reveal>
-            <p class="eyebrow">${escapeHtml(sourceCopy.symptoms.eyebrow)}</p>
-            <h2 id="symptoms-title" aria-label="${escapeHtml(sourceCopy.symptoms.heading)}"><span aria-hidden="true">It looks</span><span aria-hidden="true">like this.</span></h2>
-          </header>
-          <div class="symptoms__grid">${symptoms}
-          </div>
-        </section>
-
-        <section class="meaning" aria-labelledby="meaning-title">
-          <div class="meaning__inner page-frame">
-            <div class="meaning__mark" aria-hidden="true">
-              <img src="assets/brand/corner-off-white.png" width="255" height="248" alt="">
+      <div class="screen screen--hero">
+        <section class="concept-hero" aria-labelledby="hero-title">
+          <div class="concept-hero__inner page-frame">
+            <div class="concept-hero__copy" data-reveal>
+              <p class="eyebrow">${escapeHtml(sourceCopy.hero.eyebrow)}</p>
+              <h1 id="hero-title" aria-label="Nobody Fights Alone."><span class="concept-hero__headline-line" aria-hidden="true">Nobody</span><span class="concept-hero__headline-line" aria-hidden="true">Fights <span class="concept-hero__accent concept-hero__underline">Alone.</span></span></h1>
             </div>
-            <div class="meaning__copy" data-reveal>
-              <p class="eyebrow">${escapeHtml(sourceCopy.meaning.eyebrow)}</p>
-              <h2 id="meaning-title" aria-label="${escapeHtml(sourceCopy.meaning.heading)}"><span aria-hidden="true">Not a clinic. <span class="marker-band">A Corner.</span></span></h2>
-              <p class="meaning__body"><span class="meaning__body-line">${escapeHtml(sourceCopy.meaning.bodyFirst)}</span> <span class="meaning__body-line">${escapeHtml(sourceCopy.meaning.bodySecond)}</span></p>
+            <figure class="concept-hero__media image-frame" data-image-frame data-image-fallback-label="Blue Corner hero image">
+              <img class="concept-hero__image" src="assets/art/${escapeHtml(referenceHero.image)}?v=${cacheKeys.hero}" width="${escapeHtml(referenceHero.width)}" height="${escapeHtml(referenceHero.height)}" alt="${escapeHtml(referenceHero.alt)}" fetchpriority="high" data-fallback-image>
+            </figure>
+            <p class="concept-hero__lead" data-reveal><span class="concept-hero__lead-line"><span class="concept-hero__underline">Three</span> in four suicides in Canada are men.</span> <span class="concept-hero__lead-line">${escapeHtml(sourceCopy.hero.leadSecond)}</span></p>
+            <div class="concept-hero__details" data-reveal>
+              <p class="concept-hero__body">${escapeHtml(sourceCopy.hero.body)}</p>
             </div>
           </div>
         </section>
+${renderCrisisBand()}
       </div>
 
-      <section class="roadmap page-frame" aria-labelledby="roadmap-title">
-        <header class="section-heading roadmap__heading" data-reveal>
-          <p class="eyebrow">${escapeHtml(sourceCopy.roadmap.eyebrow)}</p>
-          <h2 id="roadmap-title" aria-label="${escapeHtml(sourceCopy.roadmap.heading)}"><span aria-hidden="true">We start with <span class="marker-band">therapy.</span></span><span aria-hidden="true">The rest of the corner is on its way.</span></h2>
-        </header>
-        <ol class="roadmap__list" data-reveal>${roadmap}
-        </ol>
-      </section>
-
-      <section class="conversion" aria-labelledby="conversion-title">
-        <div class="conversion__inner page-frame">
-          <header class="section-heading conversion__heading" data-reveal>
-            <p class="eyebrow">${escapeHtml(sourceCopy.conversion.eyebrow)}</p>
-            <h2 id="conversion-title" aria-label="${escapeHtml(sourceCopy.conversion.heading)}"><span aria-hidden="true">Be <span class="marker-band">one</span> of</span><span aria-hidden="true">the first in</span><span aria-hidden="true">the corner.</span></h2>
-            <p>${renderConversionBody()}</p>
-          </header>
-          <div class="conversion__forms">${renderMemberForm()}
+      <div class="screen screen--stats">
+        <section class="stats" aria-labelledby="stats-title">
+          <div class="stats__inner page-frame">
+            <header class="section-heading stats__heading" data-reveal>
+              <p class="eyebrow eyebrow--wide">${escapeHtml(sourceCopy.stats.eyebrow)}</p>
+              <h2 id="stats-title" aria-label="${escapeHtml(sourceCopy.stats.heading)}"><span aria-hidden="true">Every year we stay quiet,</span><span aria-hidden="true">the numbers <span class="marker-band">climb.</span></span></h2>
+            </header>
+            <div class="stats__grid" data-reveal>${stats}
+            </div>
+            <div class="stats__sources" data-reveal>
+              <p>${escapeHtml(sourceCopy.stats.source)}</p>
+              <p>${escapeHtml(sourceCopy.stats.gamblingSource)}</p>
+            </div>
           </div>
-        </div>
-      </section>
-    </main>
+        </section>
+${renderCrisisBand()}
+      </div>
 
-    <footer class="concept-footer">
-      <div class="concept-footer__bar page-frame">
-        <p class="concept-footer__line">${escapeHtml(sourceCopy.footer.line)}</p>
-        <nav class="concept-footer__support" aria-label="Crisis support">
-          <a href="tel:988">Call 9-8-8</a>
-          <a href="sms:988">Text 9-8-8</a>
-          <a href="https://www.canada.ca/en/public-health/services/mental-health-services/mental-health-get-help.html" target="_blank" rel="noopener noreferrer">Crisis resources</a>
-          <a href="tel:911">Call 9-1-1 for immediate danger</a>
+      <div class="screen screen--rooms">
+        <section class="rooms" aria-labelledby="rooms-title">
+          <div class="rooms__inner page-frame">
+            <header class="section-heading rooms__heading" data-reveal>
+              <p class="eyebrow eyebrow--wide">${escapeHtml(sourceCopy.rooms.eyebrow)}</p>
+              <h2 id="rooms-title" aria-label="${escapeHtml(sourceCopy.rooms.heading)}"><span aria-hidden="true">It looks like</span><span aria-hidden="true"><span class="marker-band">an ordinary week.</span></span></h2>
+            </header>
+            <div class="rooms__grid">${rooms}
+            </div>
+          </div>
+        </section>
+${renderCrisisBand()}
+      </div>
+
+      <div class="screen screen--corner">
+        <div class="corner-block">
+          <section class="meaning" aria-labelledby="meaning-title">
+            <div class="meaning__inner">
+              <div class="meaning__mark" aria-hidden="true">
+                <img src="assets/brand/corner-off-white.png" width="255" height="248" alt="">
+              </div>
+              <div class="meaning__copy" data-reveal>
+                <p class="eyebrow">${escapeHtml(sourceCopy.meaning.eyebrow)}</p>
+                <h2 id="meaning-title" aria-label="${escapeHtml(sourceCopy.meaning.heading)}"><span aria-hidden="true">Not a clinic. <span class="marker-band">A Corner.</span></span></h2>
+                <p class="meaning__body">${escapeHtml(sourceCopy.meaning.body)}</p>
+              </div>
+            </div>
+          </section>
+
+          <section class="roadmap" aria-labelledby="roadmap-title">
+            <div class="roadmap__inner page-frame">
+              <header class="section-heading roadmap__heading" data-reveal>
+                <p class="eyebrow">${escapeHtml(sourceCopy.roadmap.eyebrow)}</p>
+                <h2 id="roadmap-title">${escapeHtml(sourceCopy.roadmap.heading)}</h2>
+                <p class="roadmap__support">${escapeHtml(sourceCopy.roadmap.support)}</p>
+              </header>
+              <ol class="roadmap__list" data-reveal>${roadmap}
+              </ol>
+            </div>
+          </section>
+        </div>
+${renderCrisisBand()}
+      </div>
+
+      <div class="screen screen--join">
+        <section class="conversion" aria-labelledby="conversion-title">
+          <div class="conversion__inner page-frame">
+            <header class="section-heading conversion__heading" data-reveal>
+              <p class="eyebrow">${escapeHtml(sourceCopy.conversion.eyebrow)}</p>
+              <h2 id="conversion-title" aria-label="${escapeHtml(sourceCopy.conversion.heading)}"><span aria-hidden="true">Be <span class="marker-band">first</span> in</span><span aria-hidden="true">the corner.</span></h2>
+              <p class="conversion__body">${escapeHtml(sourceCopy.conversion.body)}</p>
+            </header>
+            <div class="conversion__forms">${renderMemberForm()}
+            </div>
+          </div>
+        </section>
+${renderCrisisBand()}
+      </div>
+    </main>
+${renderSignOff({ home: true })}
+  </body>
+</html>
+`;
+};
+
+export const renderPrivacyPage = () => {
+  const sections = privacyCopy.sections.map((section) => `
+          <section class="prose__section">
+            <h2>${escapeHtml(section.heading)}</h2>
+            <p>${escapeHtml(section.body)}</p>
+          </section>`).join("");
+
+  return `<!doctype html>
+<html lang="en-CA">
+  <head>
+${documentHead({ title: privacyCopy.title, description: privacyCopy.lead, canonicalStyles: false })}
+  </head>
+  <body class="concept-page concept-page--prose">
+    <a class="skip-link" href="#main">Skip to main content</a>
+
+    <header class="site-header">
+      <div class="site-header__inner page-frame">
+        <a class="site-header__brand" href="./" aria-label="${escapeHtml(sourceCopy.header.name)} home">
+          <img src="assets/brand/logo-horizontal-white.png" width="1655" height="170" alt="${escapeHtml(sourceCopy.header.name)}">
+        </a>
+        <nav class="site-header__actions" aria-label="Blue Corner access">
+          <a class="button button--ghost" href="./">${escapeHtml(privacyCopy.back)}</a>
         </nav>
       </div>
-      <img class="concept-footer__wordmark" src="assets/brand/logo-horizontal-blue.png" width="1655" height="170" alt="${escapeHtml(sourceCopy.footer.name)}">
-    </footer>
+    </header>
+
+    <main id="main" tabindex="-1">
+      <div class="screen screen--prose">
+        <section class="prose" aria-labelledby="privacy-title">
+          <div class="prose__inner page-frame">
+            <header class="section-heading" data-reveal>
+              <p class="eyebrow eyebrow--wide">${escapeHtml(privacyCopy.eyebrow)}</p>
+              <h1 id="privacy-title">${escapeHtml(privacyCopy.heading)}</h1>
+            </header>
+            <p class="prose__lead" data-reveal>${escapeHtml(privacyCopy.lead)}</p>
+            <div class="prose__body" data-reveal>${sections}
+            </div>
+          </div>
+        </section>
+${renderCrisisBand()}
+      </div>
+    </main>
+${renderSignOff({ home: false })}
   </body>
 </html>
 `;
