@@ -12,6 +12,11 @@ const strictImages = process.argv.includes("--strict-images");
 const approvedAssets = Object.freeze({
   "assets/styles/brand.css": "a80fc3111bf8b07398eb344d855e302a1e748678d6164c0f1999cee842cf25f6",
   "assets/art/blue-corner-reference-ring.webp": "22bbe8a535d1707c6d7724f9a2d71ea9f1ff8e924d50ea690d2a251062cd07f2",
+  "assets/art/blue-corner-reference-ring-human-v1.webp": "d93177bf051bf8a5ded782cb5acd8d99ad9cc2a22541397c9fec7c70c148b054",
+  "assets/art/room-01-unmade-bed.webp": "5d957222c538091e3c088b127baf8fcff60998240148523b53b20f46e78b6da2",
+  "assets/art/room-02-garage-tv-glow.webp": "b57140168b9de6b4d0b9f3ab49ca7729f1404feb791f15cb3732e90daaa63e01",
+  "assets/art/room-03-desk-at-dusk.webp": "5a856fb0c3e0dc5635137d5da4153d931c9e9ba27e4c30f300ae60d86b2751a3",
+  "assets/art/room-04-kitchen-table.webp": "39dc0bab9a8b11dd1f58d14cdd079067139ff33aa41f394b7ef712c9d3acd390",
 });
 
 const fail = (message) => failures.push(message);
@@ -97,13 +102,20 @@ if (count(home, 'class="eyebrow eyebrow--wide"') !== 2) fail("The statistics and
 const roomsGrid = home.match(/<div class="rooms__grid">([\s\S]*?)\n            <\/div>/)?.[1] ?? "";
 if (count(roomsGrid, '<article class="room"') !== 4
   || count(roomsGrid, "data-room-slot") !== 4
+  || count(roomsGrid, "<img ") !== 4
   || count(roomsGrid, "<h3>") !== 4) {
-  fail("Four rooms must render four scenes, each with a photo slot and a heading");
+  fail("Four rooms must render four scenes, each with a photograph and a heading");
 }
 for (const item of sourceCopy.rooms.items) {
-  if (!roomsGrid.includes(`<h3>${item.heading}</h3>`) || !roomsGrid.includes(`<p>${item.support}</p>`)) {
+  const image = `<img src="assets/art/${item.image}" width="${item.width}" height="${item.height}" alt="${item.alt.replaceAll("&", "&amp;").replaceAll('"', "&quot;")}" loading="lazy" decoding="async">`;
+  if (!roomsGrid.includes(image)
+    || !roomsGrid.includes(`<h3>${item.heading}</h3>`)
+    || !roomsGrid.includes(`<p>${item.support}</p>`)) {
     fail(`Four rooms is missing the approved copy for ${item.slot}`);
   }
+}
+if (/room__slot-(?:label|brief)/.test(home) || /data-room-slot[^>]*aria-hidden/.test(home)) {
+  fail("Delivered room photography must replace the commissioning-brief overlays and remain available to assistive technology");
 }
 for (const retired of ["Numbing out to get through it.", "Focus gone. Brain rot.", "No drive. No sleep.", "The people closest to him paying for it."]) {
   if (home.includes(retired)) fail(`Retired symptom copy must remain removed: ${retired}`);
@@ -201,8 +213,9 @@ if (count(home, `src="assets/art/${referenceHero.image}?v=${cacheKeys.hero}"`) !
   || count(home, `assets/art/${referenceHero.image}?v=${cacheKeys.hero}`) !== 2) {
   fail("Homepage must reference the approved hero from both the og:image and the img");
 }
-if (!home.includes(`alt="${referenceHero.alt}"`) || !/bright blue corner pad/.test(referenceHero.alt)) {
-  fail("Hero alt text must describe the brand-blue corner pad the recolour now produces");
+if (!home.includes(`width="${referenceHero.width}" height="${referenceHero.height}" alt="${referenceHero.alt.replaceAll("&", "&amp;").replaceAll('"', "&quot;")}" loading="eager" fetchpriority="high" decoding="async"`)
+  || !/HELP IS ON THE WAY/.test(referenceHero.alt)) {
+  fail("Hero must reserve its image geometry, load at high priority, and describe the ring-card message");
 }
 await checkLocalReferences(home, indexPath);
 await checkLocalReferences(privacy, privacyPath);
@@ -426,7 +439,8 @@ if (/\.stat__value\s*\{[^}]*text-decoration:\s*underline/.test(conceptCss)
 // ---------------------------------------------------------- rooms and cards
 if (!/\.rooms__grid\s*\{[^}]*grid-template-columns:\s*repeat\(4, minmax\(0, 1fr\)\);/.test(conceptCss)
   || !/\.room__copy\s*\{[^}]*background:\s*var\(--brand-navy\);/.test(conceptCss)
-  || !/\.room__copy h3\s*\{[^}]*color:\s*var\(--brand-yellow\);/.test(conceptCss)) {
+  || !/\.room__copy h3\s*\{[^}]*color:\s*var\(--brand-yellow\);/.test(conceptCss)
+  || !/\.room__slot img\s*\{[^}]*position:\s*absolute;[^}]*inset:\s*0;[^}]*inline-size:\s*100%;[^}]*block-size:\s*100%;[^}]*object-fit:\s*cover;/.test(conceptCss)) {
   fail("Four rooms must be a four-column grid of photo slots over navy caption blocks with yellow headings");
 }
 if (!/\.roadmap__list\s*\{[^}]*grid-template-columns:\s*repeat\(4, minmax\(0, 1fr\)\);/.test(conceptCss)

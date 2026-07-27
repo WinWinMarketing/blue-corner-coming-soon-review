@@ -166,9 +166,8 @@ export const renderHomePage = () => {
               </article>`).join("");
   const rooms = sourceCopy.rooms.items.map((item) => `
               <article class="room" data-reveal>
-                <div class="room__slot" data-room-slot aria-hidden="true">
-                  <span class="room__slot-label">${escapeHtml(item.slot)}</span>
-                  <span class="room__slot-brief">${item.brief.map(escapeHtml).join("<br>")}</span>
+                <div class="room__slot" data-room-slot>
+                  <img src="assets/art/${escapeHtml(item.image)}" width="${escapeHtml(item.width)}" height="${escapeHtml(item.height)}" alt="${escapeHtml(item.alt)}" loading="lazy" decoding="async">
                 </div>
                 <div class="room__copy">
                   <h3>${escapeHtml(item.heading)}</h3>
@@ -213,7 +212,7 @@ ${documentHead({
               <h1 id="hero-title" aria-label="Nobody Fights Alone."><span class="concept-hero__headline-line" aria-hidden="true">Nobody</span><span class="concept-hero__headline-line" aria-hidden="true">Fights <span class="concept-hero__accent concept-hero__underline">Alone.</span></span></h1>
             </div>
             <figure class="concept-hero__media image-frame" data-image-frame data-image-fallback-label="Blue Corner hero image">
-              <img class="concept-hero__image" src="assets/art/${escapeHtml(referenceHero.image)}?v=${cacheKeys.hero}" width="${escapeHtml(referenceHero.width)}" height="${escapeHtml(referenceHero.height)}" alt="${escapeHtml(referenceHero.alt)}" fetchpriority="high" data-fallback-image>
+              <img class="concept-hero__image" src="assets/art/${escapeHtml(referenceHero.image)}?v=${cacheKeys.hero}" width="${escapeHtml(referenceHero.width)}" height="${escapeHtml(referenceHero.height)}" alt="${escapeHtml(referenceHero.alt)}" loading="eager" fetchpriority="high" decoding="async" data-fallback-image>
             </figure>
             <p class="concept-hero__lead" data-reveal><span class="concept-hero__lead-line"><span class="concept-hero__underline">Three</span> in four suicides in Canada are men.</span> <span class="concept-hero__lead-line">${escapeHtml(sourceCopy.hero.leadSecond)}</span></p>
             <div class="concept-hero__details" data-reveal>
