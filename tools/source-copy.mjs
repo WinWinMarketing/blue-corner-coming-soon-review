@@ -1,14 +1,8 @@
 export const referenceHero = Object.freeze({
-  // Recoloured from blue-corner-reference-ring.webp by tools/recolor-hero.mjs.
-  // v4 carries the design-review change: the corner pad is --brand-blue, the
-  // same blue as the wordmark, instead of --brand-navy.
-  image: "blue-corner-reference-ring-brand-v4.webp",
-  width: 1774,
-  height: 887,
-  alt: "An empty boxing-ring corner with yellow ropes, a bright blue corner pad, a black wall, a gray floor, and a black stool.",
-  // Temporary lettered-chair fallback pending commissioned casting; this is
-  // not the final hero photograph.
-  temporaryCard: "HELP IS ON THE WAY",
+  image: "blue-corner-reference-ring-human-v1.webp",
+  width: 2400,
+  height: 1600,
+  alt: "A solemn man seated in a boxing-ring corner holds a sign reading “HELP IS ON THE WAY,” framed by yellow ropes and a blue corner pad.",
 });
 
 export const sourceCopy = Object.freeze({

@@ -14,7 +14,7 @@ const approvedAssets = Object.freeze({
   "assets/brand/archivo-latin.woff2": "7150c0ec5ad356453013d11affec1fbab95de0dd2dcecb043b4f1cb7f87c4ba4",
   "assets/brand/jetbrains-mono-latin-500.woff2": "615a7673d37b1dd624e2deeb572a1a238f9b32981bf3fc44f87aa14f3bd7d04b",
   "assets/art/blue-corner-reference-ring.webp": "22bbe8a535d1707c6d7724f9a2d71ea9f1ff8e924d50ea690d2a251062cd07f2",
-  "assets/art/blue-corner-reference-ring-brand-v4.webp": "5dde60e11165fe21e6e3f4e48e55b4b066fc3453ad38306f7af98c0075efa01f",
+  "assets/art/blue-corner-reference-ring-human-v1.webp": "d93177bf051bf8a5ded782cb5acd8d99ad9cc2a22541397c9fec7c70c148b054",
   "assets/art/room-01-unmade-bed-v2.webp": "62d313ff550ca7c07647c8ef41e9a9b23f9c58fec47aa5ab268c67629e27b399",
   "assets/art/room-02-garage-v2.webp": "84a3ab6f192a161909ce07281b38d9568298323b806de6d53dc29e967d329b89",
   "assets/art/room-03-desk-v2.webp": "8ac7a79a6516161f98b8bd89dbbf8ef130c9d302ec906166f31375f96adf71ec",
@@ -215,13 +215,12 @@ if (count(home, `src="assets/art/${referenceHero.image}?v=${cacheKeys.hero}"`) !
   || count(home, `assets/art/${referenceHero.image}?v=${cacheKeys.hero}`) !== 2) {
   fail("Homepage must reference the approved hero from both the og:image and the img");
 }
-const temporaryHeroOverlay = `<span class="concept-hero__temporary-card" aria-label="${referenceHero.temporaryCard}"><span aria-hidden="true">HELP</span><span aria-hidden="true">IS</span><span aria-hidden="true">ON</span><span aria-hidden="true">THE</span><span aria-hidden="true">WAY</span></span>`;
 if (!home.includes(`width="${referenceHero.width}" height="${referenceHero.height}" alt="${referenceHero.alt.replaceAll("&", "&amp;").replaceAll('"', "&quot;")}" loading="eager" fetchpriority="high" decoding="async"`)
-  || !home.includes(temporaryHeroOverlay)) {
-  fail("Hero must use the temporary lettered-chair fallback with its responsive DOM overlay");
+  || !/HELP IS ON THE WAY/.test(referenceHero.alt)) {
+  fail("Hero must reserve its image geometry, load at high priority, and describe the ring-card message");
 }
 for (const retiredAsset of [
-  "assets/art/blue-corner-reference-ring-human-v1.webp",
+  "assets/art/blue-corner-reference-ring-brand-v4.webp",
   "assets/art/room-01-unmade-bed.webp",
   "assets/art/room-02-garage-tv-glow.webp",
   "assets/art/room-03-desk-at-dusk.webp",

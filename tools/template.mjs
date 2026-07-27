@@ -36,19 +36,13 @@ const escapeHtml = (value) => String(value)
   .replaceAll('"', "&quot;")
   .replaceAll("'", "&#39;");
 
-const heroTemporaryCardCss = ".concept-hero__temporary-card{position:absolute;z-index:1;inset-inline-start:72.2%;inset-block-start:42%;transform:translate(-50%,-50%);inline-size:13%;color:#000;font-family:var(--font-brand);font-size:clamp(.625rem,1.4vw,1.25rem);font-weight:var(--font-weight-bold);line-height:.9;letter-spacing:.02em;text-align:center;text-transform:uppercase;pointer-events:none}.concept-hero__temporary-card>span{display:block;white-space:nowrap}@media (max-width:48rem){.concept-hero__temporary-card{inset-inline-start:77.5%}}";
-const heroTemporaryCardCspHash = createHash("sha256").update(heroTemporaryCardCss).digest("base64");
 const CSP = "default-src 'self'; script-src 'self'; style-src 'self' https://use.typekit.net; img-src 'self' data:; font-src 'self' https://use.typekit.net; connect-src 'none'; form-action 'none'; object-src 'none'; base-uri 'none'; media-src 'none'; worker-src 'none'; upgrade-insecure-requests";
-const HERO_TEMPORARY_CARD_CSP = `${CSP}; style-src-elem 'self' 'sha256-${heroTemporaryCardCspHash}' https://use.typekit.net`;
 
-const documentHead = ({ title, description, canonicalStyles = true, heroTemporaryCard = false }) => {
-  const csp = heroTemporaryCard ? HERO_TEMPORARY_CARD_CSP : CSP;
-  const temporaryCardStyle = heroTemporaryCard ? `\n    <style>${heroTemporaryCardCss}</style>` : "";
-  return `    <meta charset="utf-8">
+const documentHead = ({ title, description, canonicalStyles = true }) => `    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="robots" content="noindex, nofollow, noarchive">
     <meta name="referrer" content="no-referrer">
-    <meta http-equiv="Content-Security-Policy" content="${csp}">
+    <meta http-equiv="Content-Security-Policy" content="${CSP}">
     <title>${escapeHtml(title)}</title>
     <meta name="description" content="${escapeHtml(description)}">
     <meta name="theme-color" content="#197CE3">${canonicalStyles ? `
@@ -61,9 +55,8 @@ const documentHead = ({ title, description, canonicalStyles = true, heroTemporar
     <link rel="stylesheet" href="https://use.typekit.net/ciy6txz.css">
     <link rel="stylesheet" href="assets/styles/brand.css">
     <link rel="stylesheet" href="assets/styles/shared.css?v=${cacheKeys.sharedCss}">
-    <link rel="stylesheet" href="assets/styles/concept-base.css?v=${cacheKeys.conceptCss}">${temporaryCardStyle}
+    <link rel="stylesheet" href="assets/styles/concept-base.css?v=${cacheKeys.conceptCss}">
     <script src="assets/scripts/shared.js?v=${cacheKeys.sharedScript}" defer></script>`;
-};
 
 /* The navy crisis band closes every screen. The numbers are the single most
    important thing on the page, so they are large yellow tap targets rather than
@@ -193,7 +186,6 @@ export const renderHomePage = () => {
 ${documentHead({
     title: "The Blue Corner — Nobody Fights Alone.",
     description: `${sourceCopy.hero.heading} A Canadian men's mental-health coming-soon concept.`,
-    heroTemporaryCard: true,
   })}
   </head>
   <body class="concept-page">
@@ -221,7 +213,6 @@ ${documentHead({
             </div>
             <figure class="concept-hero__media image-frame" data-image-frame data-image-fallback-label="Blue Corner hero image">
               <img class="concept-hero__image" src="assets/art/${escapeHtml(referenceHero.image)}?v=${cacheKeys.hero}" width="${escapeHtml(referenceHero.width)}" height="${escapeHtml(referenceHero.height)}" alt="${escapeHtml(referenceHero.alt)}" loading="eager" fetchpriority="high" decoding="async" data-fallback-image>
-              <span class="concept-hero__temporary-card" aria-label="${escapeHtml(referenceHero.temporaryCard)}"><span aria-hidden="true">HELP</span><span aria-hidden="true">IS</span><span aria-hidden="true">ON</span><span aria-hidden="true">THE</span><span aria-hidden="true">WAY</span></span>
             </figure>
             <p class="concept-hero__lead" data-reveal><span class="concept-hero__lead-line"><span class="concept-hero__underline">Three</span> in four suicides in Canada are men.</span> <span class="concept-hero__lead-line">${escapeHtml(sourceCopy.hero.leadSecond)}</span></p>
             <div class="concept-hero__details" data-reveal>
