@@ -508,6 +508,7 @@ const mobileContractCss = mobileContractStart >= 0 && mobileContractEnd > mobile
   ? conceptCss.slice(mobileContractStart, mobileContractEnd)
   : "";
 const desktopFeedbackContracts = [
+  ["reviewed screens auto-height", /\.screen--rooms,\s*\.screen--corner,\s*\.screen--join\s*\{[^}]*min-block-size:\s*0;/],
   ["rooms field", /\.rooms,\s*\.roadmap\s*\{[^}]*background:\s*#eef3fb;/],
   ["rooms padding", /\.rooms__inner\s*\{[^}]*padding:\s*3\.5rem 3rem 3\.75rem;/],
   ["rooms heading rhythm", /\.rooms__heading\s*\{[^}]*gap:\s*1\.375rem;/],
