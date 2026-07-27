@@ -173,9 +173,8 @@ export const renderHomePage = () => {
               </article>`).join("");
   const rooms = sourceCopy.rooms.items.map((item) => `
               <article class="room" data-reveal>
-                <div class="room__slot" data-room-slot aria-hidden="true">
-                  <span class="room__slot-label">${escapeHtml(item.slot)}</span>
-                  <span class="room__slot-brief">${item.brief.map(escapeHtml).join("<br>")}</span>
+                <div class="room__slot" data-room-slot>
+                  <img src="assets/art/${escapeHtml(item.image)}" width="${escapeHtml(item.width)}" height="${escapeHtml(item.height)}" alt="${escapeHtml(item.alt)}" loading="lazy" decoding="async">
                 </div>
                 <div class="room__copy">
                   <h3>${escapeHtml(item.heading)}</h3>

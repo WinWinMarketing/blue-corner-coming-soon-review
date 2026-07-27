@@ -11,8 +11,14 @@ const failures = [];
 const strictImages = process.argv.includes("--strict-images");
 const approvedAssets = Object.freeze({
   "assets/styles/brand.css": "a80fc3111bf8b07398eb344d855e302a1e748678d6164c0f1999cee842cf25f6",
+  "assets/brand/archivo-latin.woff2": "7150c0ec5ad356453013d11affec1fbab95de0dd2dcecb043b4f1cb7f87c4ba4",
+  "assets/brand/jetbrains-mono-latin-500.woff2": "615a7673d37b1dd624e2deeb572a1a238f9b32981bf3fc44f87aa14f3bd7d04b",
   "assets/art/blue-corner-reference-ring.webp": "22bbe8a535d1707c6d7724f9a2d71ea9f1ff8e924d50ea690d2a251062cd07f2",
   "assets/art/blue-corner-reference-ring-brand-v4.webp": "5dde60e11165fe21e6e3f4e48e55b4b066fc3453ad38306f7af98c0075efa01f",
+  "assets/art/room-01-unmade-bed-v2.webp": "62d313ff550ca7c07647c8ef41e9a9b23f9c58fec47aa5ab268c67629e27b399",
+  "assets/art/room-02-garage-v2.webp": "84a3ab6f192a161909ce07281b38d9568298323b806de6d53dc29e967d329b89",
+  "assets/art/room-03-desk-v2.webp": "8ac7a79a6516161f98b8bd89dbbf8ef130c9d302ec906166f31375f96adf71ec",
+  "assets/art/room-04-kitchen-v2.webp": "9f3e5a5581b8e8c1e60ade60435bd481a092045fa477937de9fc0b55605a62d0",
 });
 
 const fail = (message) => failures.push(message);
@@ -98,19 +104,20 @@ if (count(home, 'class="eyebrow eyebrow--wide"') !== 2) fail("The statistics and
 const roomsGrid = home.match(/<div class="rooms__grid">([\s\S]*?)\n            <\/div>/)?.[1] ?? "";
 if (count(roomsGrid, '<article class="room"') !== 4
   || count(roomsGrid, "data-room-slot") !== 4
+  || count(roomsGrid, "<img ") !== 4
   || count(roomsGrid, "<h3>") !== 4) {
-  fail("Four rooms must render four scenes, each with a photo slot and a heading");
+  fail("Four rooms must render four scenes, each with a photograph and a heading");
 }
 for (const item of sourceCopy.rooms.items) {
-  if (!roomsGrid.includes(`<span class="room__slot-label">${item.slot}</span>`)
-    || !roomsGrid.includes(`<span class="room__slot-brief">${item.brief.join("<br>")}</span>`)
+  const image = `<img src="assets/art/${item.image}" width="${item.width}" height="${item.height}" alt="${item.alt.replaceAll("&", "&amp;").replaceAll('"', "&quot;")}" loading="lazy" decoding="async">`;
+  if (!roomsGrid.includes(image)
     || !roomsGrid.includes(`<h3>${item.heading}</h3>`)
     || !roomsGrid.includes(`<p>${item.support}</p>`)) {
     fail(`Four rooms is missing the approved copy for ${item.slot}`);
   }
 }
-if (/<div class="room__slot"[^>]*>\s*<img\b/.test(roomsGrid) || /room-(?:0[1-4])-[\w-]+\.webp/.test(home)) {
-  fail("Four rooms must remain commissioning placeholders until approved photography is delivered");
+if (/room__slot-(?:label|brief)/.test(home) || /data-room-slot[^>]*aria-hidden/.test(home)) {
+  fail("Delivered room photography must replace the commissioning-brief overlays and remain available to assistive technology");
 }
 for (const retired of ["Numbing out to get through it.", "Focus gone. Brain rot.", "No drive. No sleep.", "The people closest to him paying for it."]) {
   if (home.includes(retired)) fail(`Retired symptom copy must remain removed: ${retired}`);
@@ -316,6 +323,32 @@ if (/transition(?:-property)?:[^;]*(?:background|color|border|inline-size|block-
 if (!/--font-brand:\s*"proxima-nova-condensed"/.test(brandCss) || !/--font-weight-regular:\s*400;/.test(brandCss) || !/--font-weight-semibold:\s*700;/.test(brandCss) || !/--font-size-support:\s*1\.25rem;/.test(brandCss)) {
   fail("Brand typography must lead with Proxima Nova Condensed and use 400/700 weights");
 }
+const fontFaceBlocks = [...conceptCss.matchAll(/@font-face\s*\{([^}]*)\}/g)].map(([, block]) => block);
+const archivoFamilyUses = [...conceptCss.matchAll(/font-family:\s*(?:"Archivo"|'Archivo'|Archivo)(?=\s*[,;])/g)].length;
+const jetBrainsFamilyUses = [...conceptCss.matchAll(/font-family:\s*(?:"JetBrains Mono"|'JetBrains Mono'|JetBrains Mono)(?=\s*[,;])/g)].length;
+const hasLocalFontFace = (family, weight, fileName) => fontFaceBlocks.some((block) =>
+  block.includes(`font-family: "${family}";`)
+  && block.includes("font-style: normal;")
+  && block.includes(`font-weight: ${weight};`)
+  && block.includes("font-display: swap;")
+  && block.includes(`src: url("../brand/${fileName}") format("woff2");`));
+for (const [family, weight, fileName] of [
+  ["Archivo", 400, "archivo-latin.woff2"],
+  ["Archivo", 500, "archivo-latin.woff2"],
+  ["Archivo", 600, "archivo-latin.woff2"],
+  ["Archivo", 700, "archivo-latin.woff2"],
+  ["JetBrains Mono", 500, "jetbrains-mono-latin-500.woff2"],
+]) {
+  if (!hasLocalFontFace(family, weight, fileName)) {
+    fail(`Local font contract is missing ${family} ${weight} from ${fileName}`);
+  }
+}
+if (!/\.rooms,\s*\.meaning,\s*\.roadmap,\s*\.conversion\s*\{[^}]*font-family:\s*"Archivo", Helvetica, Arial, sans-serif;/.test(conceptCss)
+  || archivoFamilyUses !== 5
+  || !/\.roadmap-item__status\s*\{[^}]*font-family:\s*"JetBrains Mono", monospace;/.test(conceptCss)
+  || jetBrainsFamilyUses !== 2) {
+  fail("Local feedback fonts must remain scoped to the reviewed sections and roadmap status labels");
+}
 for (const typographyRule of ["font-kerning: normal", "text-rendering: optimizeLegibility", 'font-feature-settings: "kern" 1, "liga" 1, "clig" 1']) {
   if (!sharedCss.includes(typographyRule)) fail(`Shared typography is missing ${typographyRule}`);
 }
@@ -455,24 +488,85 @@ if (!/\.roadmap__list\s*\{[^}]*grid-template-columns:\s*repeat\(4, minmax\(0, 1f
 }
 
 // ------------------------------------------------------------- conversion UI
-if (!/@media \(min-width: 64\.0625rem\)\s*\{\s*\.conversion__heading h2\s*\{[^}]*font-size:\s*clamp\(4rem, min\(8\.4vw, 17svh\), 11rem\);/.test(conceptCss)) {
+if (!/@media \(min-width: 64\.0625rem\)\s*\{\s*\.conversion__heading h2\s*\{[^}]*font-size:\s*3\.5rem;/.test(conceptCss)) {
   fail("Desktop conversion headline must use the locked display scale");
 }
 if (!/\.conversion__body\s*\{[^}]*max-inline-size:\s*38ch;[^}]*font-size:\s*1\.5rem;/.test(conceptCss)) {
   fail("Sign-up sub-copy must hold the 24px large-text threshold on a short measure");
 }
-if (!/@media \(min-width: 82\.0625rem\)\s*\{[\s\S]*?\.conversion__inner\s*\{[^}]*grid-template-columns:\s*minmax\(0, 1fr\) minmax\(0, 45rem\);/.test(conceptCss)
-  || !/\.conversion__forms\s*\{[^}]*max-inline-size:\s*45rem;/.test(conceptCss)
-  || !/\.conversion__forms\s*\{[^}]*align-self:\s*start;/.test(conceptCss)
-  || !/\.conversion-path\s*\{[^}]*align-self:\s*start;[^}]*padding:\s*clamp\([^)]*svh[^)]*\) clamp\(1\.5rem, 2vw, 1\.75rem\);/.test(conceptCss)) {
-  fail("Conversion card must self-start, keep the responsive 45rem track, and scale its rhythm with svh");
+const lateDesktopStart = conceptCss.lastIndexOf("@media (min-width: 64.0625rem)");
+const mobileContractStart = conceptCss.indexOf("@media (max-width: 64rem)", lateDesktopStart + 1);
+const lateDesktopCss = lateDesktopStart >= 0 && mobileContractStart > lateDesktopStart
+  ? conceptCss.slice(lateDesktopStart, mobileContractStart)
+  : "";
+const wideDesktopStart = conceptCss.indexOf("@media (min-width: 82.0625rem)");
+const wideDesktopCss = wideDesktopStart >= 0 && lateDesktopStart > wideDesktopStart
+  ? conceptCss.slice(wideDesktopStart, lateDesktopStart)
+  : "";
+const mobileContractEnd = conceptCss.indexOf("@media (max-width: 48rem)", mobileContractStart + 1);
+const mobileContractCss = mobileContractStart >= 0 && mobileContractEnd > mobileContractStart
+  ? conceptCss.slice(mobileContractStart, mobileContractEnd)
+  : "";
+const desktopFeedbackContracts = [
+  ["rooms field", /\.rooms,\s*\.roadmap\s*\{[^}]*background:\s*#eef3fb;/],
+  ["rooms padding", /\.rooms__inner\s*\{[^}]*padding:\s*3\.5rem 3rem 3\.75rem;/],
+  ["rooms heading rhythm", /\.rooms__heading\s*\{[^}]*gap:\s*1\.375rem;/],
+  ["rooms kicker", /\.rooms__heading \.eyebrow\s*\{[^}]*padding:\s*0\.625rem 1\.125rem;[^}]*font-size:\s*1\.1875rem;[^}]*font-weight:\s*700;[^}]*letter-spacing:\s*0\.14em;/],
+  ["rooms heading", /\.rooms__heading h2\s*\{[^}]*max-inline-size:\s*20ch;[^}]*font-size:\s*4\.5rem;[^}]*font-weight:\s*800;[^}]*line-height:\s*0\.98;/],
+  ["rooms grid", /\.rooms__grid\s*\{[^}]*grid-template-columns:\s*repeat\(4, minmax\(0, 1fr\)\);[^}]*gap:\s*1\.25rem;[^}]*margin-block-start:\s*2\.75rem;/],
+  ["rooms portrait slots", /\.room__slot\s*\{[^}]*aspect-ratio:\s*3 \/ 4;/],
+  ["rooms copy panel", /\.room__copy\s*\{[^}]*gap:\s*0\.5rem;[^}]*padding:\s*1\.125rem 1\.125rem 1\.375rem;[^}]*background:\s*#0d2b6b;/],
+  ["rooms title", /\.room__copy h3\s*\{[^}]*color:\s*#f5c518;[^}]*font-size:\s*1\.5rem;/],
+  ["rooms support", /\.room__copy p\s*\{[^}]*color:\s*#c6d5f2;[^}]*font-size:\s*0\.875rem;/],
+  ["meaning field", /\.meaning\s*\{[^}]*background:\s*#1273e0;/],
+  ["meaning rail", /\.meaning__inner\s*\{[^}]*grid-template-columns:\s*11\.875rem minmax\(0, 1fr\);/],
+  ["meaning divider", /\.meaning__mark\s*\{[^}]*border-inline-end:\s*0\.25rem solid #f5c518;[^}]*background:\s*#0d2b6b;/],
+  ["meaning corner mark", /\.meaning__mark::before\s*\{[^}]*inline-size:\s*4rem;[^}]*block-size:\s*4rem;[^}]*border-block-start:\s*1\.25rem solid #eef3fb;[^}]*border-inline-end:\s*1\.25rem solid #eef3fb;/],
+  ["meaning content", /\.meaning__copy\s*\{[^}]*gap:\s*1\.25rem;[^}]*padding:\s*3\.25rem 3\.5rem 3\.5rem;/],
+  ["meaning heading", /\.meaning h2\s*\{[^}]*font-size:\s*3\.875rem;/],
+  ["meaning body", /\.meaning__body\s*\{[^}]*max-inline-size:\s*46ch;[^}]*color:\s*#dce9fb;[^}]*font-size:\s*1\.375rem;[^}]*text-wrap:\s*pretty;[^}]*white-space:\s*normal;/],
+  ["roadmap padding", /\.roadmap__inner\s*\{[^}]*gap:\s*1\.375rem;[^}]*padding:\s*3\.5rem 3\.5rem 3\.75rem;/],
+  ["roadmap heading", /\.roadmap__heading h2\s*\{[^}]*font-size:\s*3\.875rem;/],
+  ["roadmap support", /\.roadmap__support\s*\{[^}]*color:\s*#31508f;[^}]*font-size:\s*1\.25rem;/],
+  ["roadmap grid", /\.roadmap__list\s*\{[^}]*grid-template-columns:\s*repeat\(4, minmax\(0, 1fr\)\);[^}]*gap:\s*0\.875rem;[^}]*margin-block-start:\s*0\.875rem;/],
+  ["roadmap cards", /\.roadmap-item\s*\{[^}]*gap:\s*0\.625rem;[^}]*padding:\s*1\.375rem 1\.375rem 1\.5rem;/],
+  ["roadmap live palette", /\.roadmap-item--current\s*\{[^}]*background:\s*#0d2b6b;[^}]*color:\s*#fff;/],
+  ["roadmap future palette", /\.roadmap-item--future\s*\{[^}]*background:\s*#dbe4f4;[^}]*color:\s*#31508f;/],
+  ["roadmap status", /\.roadmap-item__status\s*\{[^}]*font-size:\s*0\.6875rem;/],
+  ["roadmap name", /\.roadmap-item__name\s*\{[^}]*font-size:\s*1\.75rem;/],
+  ["signup field", /\.conversion\s*\{[^}]*background:\s*#1273e0;/],
+  ["signup grid", /\.conversion__inner\s*\{[^}]*grid-template-columns:\s*minmax\(0, 1\.15fr\) minmax\(0, 1fr\);[^}]*gap:\s*3rem;[^}]*padding:\s*3\.5rem 3\.5rem 3\.75rem;/],
+  ["signup heading rhythm", /\.conversion__heading\s*\{[^}]*gap:\s*1\.625rem;/],
+  ["signup heading", /\.conversion__heading h2\s*\{[^}]*font-size:\s*3\.5rem;/],
+  ["signup body", /\.conversion__body\s*\{[^}]*max-inline-size:\s*38ch;[^}]*font-size:\s*1\.3125rem;/],
+  ["signup panel", /\.conversion-path\s*\{[^}]*gap:\s*1\.375rem;[^}]*padding:\s*2\.125rem 2\.125rem 2\.375rem;[^}]*background:\s*#eef3fb;/],
+  ["signup signal border", /\.conversion-path--member\s*\{[^}]*border-block-start:\s*0\.5rem solid #f5c518;/],
+  ["signup title", /\.conversion-path h3\s*\{[^}]*font-size:\s*2\.125rem;/],
+  ["signup notice", /\.prototype-disclosure\s*\{[^}]*padding:\s*0\.75rem 0\.875rem;[^}]*border:\s*1px solid #c3d3ec;[^}]*background:\s*#dce9fb;[^}]*font-size:\s*0\.875rem;/],
+  ["signup choices", /\.prototype-role__choices\s*\{[^}]*gap:\s*0\.75rem;/],
+  ["signup field grid", /\.conversion \.field-grid\s*\{[^}]*grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\);[^}]*column-gap:\s*0\.875rem;/],
+  ["signup field rhythm", /\.conversion \.field\s*\{[^}]*gap:\s*0\.5rem;/],
+  ["signup controls", /\.conversion \.field input\s*\{[^}]*padding:\s*0\.875rem 1rem;[^}]*font-size:\s*1rem;/],
+  ["signup CTA", /\.conversion-path \.button--signal\s*\{[^}]*padding:\s*1\.125rem;[^}]*font-size:\s*1\.1875rem;/],
+  ["signup privacy", /\.conversion-path__note\s*\{[^}]*font-size:\s*0\.875rem;/],
+];
+const missingDesktopFeedback = desktopFeedbackContracts
+  .filter(([, contract]) => !contract.test(lateDesktopCss))
+  .map(([name]) => name);
+const missingFeedbackScopes = [
+  ...(!lateDesktopCss ? ["desktop ≥64.0625rem scope"] : []),
+  ...(!/\.rooms__grid\s*\{[^}]*grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\);/.test(mobileContractCss)
+    ? ["mobile ≤64rem scope"]
+    : []),
+  ...(/\.conversion(?:__inner|__forms|-path)\b/.test(wideDesktopCss)
+    ? ["desktop contract isolated from the ≥82.0625rem hero scope"]
+    : []),
+];
+if (missingDesktopFeedback.length || missingFeedbackScopes.length) {
+  fail(`Final desktop feedback contract is incomplete: ${[...missingDesktopFeedback, ...missingFeedbackScopes].join(", ")}`);
 }
-// The card is the tallest element on the sign-up screen. Fixed rem spacing made
-// it rigid at every window height and overflowed the screen by 113px at 830px.
-if (!/\.conversion \.prototype-form,\s*\.conversion \.prototype-form fieldset\s*\{[^}]*gap:\s*clamp\([^)]*svh[^)]*\);/.test(conceptCss)
-  || !/\.conversion \.field-grid\s*\{[^}]*gap:\s*clamp\([^)]*svh[^)]*\);/.test(conceptCss)
-  || !/\.conversion__inner\s*\{[^}]*padding-block:\s*clamp\([^)]*svh[^)]*\);/.test(conceptCss)) {
-  fail("Sign-up card spacing must scale continuously with svh, not sit at a fixed rem height");
+if (!/@media \(max-width: 20rem\)\s*\{\s*\.rooms h2\s*\{[^}]*letter-spacing:\s*-0\.04em;/.test(conceptCss)) {
+  fail("The 320px rooms heading must retain its narrow-screen tracking correction");
 }
 // Reserved, not collapsed: an empty slot that disappears shifts the submit
 // button under the cursor exactly when a user is correcting a field.
@@ -484,7 +578,7 @@ if (!/\.field input\s*\{[^}]*min-block-size:\s*2\.75rem;/.test(sharedCss)
   fail("Inputs must hold the 44px floor and grow on coarse pointers");
 }
 if (!/\.prototype-disclosure\s*\{[^}]*padding:\s*0\.375rem var\(--space-sm\);[^}]*border:\s*1px solid color-mix\([^;]+\);[^}]*background:\s*color-mix\(in oklch, var\(--brand-yellow\) 9%, var\(--brand-off-white\)\);[^}]*font-size:\s*var\(--font-size-support\);[^}]*font-weight:\s*var\(--font-weight-regular\);/.test(conceptCss)
-  || /\.prototype-disclosure\s*\{[^}]*(?:opacity:\s*0|font-size:\s*(?:0\.|[1-9][0-9]?px))/.test(conceptCss)
+  || /\.prototype-disclosure\s*\{[^}]*(?:opacity:\s*0\s*;|font-size:\s*(?:0(?:rem|em|px)?|(?:[1-9]|1[0-3])(?:\.\d+)?px)\s*;)/.test(conceptCss)
   || /\.prototype-role__choice:has\(input:checked\)\s*\{[^}]*border-width/.test(conceptCss)
   || !/\.prototype-role__choice:has\(input:checked\)\s*\{[^}]*outline:\s*2px solid var\(--brand-navy\);/.test(conceptCss)) {
   fail("Prototype disclosure and checked radios must be quieter without reduced legibility or layout-shifting borders");
