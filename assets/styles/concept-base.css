@@ -1145,6 +1145,12 @@
 }
 
 @media (min-width: 64.0625rem) {
+  .screen--rooms,
+  .screen--corner,
+  .screen--join {
+    min-block-size: 0;
+  }
+
   .rooms,
   .roadmap {
     background: #eef3fb;
