@@ -145,26 +145,34 @@ if (count(home, "roadmap-item--current") !== 1
 if (home.includes("IV Wellness")) fail("Nutrition and IV Wellness must stay collapsed into one item");
 
 // ------------------------------------------------------------------ page 6
-if (!home.includes('<span aria-hidden="true">Be <span class="marker-band">first</span> in</span><span aria-hidden="true">the corner.</span>')) {
-  fail("Sign-up headline must be the approved two-line lock with first highlighted");
+if (!home.includes('<h2 id="conversion-title" aria-label="Be first in the corner.">Be <span class="marker-band">first</span> in the corner.</h2>')) {
+  fail("Sign-up headline must be the approved single inline sentence with first highlighted");
 }
 if (home.includes("Be one of") || home.includes(">For men<")) fail("The retired nine-word headline and the FOR MEN eyebrow must remain removed");
 if (!home.includes(`<p class="conversion__body">${sourceCopy.conversion.body}</p>`) || /conversion__body-line/.test(home)) {
   fail("Sign-up sub-copy must be one line, not the retired two");
 }
 if (count(home, "data-prototype-form") !== 1 || /<form\b[^>]*\baction=/i.test(home)) fail("Root must retain one local-only form without an action");
-if (count(home, 'name="role" type="radio"') !== 2 || !home.includes("<legend>I'm joining as</legend>")) fail("Root form must retain exactly two named role radios");
+const roleInputs = [...home.matchAll(/<input\b(?=[^>]*\bname="role"(?=[\s>]))(?=[^>]*\btype="radio"(?=[\s>]))[^>]*>/gi)]
+  .map(([input]) => input);
+if (roleInputs.length !== 2 || !home.includes("<legend>I'm joining as</legend>")) fail("Root form must retain exactly two named role radios");
 for (const role of ["Patient", "Therapist"]) {
-  if (!home.includes(`value="${role}"`) || !home.includes(`>${role}</span>`)) fail(`Root role choice is missing ${role}`);
+  const input = roleInputs.find((candidate) => candidate.includes(`value="${role}"`)) ?? "";
+  if (!input || !home.includes(`>${role}</span>`)) fail(`Root role choice is missing ${role}`);
+  if (!/\srequired(?:\s|=|\/?>)/i.test(input) || !/\saria-describedby="member-role-error"(?:\s|\/?>)/i.test(input)) {
+    fail(`Root ${role} role choice must retain required accessible validation`);
+  }
+  if (/\schecked(?:\s|=|\/?>)/i.test(input)) fail(`Root ${role} role choice must not be checked by default`);
 }
-if (!/name="role"[^>]*required[^>]*aria-describedby="member-role-error"/.test(home) || count(home, "data-role-error") !== 1) {
+if (count(home, "data-role-error") !== 1) {
   fail("Root role selector must have the local accessible validation contract");
 }
 
 // ------------------------------------------------------------------ page 7
-// The band repeats once per screen; the light sign-off row runs only at the end.
+// One global support route follows the landing-page content; the light sign-off
+// row runs only after it.
 const crisisBandCount = count(home, '<aside class="crisis-band" aria-label="Crisis support">');
-if (crisisBandCount !== 5) fail(`The navy crisis band must close all five screens; found ${crisisBandCount}`);
+if (crisisBandCount !== 1) fail(`The landing page must have exactly one global crisis band; found ${crisisBandCount}`);
 if (count(privacy, '<aside class="crisis-band" aria-label="Crisis support">') !== 1) fail("The privacy page must also close on the crisis band");
 for (const action of ['<a class="crisis-action crisis-action--signal" href="tel:988">Call 9-8-8</a>',
   '<a class="crisis-action crisis-action--signal" href="sms:988">Text 9-8-8</a>',
@@ -172,7 +180,10 @@ for (const action of ['<a class="crisis-action crisis-action--signal" href="tel:
   if (count(home, action) !== crisisBandCount) fail(`Every crisis band must carry the same tap target: ${action}`);
 }
 if (count(home, sourceCopy.crisis.note) !== crisisBandCount || !home.includes("Suicide Crisis Helpline")) {
-  fail("Every crisis band must name the helpline so nobody has to guess who answers");
+  fail("The global crisis band must name the helpline so nobody has to guess who answers");
+}
+if (!/<\/main>\s*<aside class="crisis-band" aria-label="Crisis support">[\s\S]*?<footer class="concept-footer"/.test(home)) {
+  fail("The global crisis band must sit immediately after main and before the light sign-off footer");
 }
 if (count(home, 'class="concept-footer__signoff page-frame"') !== 1) fail("The light sign-off row must appear exactly once, at the end");
 if (/concept-footer__wordmark/.test(home) || /concept-footer__support/.test(home)) {
@@ -403,10 +414,10 @@ if (!/--page-max:\s*100%;/.test(brandCss)) {
   fail("Sections must run full bleed; the retired 96rem page cap left them narrow on wide screens");
 }
 
-// ------------------------------------------------- crisis band, every screen
+// ------------------------------------------------------ crisis band, global
 if (/\.crisis-band\s*\{[^}]*position:\s*fixed/.test(`${conceptCss}\n${sharedCss}`)
   || /\.crisis-band[^{]*\{[^}]*(?:display:\s*none|visibility:\s*hidden|opacity:\s*0)/.test(`${conceptCss}\n${sharedCss}`)) {
-  fail("Crisis support must be permanent, visible, in-flow content on every screen — never a fixed or hidden overlay");
+  fail("Crisis support must be permanent, visible, in-flow global content after main — never a fixed or hidden overlay");
 }
 if (!/\.crisis-band\s*\{[^}]*background:\s*var\(--brand-navy\);/.test(conceptCss)
   || !/\.crisis-action\s*\{[^}]*min-block-size:\s*2\.75rem;/.test(conceptCss)
@@ -430,11 +441,6 @@ if (!/@media \(min-width: 64\.0625rem\)[\s\S]*?\.screen\s*\{[^}]*min-block-size:
   || !/@media \(min-width: 64\.0625rem\)[\s\S]*?\.screen--hero\s*\{[^}]*min-block-size:\s*calc\(100svh - var\(--header-h\)\);/.test(conceptCss)
   || !/--header-h:\s*clamp\(5\.5rem, 7vw, 6rem\);/.test(conceptCss)) {
   fail("Every block must fill exactly one desktop viewport, with the masthead subtracted from the hero screen");
-}
-// The crisis band is auto-height and the content row takes the slack, so adding
-// the band shrinks the section rather than pushing the screen past the fold.
-if (!/\.screen\s*\{[^}]*display:\s*grid;[^}]*grid-template-rows:\s*minmax\(0, 1fr\) auto;/.test(conceptCss)) {
-  fail("Each screen must give its content the flexible row and the crisis band the auto row");
 }
 if (/scroll-snap/.test(`${conceptCss}\n${sharedCss}\n${brandCss}`)) {
   fail("Scroll snapping must stay off; scrolling is never locked to a block");
@@ -518,22 +524,24 @@ const desktopFeedbackContracts = [
   ["rooms copy panel", /\.room__copy\s*\{[^}]*gap:\s*0\.5rem;[^}]*padding:\s*1\.125rem 1\.125rem 1\.375rem;[^}]*background:\s*#0d2b6b;/],
   ["rooms title", /\.room__copy h3\s*\{[^}]*color:\s*#f5c518;[^}]*font-size:\s*1\.5rem;/],
   ["rooms support", /\.room__copy p\s*\{[^}]*color:\s*#c6d5f2;[^}]*font-size:\s*0\.875rem;/],
-  ["meaning field", /\.meaning\s*\{[^}]*background:\s*#1273e0;/],
+  ["meaning field", /\.meaning\s*\{[^}]*min-block-size:\s*auto;[^}]*background:\s*#1273e0;/],
   ["meaning rail", /\.meaning__inner\s*\{[^}]*grid-template-columns:\s*11\.875rem minmax\(0, 1fr\);/],
   ["meaning divider", /\.meaning__mark\s*\{[^}]*border-inline-end:\s*0\.25rem solid #f5c518;[^}]*background:\s*#0d2b6b;/],
   ["meaning corner mark", /\.meaning__mark::before\s*\{[^}]*inline-size:\s*4rem;[^}]*block-size:\s*4rem;[^}]*border-block-start:\s*1\.25rem solid #eef3fb;[^}]*border-inline-end:\s*1\.25rem solid #eef3fb;/],
   ["meaning content", /\.meaning__copy\s*\{[^}]*gap:\s*1\.25rem;[^}]*padding:\s*3\.25rem 3\.5rem 3\.5rem;/],
   ["meaning heading", /\.meaning h2\s*\{[^}]*font-size:\s*3\.875rem;/],
+  ["meaning final marker clearance reset", /\.meaning h2:has\(> span:last-child > \.marker-band:last-child\)\s*\{[^}]*padding-block-end:\s*0;/],
   ["meaning body", /\.meaning__body\s*\{[^}]*max-inline-size:\s*46ch;[^}]*color:\s*#dce9fb;[^}]*font-size:\s*1\.375rem;[^}]*text-wrap:\s*pretty;[^}]*white-space:\s*normal;/],
   ["roadmap padding", /\.roadmap__inner\s*\{[^}]*gap:\s*1\.375rem;[^}]*padding:\s*3\.5rem 3\.5rem 3\.75rem;/],
   ["roadmap heading", /\.roadmap__heading h2\s*\{[^}]*font-size:\s*3\.875rem;/],
-  ["roadmap support", /\.roadmap__support\s*\{[^}]*color:\s*#31508f;[^}]*font-size:\s*1\.25rem;/],
+  ["proposed-panel eyebrow leading", /\.meaning__copy \.eyebrow,\s*\.roadmap__heading \.eyebrow,\s*\.conversion__heading \.eyebrow\s*\{[^}]*font-size:\s*0\.9375rem;[^}]*line-height:\s*normal;/],
+  ["roadmap support", /\.roadmap__support\s*\{[^}]*color:\s*#31508f;[^}]*font-size:\s*1\.25rem;[^}]*line-height:\s*normal;/],
   ["roadmap grid", /\.roadmap__list\s*\{[^}]*grid-template-columns:\s*repeat\(4, minmax\(0, 1fr\)\);[^}]*gap:\s*0\.875rem;[^}]*margin-block-start:\s*0\.875rem;/],
   ["roadmap cards", /\.roadmap-item\s*\{[^}]*gap:\s*0\.625rem;[^}]*padding:\s*1\.375rem 1\.375rem 1\.5rem;/],
   ["roadmap live palette", /\.roadmap-item--current\s*\{[^}]*background:\s*#0d2b6b;[^}]*color:\s*#fff;/],
   ["roadmap future palette", /\.roadmap-item--future\s*\{[^}]*background:\s*#dbe4f4;[^}]*color:\s*#31508f;/],
-  ["roadmap status", /\.roadmap-item__status\s*\{[^}]*font-size:\s*0\.6875rem;/],
-  ["roadmap name", /\.roadmap-item__name\s*\{[^}]*font-size:\s*1\.75rem;/],
+  ["roadmap status", /\.roadmap-item__status\s*\{[^}]*font-size:\s*0\.6875rem;[^}]*line-height:\s*normal;/],
+  ["roadmap name", /\.roadmap-item__name\s*\{[^}]*font-size:\s*1\.75rem;[^}]*line-height:\s*normal;/],
   ["signup field", /\.conversion\s*\{[^}]*background:\s*#1273e0;/],
   ["signup grid", /\.conversion__inner\s*\{[^}]*grid-template-columns:\s*minmax\(0, 1\.15fr\) minmax\(0, 1fr\);[^}]*gap:\s*3rem;[^}]*padding:\s*3\.5rem 3\.5rem 3\.75rem;/],
   ["signup heading rhythm", /\.conversion__heading\s*\{[^}]*gap:\s*1\.625rem;/],
@@ -541,6 +549,7 @@ const desktopFeedbackContracts = [
   ["signup body", /\.conversion__body\s*\{[^}]*max-inline-size:\s*38ch;[^}]*font-size:\s*1\.3125rem;/],
   ["signup panel", /\.conversion-path\s*\{[^}]*gap:\s*1\.375rem;[^}]*padding:\s*2\.125rem 2\.125rem 2\.375rem;[^}]*background:\s*#eef3fb;/],
   ["signup signal border", /\.conversion-path--member\s*\{[^}]*border-block-start:\s*0\.5rem solid #f5c518;/],
+  ["signup semantic fieldset inset", /\.conversion \.prototype-form > fieldset\s*\{[^}]*padding-block-start:\s*0\.625rem;[^}]*padding-block-end:\s*0;/],
   ["signup title", /\.conversion-path h3\s*\{[^}]*font-size:\s*2\.125rem;/],
   ["signup notice", /\.prototype-disclosure\s*\{[^}]*padding:\s*0\.75rem 0\.875rem;[^}]*border:\s*1px solid #c3d3ec;[^}]*background:\s*#dce9fb;[^}]*font-size:\s*0\.875rem;/],
   ["signup choices", /\.prototype-role__choices\s*\{[^}]*gap:\s*0\.75rem;/],
@@ -568,20 +577,70 @@ if (missingDesktopFeedback.length || missingFeedbackScopes.length) {
 if (!/@media \(max-width: 20rem\)\s*\{\s*\.rooms h2\s*\{[^}]*letter-spacing:\s*-0\.04em;/.test(conceptCss)) {
   fail("The 320px rooms heading must retain its narrow-screen tracking correction");
 }
-// Reserved, not collapsed: an empty slot that disappears shifts the submit
-// button under the cursor exactly when a user is correcting a field.
-if (!/\.field-error\s*\{[^}]*min-block-size:\s*1\.45em;/.test(sharedCss)) {
-  fail("Field error slots must stay reserved so validation never shifts the form");
+const conversionErrorRule = conceptCss.match(/\.conversion \.field-error\s*\{([^}]*)\}/)?.[1] ?? "";
+for (const rule of [
+  /position:\s*absolute;/,
+  /inline-size:\s*1px;/,
+  /block-size:\s*1px;/,
+  /min-block-size:\s*0;/,
+  /margin:\s*-1px;/,
+  /overflow:\s*hidden;/,
+  /clip:\s*rect\(0 0 0 0\);/,
+  /clip-path:\s*inset\(50%\);/,
+  /white-space:\s*nowrap;/,
+]) {
+  if (!rule.test(conversionErrorRule)) fail("Conversion field errors must remain linked, visually hidden live regions without occupying form space");
+}
+if (/\.conversion \.field-error[^{]*\{[^}]*(?:display:\s*none|visibility:\s*hidden)/.test(conceptCss)) {
+  fail("Conversion field-error live regions must never be removed from the accessibility tree");
+}
+if (!/const originalDisclosure = disclosure\?\.textContent \?\? "";/.test(sharedScript)
+  || !/disclosure\.dataset\.originalText = originalDisclosure;/.test(sharedScript)
+  || !/const syncValidationSummary = \(\) => \{/.test(sharedScript)
+  || !/const hasExistingError = field\.getAttribute\("aria-invalid"\) === "true";/.test(sharedScript)
+  || !/Boolean\(errorFor\(field\)\) && \(validationAttempted \|\| hasExistingError\)/.test(sharedScript)
+  || !/disclosure\.textContent = message \|\| originalDisclosure;/.test(sharedScript)
+  || !/disclosure\.dataset\.validationState = "error";/.test(sharedScript)
+  || !/delete disclosure\.dataset\.validationState;/.test(sharedScript)
+  || !/field\.addEventListener\("blur", \(\) => \{\s*renderFieldState\(form, field\);\s*syncValidationSummary\(\);\s*\}\);/.test(sharedScript)
+  || !/validationAttempted = false;[\s\S]*?syncValidationSummary\(\);/.test(sharedScript)) {
+  fail("The visible prototype disclosure must mirror submit and pre-submit blur errors, then restore its original notice");
+}
+for (const size of ["2.5625rem", "4.625rem", "2.8125rem", "4.75rem", "6.6875rem"]) {
+  if (!conceptCss.includes(`block-size: ${size};`)) fail(`Prototype disclosure is missing its no-shift ${size} block-size contract`);
 }
 if (!/\.field input\s*\{[^}]*min-block-size:\s*2\.75rem;/.test(sharedCss)
   || !/@media \(pointer: coarse\)[\s\S]*?min-block-size:\s*3\.25rem;/.test(sharedCss)) {
   fail("Inputs must hold the 44px floor and grow on coarse pointers");
 }
 if (!/\.prototype-disclosure\s*\{[^}]*padding:\s*0\.375rem var\(--space-sm\);[^}]*border:\s*1px solid color-mix\([^;]+\);[^}]*background:\s*color-mix\(in oklch, var\(--brand-yellow\) 9%, var\(--brand-off-white\)\);[^}]*font-size:\s*var\(--font-size-support\);[^}]*font-weight:\s*var\(--font-weight-regular\);/.test(conceptCss)
-  || /\.prototype-disclosure\s*\{[^}]*(?:opacity:\s*0\s*;|font-size:\s*(?:0(?:rem|em|px)?|(?:[1-9]|1[0-3])(?:\.\d+)?px)\s*;)/.test(conceptCss)
-  || /\.prototype-role__choice:has\(input:checked\)\s*\{[^}]*border-width/.test(conceptCss)
-  || !/\.prototype-role__choice:has\(input:checked\)\s*\{[^}]*outline:\s*2px solid var\(--brand-navy\);/.test(conceptCss)) {
-  fail("Prototype disclosure and checked radios must be quieter without reduced legibility or layout-shifting borders");
+  || /\.prototype-disclosure\s*\{[^}]*(?:opacity:\s*0\s*;|font-size:\s*(?:0(?:rem|em|px)?|(?:[1-9]|1[0-3])(?:\.\d+)?px)\s*;)/.test(conceptCss)) {
+  fail("Prototype disclosure must remain readable and visually quiet");
+}
+const roleInputRule = conceptCss.match(/\.prototype-role__choice input\s*\{([^}]*)\}/)?.[1] ?? "";
+if (!/position:\s*absolute;/.test(roleInputRule)
+  || !/inline-size:\s*1px;/.test(roleInputRule)
+  || !/block-size:\s*1px;/.test(roleInputRule)
+  || !/padding:\s*0;/.test(roleInputRule)
+  || !/margin:\s*-1px;/.test(roleInputRule)
+  || !/overflow:\s*hidden;/.test(roleInputRule)
+  || !/clip:\s*rect\(0 0 0 0\);/.test(roleInputRule)
+  || !/border:\s*0;/.test(roleInputRule)
+  || !/white-space:\s*nowrap;/.test(roleInputRule)
+  || /(?:display:\s*none|visibility:\s*hidden)/.test(roleInputRule)) {
+  fail("Role choices must use visually hidden, focusable real radio inputs");
+}
+if (!/\.prototype-role__choice\s*\{[^}]*position:\s*relative;[^}]*display:\s*block;[^}]*padding:\s*0\.9375rem 1rem;[^}]*border:\s*1px solid #c3d3ec;[^}]*background:\s*#fff;[^}]*color:\s*#5b6f9c;[^}]*cursor:\s*pointer;/.test(conceptCss)) {
+  fail("Role labels must retain the custom unselected choice-card treatment");
+}
+if (/\.prototype-role__choices:not\(:has\(input:checked\)\)\s+\.prototype-role__choice:first-child/.test(conceptCss)) {
+  fail("Role choice cards must not imply a selection while no radio is checked");
+}
+if (!/\.prototype-role__choice:has\(input:checked\)\s*\{[^}]*padding:\s*0\.875rem 1rem;[^}]*border:\s*2px solid var\(--brand-navy\);[^}]*background:\s*#fff;[^}]*color:\s*var\(--brand-navy\);/.test(conceptCss)) {
+  fail("Role choice cards must emphasize only the checked card");
+}
+if (!/\.prototype-role__choice:has\(input:focus-visible\)\s*\{[^}]*outline:\s*3px solid var\(--brand-navy\);[^}]*outline-offset:\s*2px;[^}]*box-shadow:\s*0 0 0 6px var\(--color-focus\);/.test(conceptCss)) {
+  fail("Role choice cards must expose a visible focus affordance for their real radios");
 }
 if (!/:focus-visible\s*\{[^}]*outline:\s*3px solid/.test(sharedCss)
   || !/@media \(forced-colors: active\)[\s\S]*?:focus-visible\s*\{[^}]*outline:\s*3px solid Highlight;/.test(sharedCss)

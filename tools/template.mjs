@@ -58,10 +58,9 @@ const documentHead = ({ title, description, canonicalStyles = true }) => `    <m
     <link rel="stylesheet" href="assets/styles/concept-base.css?v=${cacheKeys.conceptCss}">
     <script src="assets/scripts/shared.js?v=${cacheKeys.sharedScript}" defer></script>`;
 
-/* The navy crisis band closes every screen. The numbers are the single most
-   important thing on the page, so they are large yellow tap targets rather than
-   a row of underlines, and the helpline is named so nobody has to guess who
-   answers. Nothing inside carries an id: the band is emitted five times. */
+/* The navy crisis band is the single global support route before the final
+   sign-off. The numbers are large tap targets rather than underlined links,
+   and the helpline is named so nobody has to guess who answers. */
 const renderCrisisBand = () => {
   const { crisis } = sourceCopy;
   const [line, accent] = [crisis.line, crisis.lineAccent];
@@ -220,7 +219,6 @@ ${documentHead({
             </div>
           </div>
         </section>
-${renderCrisisBand()}
       </div>
 
       <div class="screen screen--stats">
@@ -238,7 +236,6 @@ ${renderCrisisBand()}
             </div>
           </div>
         </section>
-${renderCrisisBand()}
       </div>
 
       <div class="screen screen--rooms">
@@ -252,7 +249,6 @@ ${renderCrisisBand()}
             </div>
           </div>
         </section>
-${renderCrisisBand()}
       </div>
 
       <div class="screen screen--corner">
@@ -282,7 +278,6 @@ ${renderCrisisBand()}
             </div>
           </section>
         </div>
-${renderCrisisBand()}
       </div>
 
       <div class="screen screen--join">
@@ -290,16 +285,16 @@ ${renderCrisisBand()}
           <div class="conversion__inner page-frame">
             <header class="section-heading conversion__heading" data-reveal>
               <p class="eyebrow">${escapeHtml(sourceCopy.conversion.eyebrow)}</p>
-              <h2 id="conversion-title" aria-label="${escapeHtml(sourceCopy.conversion.heading)}"><span aria-hidden="true">Be <span class="marker-band">first</span> in</span><span aria-hidden="true">the corner.</span></h2>
+              <h2 id="conversion-title" aria-label="${escapeHtml(sourceCopy.conversion.heading)}">Be <span class="marker-band">first</span> in the corner.</h2>
               <p class="conversion__body">${escapeHtml(sourceCopy.conversion.body)}</p>
             </header>
             <div class="conversion__forms">${renderMemberForm()}
             </div>
           </div>
         </section>
-${renderCrisisBand()}
       </div>
     </main>
+${renderCrisisBand()}
 ${renderSignOff({ home: true })}
   </body>
 </html>

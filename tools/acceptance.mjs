@@ -27,6 +27,7 @@ const argv = process.argv.slice(2);
 const arg = (flag) => { const i = argv.indexOf(flag); return i === -1 ? null : argv[i + 1]; };
 const TARGET_ARG = arg("--target");
 const SHOTS = arg("--shots");
+const FORM_ONLY = argv.includes("--form-only");
 
 const PLAYWRIGHT_CANDIDATES = [
   "c:/Users/sanja/Projects/sharkord-e2e/node_modules/playwright-core/index.mjs",
@@ -92,6 +93,7 @@ const openPage = async (width, height, opts = {}) => {
 };
 const settle = async (page) => { await page.evaluate(() => document.fonts.ready); await page.waitForTimeout(1200); };
 
+if (!FORM_ONLY) {
 // ---------------------------------------------------------------- motion
 {
   const page = await openPage(2048, 870);
@@ -263,13 +265,12 @@ for (const viewport of VIEWPORTS) {
     const heading = pick("#roadmap-title");
     const card = pick(".conversion-path--member");
 
-    // The crisis band closes every screen and its numbers are the one thing
-    // that has to be reachable, so measure the real tap targets rather than
-    // trusting the stylesheet.
+    // The single global crisis band is the one support route. Measure real
+    // tap targets and DOM placement rather than trusting the stylesheet.
     const screens = [...document.querySelectorAll(".screen")];
-    const screensWithoutBand = screens
-      .filter((screen) => !(screen.lastElementChild && screen.lastElementChild.classList.contains("crisis-band")))
-      .map((screen) => screen.className);
+    const crisisBand = document.querySelector(".crisis-band");
+    const main = document.querySelector("main");
+    const footer = document.querySelector(".concept-footer");
     const smallTargets = [...document.querySelectorAll(".crisis-action")]
       .map((node) => node.getBoundingClientRect())
       .filter((box) => box.height < 44 || box.width < 44).length;
@@ -279,7 +280,8 @@ for (const viewport of VIEWPORTS) {
       horizontalOverflow: root.scrollWidth > root.clientWidth,
       overflowing: [...new Set(overflowing)].slice(0, 6),
       screenCount: screens.length,
-      screensWithoutBand,
+      crisisBands: document.querySelectorAll(".crisis-band").length,
+      crisisAfterMainBeforeFooter: Boolean(crisisBand && main && footer && main.nextElementSibling === crisisBand && crisisBand.nextElementSibling === footer),
       crisisTargets: document.querySelectorAll(".crisis-action").length,
       smallTargets,
       roadmapCards: heightOf(".roadmap__list"),
@@ -345,11 +347,11 @@ for (const viewport of VIEWPORTS) {
     measured.bands.length === 4 && tightest >= 3,
     measured.bands.map((b) => `${b.text} ${b.left}/${b.right}`).join("  "));
 
-  check(`crisis ${label}: a band closes every screen`,
-    measured.screenCount === 5 && measured.screensWithoutBand.length === 0,
-    measured.screensWithoutBand.join(", ") || `${measured.screenCount} screens, all closed by the band`);
+  check(`crisis ${label}: one global band follows main before the footer`,
+    measured.screenCount === 5 && measured.crisisBands === 1 && measured.crisisAfterMainBeforeFooter,
+    `${measured.screenCount} screens, ${measured.crisisBands} band(s), ordered ${measured.crisisAfterMainBeforeFooter}`);
   check(`crisis ${label}: every number is a 44px tap target`,
-    measured.crisisTargets === 15 && measured.smallTargets === 0,
+    measured.crisisTargets === 3 && measured.smallTargets === 0,
     `${measured.crisisTargets} targets, ${measured.smallTargets} under 44px`);
 
   if (viewport.width === 2048 && viewport.height === 870) {
@@ -453,6 +455,229 @@ for (const viewport of VIEWPORTS) {
   check("cache: every versioned asset key matches its content hash", stale.length === 0,
     stale.join("; ") || `${versioned.length} versioned assets consistent`);
   check("console: clean on the interaction pass", page.problems.length === 0, page.problems.join(" | ") || "clean");
+  await page.context().close();
+}
+}
+
+const FORM_VIEWPORTS = [
+  [1280, 900],
+  [1024, 900],
+  [768, 900],
+  [390, 844],
+];
+const EXPECTED_FORM_ERRORS = {
+  role: "Choose whether you're joining as a patient or therapist.",
+  name: "Please enter your name.",
+  email: "Please enter your email address.",
+  phone: "Please enter your phone number.",
+};
+const PROTOTYPE_NOTICE = "Prototype — use test details only. Nothing is transmitted or stored.";
+for (const [width, height] of FORM_VIEWPORTS) {
+  const page = await openPage(width, height);
+  await page.goto(target, { waitUntil: "networkidle" });
+  await settle(page);
+  await page.evaluate(() => document.querySelector("#member-form").scrollIntoView());
+  await page.waitForTimeout(700);
+
+  const blurBefore = await page.evaluate(() => {
+    const measure = (selector) => {
+      const rect = document.querySelector(selector).getBoundingClientRect();
+      return { y: rect.top + window.scrollY, height: rect.height };
+    };
+    return {
+      conversion: measure(".conversion"),
+      card: measure(".conversion-path--member"),
+      fields: measure("[data-form-fields]"),
+      submit: measure("[data-submit]"),
+    };
+  });
+  await page.locator("#member-name").focus();
+  await page.locator("#member-email").focus();
+  await page.waitForTimeout(50);
+  const blurInvalid = await page.evaluate(() => {
+    const measure = (selector) => {
+      const rect = document.querySelector(selector).getBoundingClientRect();
+      return { y: rect.top + window.scrollY, height: rect.height };
+    };
+    const input = document.querySelector("#member-name");
+    const error = document.querySelector("#member-name-error");
+    const disclosure = document.querySelector(".prototype-disclosure");
+    return {
+      message: error.textContent.trim(),
+      ariaLive: error.getAttribute("aria-live"),
+      ariaInvalid: input.getAttribute("aria-invalid"),
+      describedBy: input.getAttribute("aria-describedby"),
+      summary: disclosure.textContent.trim(),
+      summaryState: disclosure.dataset.validationState || "",
+      geometry: {
+        conversion: measure(".conversion"),
+        card: measure(".conversion-path--member"),
+        fields: measure("[data-form-fields]"),
+        submit: measure("[data-submit]"),
+      },
+    };
+  });
+  check(`form ${width}: pre-submit blur mirrors its linked live error`,
+    blurInvalid.message === EXPECTED_FORM_ERRORS.name
+      && blurInvalid.summary === EXPECTED_FORM_ERRORS.name
+      && blurInvalid.ariaLive === "polite"
+      && blurInvalid.ariaInvalid === "true"
+      && blurInvalid.describedBy?.split(/\s+/).includes("member-name-error")
+      && blurInvalid.summaryState === "error",
+    JSON.stringify(blurInvalid));
+  const blurDeltas = {};
+  for (const key of Object.keys(blurBefore)) {
+    blurDeltas[key] = {
+      y: Math.abs(blurBefore[key].y - blurInvalid.geometry[key].y),
+      height: Math.abs(blurBefore[key].height - blurInvalid.geometry[key].height),
+    };
+  }
+  check(`form ${width}: pre-submit blur causes no geometry shift`,
+    Object.values(blurDeltas).every((delta) => delta.y <= 0.5 && delta.height <= 0.5),
+    JSON.stringify(blurDeltas));
+
+  await page.evaluate(() => {
+    const input = document.querySelector("#member-name");
+    input.value = "Test Person";
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+  });
+  await page.waitForTimeout(50);
+  const blurCorrected = await page.evaluate(() => {
+    const measure = (selector) => {
+      const rect = document.querySelector(selector).getBoundingClientRect();
+      return { y: rect.top + window.scrollY, height: rect.height };
+    };
+    const disclosure = document.querySelector(".prototype-disclosure");
+    return {
+      summary: disclosure.textContent.trim(),
+      summaryState: disclosure.dataset.validationState || "",
+      ariaInvalid: document.querySelector("#member-name").getAttribute("aria-invalid"),
+      message: document.querySelector("#member-name-error").textContent.trim(),
+      geometry: {
+        conversion: measure(".conversion"),
+        card: measure(".conversion-path--member"),
+        fields: measure("[data-form-fields]"),
+        submit: measure("[data-submit]"),
+      },
+    };
+  });
+  const blurCorrectionDeltas = {};
+  for (const key of Object.keys(blurBefore)) {
+    blurCorrectionDeltas[key] = {
+      y: Math.abs(blurBefore[key].y - blurCorrected.geometry[key].y),
+      height: Math.abs(blurBefore[key].height - blurCorrected.geometry[key].height),
+    };
+  }
+  check(`form ${width}: pre-submit correction restores notice without shift`,
+    blurCorrected.summary === PROTOTYPE_NOTICE
+      && !blurCorrected.summaryState
+      && blurCorrected.ariaInvalid === "false"
+      && blurCorrected.message === ""
+      && Object.values(blurCorrectionDeltas).every((delta) => delta.y <= 0.5 && delta.height <= 0.5),
+    JSON.stringify({ ...blurCorrected, geometry: blurCorrectionDeltas }));
+  await page.evaluate(() => {
+    const input = document.querySelector("#member-name");
+    input.value = "";
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+  });
+
+  const before = await page.evaluate(() => {
+    const measure = (selector) => {
+      const rect = document.querySelector(selector).getBoundingClientRect();
+      return { y: rect.top + window.scrollY, height: rect.height };
+    };
+    const geometry = {
+      conversion: measure(".conversion"),
+      card: measure(".conversion-path--member"),
+      fields: measure("[data-form-fields]"),
+      submit: measure("[data-submit]"),
+    };
+    document.querySelector("[data-submit]").click();
+    return geometry;
+  });
+  await page.waitForTimeout(100);
+
+  const invalidState = await page.evaluate(() => {
+    const measure = (selector) => {
+      const rect = document.querySelector(selector).getBoundingClientRect();
+      return { y: rect.top + window.scrollY, height: rect.height };
+    };
+    const disclosure = document.querySelector(".prototype-disclosure");
+    const style = getComputedStyle(disclosure);
+    return {
+      errors: {
+        role: document.querySelector("[data-role-error]").textContent.trim(),
+        name: document.querySelector('[data-field-error="name"]').textContent.trim(),
+        email: document.querySelector('[data-field-error="email"]').textContent.trim(),
+        phone: document.querySelector('[data-field-error="phone"]').textContent.trim(),
+      },
+      invalidIds: [...document.querySelectorAll('[aria-invalid="true"]')].map((node) => node.id),
+      checkedRoles: document.querySelectorAll('input[name="role"]:checked').length,
+      activeId: document.activeElement?.id,
+      summary: disclosure.textContent.trim(),
+      summaryState: disclosure.dataset.validationState || "",
+      summaryClass: disclosure.classList.contains("has-validation-error"),
+      summaryVisible: style.display !== "none" && style.visibility !== "hidden" && disclosure.getBoundingClientRect().height > 0,
+      geometry: {
+        conversion: measure(".conversion"),
+        card: measure(".conversion-path--member"),
+        fields: measure("[data-form-fields]"),
+        submit: measure("[data-submit]"),
+      },
+      overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    };
+  });
+  const expectedInvalidIds = ["member-role-patient", "member-role-therapist", "member-name", "member-email", "member-phone"];
+  check(`form ${width}: empty errors and aria-invalid are exact`,
+    JSON.stringify(invalidState.errors) === JSON.stringify(EXPECTED_FORM_ERRORS)
+      && JSON.stringify(invalidState.invalidIds) === JSON.stringify(expectedInvalidIds),
+    JSON.stringify({ errors: invalidState.errors, invalidIds: invalidState.invalidIds }));
+  check(`form ${width}: no implicit role and first invalid receives focus`,
+    invalidState.checkedRoles === 0 && invalidState.activeId === "member-role-patient",
+    JSON.stringify({ checkedRoles: invalidState.checkedRoles, activeId: invalidState.activeId }));
+  check(`form ${width}: disclosure mirrors first invalid message`,
+    invalidState.summaryVisible
+      && invalidState.summary === EXPECTED_FORM_ERRORS.role
+      && invalidState.summaryState === "error"
+      && invalidState.summaryClass,
+    JSON.stringify({ summary: invalidState.summary, state: invalidState.summaryState, visible: invalidState.summaryVisible }));
+
+  const deltas = {};
+  for (const key of Object.keys(before)) {
+    deltas[key] = {
+      y: Math.abs(before[key].y - invalidState.geometry[key].y),
+      height: Math.abs(before[key].height - invalidState.geometry[key].height),
+    };
+  }
+  const stable = Object.values(deltas).every((delta) => delta.y <= 0.5 && delta.height <= 0.5);
+  check(`form ${width}: validation causes no geometry shift`, stable, JSON.stringify(deltas));
+
+  await page.locator("#member-role-patient").check({ force: true });
+  await page.locator("#member-name").fill("Test Person");
+  await page.locator("#member-email").fill("test@example.com");
+  await page.locator("#member-phone").fill("4165550100");
+  await page.waitForTimeout(50);
+  const corrected = await page.evaluate(() => {
+    const disclosure = document.querySelector(".prototype-disclosure");
+    return {
+      summary: disclosure.textContent.trim(),
+      state: disclosure.dataset.validationState || "",
+      hasClass: disclosure.classList.contains("has-validation-error"),
+      errors: [...document.querySelectorAll("[data-field-error], [data-role-error]")].map((node) => node.textContent.trim()),
+      invalid: document.querySelectorAll('[aria-invalid="true"]').length,
+      overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    };
+  });
+  check(`form ${width}: correction restores the prototype notice`,
+    corrected.summary === PROTOTYPE_NOTICE
+      && !corrected.state
+      && !corrected.hasClass
+      && corrected.errors.every((message) => message === "")
+      && corrected.invalid === 0,
+    JSON.stringify(corrected));
+  check(`form ${width}: validation has no horizontal overflow`,
+    invalidState.overflow <= 0.5 && corrected.overflow <= 0.5,
+    JSON.stringify({ invalid: invalidState.overflow, corrected: corrected.overflow }));
   await page.context().close();
 }
 
