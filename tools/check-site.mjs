@@ -519,9 +519,15 @@ const mobileContractCss = mobileContractStart >= 0 && mobileContractEnd > mobile
 const u = (n) => String.raw`calc\(var\(--u\) \* ${n}\)`;
 const desktopFeedbackContracts = [
   ["rooms screen auto-height", /\.screen--rooms\s*\{[^}]*min-block-size:\s*0;/],
-  ["reviewed scale unit", /\.screen--corner,\s*\.screen--join\s*\{\s*--u:\s*min\(0\.078125vw,\s*0\.1145svh\);\s*--frame:\s*calc\(var\(--u\) \* 1280\);/],
-  ["reviewed shared frame", /\.meaning__inner,\s*\.roadmap__inner,\s*\.conversion__inner\s*\{[^}]*max-inline-size:\s*var\(--frame\);[^}]*margin-inline:\s*auto;/],
-  ["meaning corner bleeds to the edge", /\.meaning__mark\s*\{[^}]*margin-inline-start:\s*calc\(\(var\(--frame\) - 100vw\) \/ 2\);[^}]*padding-inline-start:\s*calc\(\(100vw - var\(--frame\)\) \/ 2\);/],
+  ["reviewed scale unit", /\.screen--corner,\s*\.screen--join\s*\{\s*--u:\s*min\(0\.078125vw,\s*0.1115svh\);\s*--frame:\s*calc\(var\(--u\) \* 1280\);/],
+  // Full bleed, like every other band. A centred frame held the mock's ratios
+  // more exactly but left empty gutters down both sides that matched neither
+  // the mock nor the rest of the page.
+  ["reviewed blocks run full bleed", /\.meaning__inner,\s*\.roadmap__inner,\s*\.conversion__inner\s*\{[^}]*max-inline-size:\s*none;[^}]*margin-inline:\s*0;/],
+  // At full width a card is ~474px, and at the mock's own card height that is a
+  // 4.7:1 bar. The row takes the page's leftover height instead, stopping at the
+  // height the mock would give a card this wide.
+  ["plan cards take the page's slack", /\.roadmap__list\s*\{[^}]*grid-auto-rows:\s*minmax\(0, 1fr\);[^}]*flex:\s*1 1 auto;[^}]*min-block-size:\s*0;[^}]*max-block-size:\s*10\.3125vw;/],
   ["rooms field", /\.rooms,\s*\.roadmap\s*\{[^}]*background:\s*#eef3fb;/],
   ["rooms padding", /\.rooms__inner\s*\{[^}]*padding:\s*3\.5rem 3rem 3\.75rem;/],
   ["rooms heading rhythm", /\.rooms__heading\s*\{[^}]*gap:\s*1\.375rem;/],
