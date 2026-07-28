@@ -169,10 +169,10 @@ if (count(home, "data-role-error") !== 1) {
 }
 
 // ------------------------------------------------------------------ page 7
-// One global support route follows the landing-page content; the light sign-off
-// row runs only after it.
+// The navy support route closes every content screen; the light sign-off row
+// runs only once after all five screens.
 const crisisBandCount = count(home, '<aside class="crisis-band" aria-label="Crisis support">');
-if (crisisBandCount !== 1) fail(`The landing page must have exactly one global crisis band; found ${crisisBandCount}`);
+if (crisisBandCount !== 5) fail(`The navy crisis band must close all five screens; found ${crisisBandCount}`);
 if (count(privacy, '<aside class="crisis-band" aria-label="Crisis support">') !== 1) fail("The privacy page must also close on the crisis band");
 for (const action of ['<a class="crisis-action crisis-action--signal" href="tel:988">Call 9-8-8</a>',
   '<a class="crisis-action crisis-action--signal" href="sms:988">Text 9-8-8</a>',
@@ -180,10 +180,7 @@ for (const action of ['<a class="crisis-action crisis-action--signal" href="tel:
   if (count(home, action) !== crisisBandCount) fail(`Every crisis band must carry the same tap target: ${action}`);
 }
 if (count(home, sourceCopy.crisis.note) !== crisisBandCount || !home.includes("Suicide Crisis Helpline")) {
-  fail("The global crisis band must name the helpline so nobody has to guess who answers");
-}
-if (!/<\/main>\s*<aside class="crisis-band" aria-label="Crisis support">[\s\S]*?<footer class="concept-footer"/.test(home)) {
-  fail("The global crisis band must sit immediately after main and before the light sign-off footer");
+  fail("Every crisis band must name the helpline so nobody has to guess who answers");
 }
 if (count(home, 'class="concept-footer__signoff page-frame"') !== 1) fail("The light sign-off row must appear exactly once, at the end");
 if (/concept-footer__wordmark/.test(home) || /concept-footer__support/.test(home)) {
@@ -414,10 +411,10 @@ if (!/--page-max:\s*100%;/.test(brandCss)) {
   fail("Sections must run full bleed; the retired 96rem page cap left them narrow on wide screens");
 }
 
-// ------------------------------------------------------ crisis band, global
+// ------------------------------------------------------ crisis band, per screen
 if (/\.crisis-band\s*\{[^}]*position:\s*fixed/.test(`${conceptCss}\n${sharedCss}`)
   || /\.crisis-band[^{]*\{[^}]*(?:display:\s*none|visibility:\s*hidden|opacity:\s*0)/.test(`${conceptCss}\n${sharedCss}`)) {
-  fail("Crisis support must be permanent, visible, in-flow global content after main — never a fixed or hidden overlay");
+  fail("Crisis support must be permanent, visible, in-flow content inside every screen — never a fixed or hidden overlay");
 }
 if (!/\.crisis-band\s*\{[^}]*background:\s*var\(--brand-navy\);/.test(conceptCss)
   || !/\.crisis-action\s*\{[^}]*min-block-size:\s*2\.75rem;/.test(conceptCss)
@@ -441,6 +438,9 @@ if (!/@media \(min-width: 64\.0625rem\)[\s\S]*?\.screen\s*\{[^}]*min-block-size:
   || !/@media \(min-width: 64\.0625rem\)[\s\S]*?\.screen--hero\s*\{[^}]*min-block-size:\s*calc\(100svh - var\(--header-h\)\);/.test(conceptCss)
   || !/--header-h:\s*clamp\(5\.5rem, 7vw, 6rem\);/.test(conceptCss)) {
   fail("Every block must fill exactly one desktop viewport, with the masthead subtracted from the hero screen");
+}
+if (!/\.screen\s*\{[^}]*display:\s*grid;[^}]*grid-template-rows:\s*minmax\(0, 1fr\) auto;/.test(conceptCss)) {
+  fail("Each screen must give its content the flexible row and the crisis band the auto row");
 }
 if (/scroll-snap/.test(`${conceptCss}\n${sharedCss}\n${brandCss}`)) {
   fail("Scroll snapping must stay off; scrolling is never locked to a block");

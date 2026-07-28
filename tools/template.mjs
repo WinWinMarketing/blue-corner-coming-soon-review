@@ -58,9 +58,10 @@ const documentHead = ({ title, description, canonicalStyles = true }) => `    <m
     <link rel="stylesheet" href="assets/styles/concept-base.css?v=${cacheKeys.conceptCss}">
     <script src="assets/scripts/shared.js?v=${cacheKeys.sharedScript}" defer></script>`;
 
-/* The navy crisis band is the single global support route before the final
-   sign-off. The numbers are large tap targets rather than underlined links,
-   and the helpline is named so nobody has to guess who answers. */
+/* The navy crisis band closes every screen. The numbers are large tap targets
+   rather than underlined links, and the helpline is named so nobody has to
+   guess who answers. Nothing inside carries an id because it is emitted five
+   times on the landing page. */
 const renderCrisisBand = () => {
   const { crisis } = sourceCopy;
   const [line, accent] = [crisis.line, crisis.lineAccent];
@@ -219,6 +220,7 @@ ${documentHead({
             </div>
           </div>
         </section>
+${renderCrisisBand()}
       </div>
 
       <div class="screen screen--stats">
@@ -236,6 +238,7 @@ ${documentHead({
             </div>
           </div>
         </section>
+${renderCrisisBand()}
       </div>
 
       <div class="screen screen--rooms">
@@ -249,6 +252,7 @@ ${documentHead({
             </div>
           </div>
         </section>
+${renderCrisisBand()}
       </div>
 
       <div class="screen screen--corner">
@@ -278,6 +282,7 @@ ${documentHead({
             </div>
           </section>
         </div>
+${renderCrisisBand()}
       </div>
 
       <div class="screen screen--join">
@@ -292,9 +297,9 @@ ${documentHead({
             </div>
           </div>
         </section>
+${renderCrisisBand()}
       </div>
     </main>
-${renderCrisisBand()}
 ${renderSignOff({ home: true })}
   </body>
 </html>

@@ -265,12 +265,12 @@ for (const viewport of VIEWPORTS) {
     const heading = pick("#roadmap-title");
     const card = pick(".conversion-path--member");
 
-    // The single global crisis band is the one support route. Measure real
-    // tap targets and DOM placement rather than trusting the stylesheet.
+    // The crisis band closes every screen. Measure real tap targets and DOM
+    // placement rather than trusting the stylesheet.
     const screens = [...document.querySelectorAll(".screen")];
-    const crisisBand = document.querySelector(".crisis-band");
-    const main = document.querySelector("main");
-    const footer = document.querySelector(".concept-footer");
+    const screensWithoutBand = screens
+      .filter((screen) => !(screen.lastElementChild && screen.lastElementChild.classList.contains("crisis-band")))
+      .map((screen) => screen.className);
     const smallTargets = [...document.querySelectorAll(".crisis-action")]
       .map((node) => node.getBoundingClientRect())
       .filter((box) => box.height < 44 || box.width < 44).length;
@@ -280,8 +280,7 @@ for (const viewport of VIEWPORTS) {
       horizontalOverflow: root.scrollWidth > root.clientWidth,
       overflowing: [...new Set(overflowing)].slice(0, 6),
       screenCount: screens.length,
-      crisisBands: document.querySelectorAll(".crisis-band").length,
-      crisisAfterMainBeforeFooter: Boolean(crisisBand && main && footer && main.nextElementSibling === crisisBand && crisisBand.nextElementSibling === footer),
+      screensWithoutBand,
       crisisTargets: document.querySelectorAll(".crisis-action").length,
       smallTargets,
       roadmapCards: heightOf(".roadmap__list"),
@@ -347,11 +346,11 @@ for (const viewport of VIEWPORTS) {
     measured.bands.length === 4 && tightest >= 3,
     measured.bands.map((b) => `${b.text} ${b.left}/${b.right}`).join("  "));
 
-  check(`crisis ${label}: one global band follows main before the footer`,
-    measured.screenCount === 5 && measured.crisisBands === 1 && measured.crisisAfterMainBeforeFooter,
-    `${measured.screenCount} screens, ${measured.crisisBands} band(s), ordered ${measured.crisisAfterMainBeforeFooter}`);
+  check(`crisis ${label}: a band closes every screen`,
+    measured.screenCount === 5 && measured.screensWithoutBand.length === 0,
+    measured.screensWithoutBand.join(", ") || `${measured.screenCount} screens, all closed by the band`);
   check(`crisis ${label}: every number is a 44px tap target`,
-    measured.crisisTargets === 3 && measured.smallTargets === 0,
+    measured.crisisTargets === 15 && measured.smallTargets === 0,
     `${measured.crisisTargets} targets, ${measured.smallTargets} under 44px`);
 
   if (viewport.width === 2048 && viewport.height === 870) {
