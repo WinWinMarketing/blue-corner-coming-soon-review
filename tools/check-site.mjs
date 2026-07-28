@@ -89,7 +89,10 @@ if (/concept-hero__corner/.test(home)) fail("The hero photograph must not carry 
 if (!home.includes(`<p class="concept-hero__body">${sourceCopy.hero.body.replaceAll("'", "&#39;")}</p>`)) {
   fail("Hero right-column copy must be the approved line");
 }
-if (!/\.concept-hero__body\s*\{[^}]*max-inline-size:\s*34ch;[^}]*font-size:\s*clamp\(1\.375rem, 1\.78vw, 1\.75rem\);[^}]*font-weight:\s*var\(--font-weight-bold\);[^}]*line-height:\s*1\.2;/.test(await readFile(path.join(rootDirectory, "assets/styles/concept-base.css"), "utf8"))) {
+// 42ch, not 34ch: 34ch broke this line to three and orphaned "opens soon.".
+// The measure is the only thing that moved; size, weight and leading are pinned
+// here exactly as before so widening cannot become a licence to shrink the type.
+if (!/\.concept-hero__body\s*\{[^}]*max-inline-size:\s*42ch;[^}]*font-size:\s*clamp\(1\.375rem, 1\.78vw, 1\.75rem\);[^}]*font-weight:\s*var\(--font-weight-bold\);[^}]*line-height:\s*1\.2;/.test(await readFile(path.join(rootDirectory, "assets/styles/concept-base.css"), "utf8"))) {
   fail("Hero right-column line must share the left column's family, weight, size and leading on a short measure");
 }
 
