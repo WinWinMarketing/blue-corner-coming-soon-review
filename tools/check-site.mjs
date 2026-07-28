@@ -512,8 +512,16 @@ const mobileContractEnd = conceptCss.indexOf("@media (max-width: 48rem)", mobile
 const mobileContractCss = mobileContractStart >= 0 && mobileContractEnd > mobileContractStart
   ? conceptCss.slice(mobileContractStart, mobileContractEnd)
   : "";
+// The reviewed mock is authored at 1280px wide. Its values are reproduced as
+// multiples of --u (one mock pixel), never as fixed rem, so that the design's
+// RATIOS survive a 2048px screen instead of flattening. Pinning the multiplier
+// pins the mock's own number, which is a stricter contract than the old rem was.
+const u = (n) => String.raw`calc\(var\(--u\) \* ${n}\)`;
 const desktopFeedbackContracts = [
   ["rooms screen auto-height", /\.screen--rooms\s*\{[^}]*min-block-size:\s*0;/],
+  ["reviewed scale unit", /\.screen--corner,\s*\.screen--join\s*\{\s*--u:\s*min\(0\.078125vw,\s*0\.1145svh\);\s*--frame:\s*calc\(var\(--u\) \* 1280\);/],
+  ["reviewed shared frame", /\.meaning__inner,\s*\.roadmap__inner,\s*\.conversion__inner\s*\{[^}]*max-inline-size:\s*var\(--frame\);[^}]*margin-inline:\s*auto;/],
+  ["meaning corner bleeds to the edge", /\.meaning__mark\s*\{[^}]*margin-inline-start:\s*calc\(\(var\(--frame\) - 100vw\) \/ 2\);[^}]*padding-inline-start:\s*calc\(\(100vw - var\(--frame\)\) \/ 2\);/],
   ["rooms field", /\.rooms,\s*\.roadmap\s*\{[^}]*background:\s*#eef3fb;/],
   ["rooms padding", /\.rooms__inner\s*\{[^}]*padding:\s*3\.5rem 3rem 3\.75rem;/],
   ["rooms heading rhythm", /\.rooms__heading\s*\{[^}]*gap:\s*1\.375rem;/],
@@ -525,39 +533,39 @@ const desktopFeedbackContracts = [
   ["rooms title", /\.room__copy h3\s*\{[^}]*color:\s*#f5c518;[^}]*font-size:\s*1\.5rem;/],
   ["rooms support", /\.room__copy p\s*\{[^}]*color:\s*#c6d5f2;[^}]*font-size:\s*0\.875rem;/],
   ["meaning field", /\.meaning\s*\{[^}]*min-block-size:\s*auto;[^}]*background:\s*#1273e0;/],
-  ["meaning rail", /\.meaning__inner\s*\{[^}]*grid-template-columns:\s*11\.875rem minmax\(0, 1fr\);/],
-  ["meaning divider", /\.meaning__mark\s*\{[^}]*border-inline-end:\s*0\.25rem solid #f5c518;[^}]*background:\s*#0d2b6b;/],
-  ["meaning corner mark", /\.meaning__mark::before\s*\{[^}]*inline-size:\s*4rem;[^}]*block-size:\s*4rem;[^}]*border-block-start:\s*1\.25rem solid #eef3fb;[^}]*border-inline-end:\s*1\.25rem solid #eef3fb;/],
-  ["meaning content", /\.meaning__copy\s*\{[^}]*gap:\s*1\.25rem;[^}]*padding:\s*3\.25rem 3\.5rem 3\.5rem;/],
-  ["meaning heading", /\.meaning h2\s*\{[^}]*font-size:\s*3\.875rem;/],
+  ["meaning rail", new RegExp(String.raw`\.meaning__inner\s*\{[^}]*grid-template-columns:\s*${u(190)} minmax\(0, 1fr\);`)],
+  ["meaning divider", new RegExp(String.raw`\.meaning__mark\s*\{[^}]*border-inline-end:\s*${u(4)} solid #f5c518;[^}]*background:\s*#0d2b6b;`)],
+  ["meaning corner mark", new RegExp(String.raw`\.meaning__mark::before\s*\{[^}]*inline-size:\s*${u(64)};[^}]*block-size:\s*${u(64)};[^}]*border-block-start:\s*${u(20)} solid #eef3fb;[^}]*border-inline-end:\s*${u(20)} solid #eef3fb;`)],
+  ["meaning content", new RegExp(String.raw`\.meaning__copy\s*\{[^}]*gap:\s*${u(20)};[^}]*padding:\s*${u(52)} ${u(56)} ${u(56)};`)],
+  ["meaning heading", new RegExp(String.raw`\.meaning h2\s*\{[^}]*font-size:\s*${u(62)};`)],
   ["meaning final marker clearance reset", /\.meaning h2:has\(> span:last-child > \.marker-band:last-child\)\s*\{[^}]*padding-block-end:\s*0;/],
-  ["meaning body", /\.meaning__body\s*\{[^}]*max-inline-size:\s*46ch;[^}]*color:\s*#dce9fb;[^}]*font-size:\s*1\.375rem;[^}]*text-wrap:\s*pretty;[^}]*white-space:\s*normal;/],
-  ["roadmap padding", /\.roadmap__inner\s*\{[^}]*gap:\s*1\.375rem;[^}]*padding:\s*3\.5rem 3\.5rem 3\.75rem;/],
-  ["roadmap heading", /\.roadmap__heading h2\s*\{[^}]*font-size:\s*3\.875rem;/],
-  ["proposed-panel eyebrow leading", /\.meaning__copy \.eyebrow,\s*\.roadmap__heading \.eyebrow,\s*\.conversion__heading \.eyebrow\s*\{[^}]*font-size:\s*0\.9375rem;[^}]*line-height:\s*normal;/],
-  ["roadmap support", /\.roadmap__support\s*\{[^}]*color:\s*#31508f;[^}]*font-size:\s*1\.25rem;[^}]*line-height:\s*normal;/],
-  ["roadmap grid", /\.roadmap__list\s*\{[^}]*grid-template-columns:\s*repeat\(4, minmax\(0, 1fr\)\);[^}]*gap:\s*0\.875rem;[^}]*margin-block-start:\s*0\.875rem;/],
-  ["roadmap cards", /\.roadmap-item\s*\{[^}]*gap:\s*0\.625rem;[^}]*padding:\s*1\.375rem 1\.375rem 1\.5rem;/],
+  ["meaning body", new RegExp(String.raw`\.meaning__body\s*\{[^}]*max-inline-size:\s*46ch;[^}]*color:\s*#dce9fb;[^}]*font-size:\s*${u(22)};[^}]*text-wrap:\s*pretty;[^}]*white-space:\s*normal;`)],
+  ["roadmap padding", new RegExp(String.raw`\.roadmap__inner\s*\{[^}]*gap:\s*${u(22)};[^}]*padding:\s*${u(56)} ${u(56)} ${u(60)};`)],
+  ["roadmap heading", new RegExp(String.raw`\.roadmap__heading h2\s*\{[^}]*font-size:\s*${u(62)};`)],
+  ["proposed-panel eyebrow leading", new RegExp(String.raw`\.meaning__copy \.eyebrow,\s*\.roadmap__heading \.eyebrow,\s*\.conversion__heading \.eyebrow\s*\{[^}]*font-size:\s*${u(15)};[^}]*line-height:\s*normal;`)],
+  ["roadmap support", new RegExp(String.raw`\.roadmap__support\s*\{[^}]*color:\s*#31508f;[^}]*font-size:\s*${u(20)};[^}]*line-height:\s*normal;`)],
+  ["roadmap grid", new RegExp(String.raw`\.roadmap__list\s*\{[^}]*grid-template-columns:\s*repeat\(4, minmax\(0, 1fr\)\);[^}]*gap:\s*${u(14)};[^}]*margin-block-start:\s*${u(14)};`)],
+  ["roadmap cards", new RegExp(String.raw`\.roadmap-item\s*\{[^}]*gap:\s*${u(10)};[^}]*padding:\s*${u(22)} ${u(22)} ${u(24)};`)],
   ["roadmap live palette", /\.roadmap-item--current\s*\{[^}]*background:\s*#0d2b6b;[^}]*color:\s*#fff;/],
   ["roadmap future palette", /\.roadmap-item--future\s*\{[^}]*background:\s*#dbe4f4;[^}]*color:\s*#31508f;/],
-  ["roadmap status", /\.roadmap-item__status\s*\{[^}]*font-size:\s*0\.6875rem;[^}]*line-height:\s*normal;/],
-  ["roadmap name", /\.roadmap-item__name\s*\{[^}]*font-size:\s*1\.75rem;[^}]*line-height:\s*normal;/],
+  ["roadmap status", new RegExp(String.raw`\.roadmap-item__status\s*\{[^}]*font-size:\s*${u(11)};[^}]*line-height:\s*normal;`)],
+  ["roadmap name", new RegExp(String.raw`\.roadmap-item__name\s*\{[^}]*font-size:\s*${u(28)};[^}]*line-height:\s*normal;`)],
   ["signup field", /\.conversion\s*\{[^}]*background:\s*#1273e0;/],
-  ["signup grid", /\.conversion__inner\s*\{[^}]*grid-template-columns:\s*minmax\(0, 1\.15fr\) minmax\(0, 1fr\);[^}]*gap:\s*3rem;[^}]*padding:\s*3\.5rem 3\.5rem 3\.75rem;/],
-  ["signup heading rhythm", /\.conversion__heading\s*\{[^}]*gap:\s*1\.625rem;/],
-  ["signup heading", /\.conversion__heading h2\s*\{[^}]*font-size:\s*3\.5rem;/],
-  ["signup body", /\.conversion__body\s*\{[^}]*max-inline-size:\s*38ch;[^}]*font-size:\s*1\.3125rem;/],
-  ["signup panel", /\.conversion-path\s*\{[^}]*gap:\s*1\.375rem;[^}]*padding:\s*2\.125rem 2\.125rem 2\.375rem;[^}]*background:\s*#eef3fb;/],
-  ["signup signal border", /\.conversion-path--member\s*\{[^}]*border-block-start:\s*0\.5rem solid #f5c518;/],
-  ["signup semantic fieldset inset", /\.conversion \.prototype-form > fieldset\s*\{[^}]*padding-block-start:\s*0\.625rem;[^}]*padding-block-end:\s*0;/],
-  ["signup title", /\.conversion-path h3\s*\{[^}]*font-size:\s*2\.125rem;/],
-  ["signup notice", /\.prototype-disclosure\s*\{[^}]*padding:\s*0\.75rem 0\.875rem;[^}]*border:\s*1px solid #c3d3ec;[^}]*background:\s*#dce9fb;[^}]*font-size:\s*0\.875rem;/],
-  ["signup choices", /\.prototype-role__choices\s*\{[^}]*gap:\s*0\.75rem;/],
-  ["signup field grid", /\.conversion \.field-grid\s*\{[^}]*grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\);[^}]*column-gap:\s*0\.875rem;/],
-  ["signup field rhythm", /\.conversion \.field\s*\{[^}]*gap:\s*0\.5rem;/],
-  ["signup controls", /\.conversion \.field input\s*\{[^}]*padding:\s*0\.875rem 1rem;[^}]*font-size:\s*1rem;/],
-  ["signup CTA", /\.conversion-path \.button--signal\s*\{[^}]*padding:\s*1\.125rem;[^}]*font-size:\s*1\.1875rem;/],
-  ["signup privacy", /\.conversion-path__note\s*\{[^}]*font-size:\s*0\.875rem;/],
+  ["signup grid", new RegExp(String.raw`\.conversion__inner\s*\{[^}]*grid-template-columns:\s*minmax\(0, 1\.15fr\) minmax\(0, 1fr\);[^}]*gap:\s*${u(48)};[^}]*padding:\s*${u(56)} ${u(56)} ${u(60)};`)],
+  ["signup heading rhythm", new RegExp(String.raw`\.conversion__heading\s*\{[^}]*gap:\s*${u(26)};`)],
+  ["signup heading", new RegExp(String.raw`\.conversion__heading h2\s*\{[^}]*font-size:\s*${u(56)};`)],
+  ["signup body", new RegExp(String.raw`\.conversion__body\s*\{[^}]*max-inline-size:\s*38ch;[^}]*font-size:\s*${u(21)};`)],
+  ["signup panel", new RegExp(String.raw`\.conversion-path\s*\{[^}]*gap:\s*${u(22)};[^}]*padding:\s*${u(34)} ${u(34)} ${u(38)};[^}]*background:\s*#eef3fb;`)],
+  ["signup signal border", new RegExp(String.raw`\.conversion-path--member\s*\{[^}]*border-block-start:\s*${u(8)} solid #f5c518;`)],
+  ["signup semantic fieldset inset", new RegExp(String.raw`\.conversion \.prototype-form > fieldset\s*\{[^}]*padding-block-start:\s*${u(10)};[^}]*padding-block-end:\s*0;`)],
+  ["signup title", new RegExp(String.raw`\.conversion-path h3\s*\{[^}]*font-size:\s*${u(34)};`)],
+  ["signup notice", new RegExp(String.raw`\.prototype-disclosure\s*\{[^}]*padding:\s*${u(12)} ${u(14)};[^}]*border:\s*1px solid #c3d3ec;[^}]*background:\s*#dce9fb;[^}]*font-size:\s*${u(14)};`)],
+  ["signup choices", new RegExp(String.raw`\.prototype-role__choices\s*\{[^}]*gap:\s*${u(12)};`)],
+  ["signup field grid", new RegExp(String.raw`\.conversion \.field-grid\s*\{[^}]*grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\);[^}]*column-gap:\s*${u(14)};`)],
+  ["signup field rhythm", new RegExp(String.raw`\.conversion \.field\s*\{[^}]*gap:\s*${u(8)};`)],
+  ["signup controls", new RegExp(String.raw`\.conversion \.field input\s*\{[^}]*padding:\s*${u(14)} ${u(16)};[^}]*font-size:\s*${u(16)};`)],
+  ["signup CTA", new RegExp(String.raw`\.conversion-path \.button--signal\s*\{[^}]*padding:\s*${u(18)};[^}]*font-size:\s*${u(19)};`)],
+  ["signup privacy", new RegExp(String.raw`\.conversion-path__note\s*\{[^}]*font-size:\s*${u(14)};`)],
 ];
 const missingDesktopFeedback = desktopFeedbackContracts
   .filter(([, contract]) => !contract.test(lateDesktopCss))
@@ -606,7 +614,11 @@ if (!/const originalDisclosure = disclosure\?\.textContent \?\? "";/.test(shared
   || !/validationAttempted = false;[\s\S]*?syncValidationSummary\(\);/.test(sharedScript)) {
   fail("The visible prototype disclosure must mirror submit and pre-submit blur errors, then restore its original notice");
 }
-for (const size of ["2.5625rem", "4.625rem", "2.8125rem", "4.75rem", "6.6875rem"]) {
+// The disclosure reserves a fixed height at every breakpoint so a validation
+// message swapping in cannot move the submit button under the cursor. On desktop
+// that height is now a multiple of the mock unit rather than a rem, but it is
+// still a reserved height, which is what this contract is protecting.
+for (const size of ["calc(var(--u) * 41)", "4.625rem", "2.8125rem", "4.75rem", "6.6875rem"]) {
   if (!conceptCss.includes(`block-size: ${size};`)) fail(`Prototype disclosure is missing its no-shift ${size} block-size contract`);
 }
 if (!/\.field input\s*\{[^}]*min-block-size:\s*2\.75rem;/.test(sharedCss)
