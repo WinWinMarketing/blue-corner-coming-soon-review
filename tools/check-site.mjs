@@ -513,7 +513,7 @@ const mobileContractCss = mobileContractStart >= 0 && mobileContractEnd > mobile
   ? conceptCss.slice(mobileContractStart, mobileContractEnd)
   : "";
 const desktopFeedbackContracts = [
-  ["rooms screen auto-height", /\.screen--rooms\s*\{[^}]*min-block-size:\s*0;/],
+  ["reviewed screens auto-height", /\.screen--rooms,\s*\.screen--corner,\s*\.screen--join\s*\{[^}]*min-block-size:\s*0;/],
   ["rooms field", /\.rooms,\s*\.roadmap\s*\{[^}]*background:\s*#eef3fb;/],
   ["rooms padding", /\.rooms__inner\s*\{[^}]*padding:\s*3\.5rem 3rem 3\.75rem;/],
   ["rooms heading rhythm", /\.rooms__heading\s*\{[^}]*gap:\s*1\.375rem;/],
@@ -532,7 +532,7 @@ const desktopFeedbackContracts = [
   ["meaning heading", /\.meaning h2\s*\{[^}]*font-size:\s*3\.875rem;/],
   ["meaning final marker clearance reset", /\.meaning h2:has\(> span:last-child > \.marker-band:last-child\)\s*\{[^}]*padding-block-end:\s*0;/],
   ["meaning body", /\.meaning__body\s*\{[^}]*max-inline-size:\s*46ch;[^}]*color:\s*#dce9fb;[^}]*font-size:\s*1\.375rem;[^}]*text-wrap:\s*pretty;[^}]*white-space:\s*normal;/],
-  ["roadmap padding", /\.roadmap__inner\s*\{[^}]*gap:\s*1\.375rem;[^}]*padding:\s*3\.5rem 3\.5rem 3\.75rem;/],
+  ["roadmap padding", /\.roadmap__inner\s*\{[^}]*align-items:\s*flex-start;[^}]*justify-content:\s*flex-start;[^}]*gap:\s*1\.375rem;[^}]*padding:\s*3\.5rem 3\.5rem 3\.75rem;/],
   ["roadmap heading", /\.roadmap__heading h2\s*\{[^}]*font-size:\s*3\.875rem;/],
   ["proposed-panel eyebrow leading", /\.meaning__copy \.eyebrow,\s*\.roadmap__heading \.eyebrow,\s*\.conversion__heading \.eyebrow\s*\{[^}]*font-size:\s*0\.9375rem;[^}]*line-height:\s*normal;/],
   ["roadmap support", /\.roadmap__support\s*\{[^}]*color:\s*#31508f;[^}]*font-size:\s*1\.25rem;[^}]*line-height:\s*normal;/],
@@ -543,7 +543,7 @@ const desktopFeedbackContracts = [
   ["roadmap status", /\.roadmap-item__status\s*\{[^}]*font-size:\s*0\.6875rem;[^}]*line-height:\s*normal;/],
   ["roadmap name", /\.roadmap-item__name\s*\{[^}]*font-size:\s*1\.75rem;[^}]*line-height:\s*normal;/],
   ["signup field", /\.conversion\s*\{[^}]*background:\s*#1273e0;/],
-  ["signup grid", /\.conversion__inner\s*\{[^}]*grid-template-columns:\s*minmax\(0, 1\.15fr\) minmax\(0, 1fr\);[^}]*gap:\s*3rem;[^}]*padding:\s*3\.5rem 3\.5rem 3\.75rem;/],
+  ["signup grid", /\.conversion__inner\s*\{[^}]*grid-template-columns:\s*minmax\(0, 1\.15fr\) minmax\(0, 1fr\);[^}]*align-content:\s*start;[^}]*align-items:\s*start;[^}]*gap:\s*3rem;[^}]*padding:\s*3\.5rem 3\.5rem 3\.75rem;/],
   ["signup heading rhythm", /\.conversion__heading\s*\{[^}]*gap:\s*1\.625rem;/],
   ["signup heading", /\.conversion__heading h2\s*\{[^}]*font-size:\s*3\.5rem;/],
   ["signup body", /\.conversion__body\s*\{[^}]*max-inline-size:\s*38ch;[^}]*font-size:\s*1\.3125rem;/],
