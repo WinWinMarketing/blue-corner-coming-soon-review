@@ -1200,19 +1200,19 @@
      at every size, exactly as it does in the mock. */
   .screen--corner,
   .screen--join {
-    --u: min(0.078125vw, 0.1145svh);
+    --u: min(0.078125vw, 0.1115svh);
     --frame: calc(var(--u) * 1280);
   }
 
-  /* The mock block is its own page edge to edge, so scaling it up means a
-     centred frame with the section colour bleeding past it — not a stretched
-     layout. The manifesto, plan and sign-up share one frame so their left edges
-     line up down the screen. */
+  /* Full bleed, like every other band on the site. A centred frame reproduced
+     the mock's ratios more exactly, but it put empty gutters down both sides
+     that matched neither the mock nor the rest of the page, so the blocks run
+     edge to edge and the plan cards carry the ratio instead (see below). */
   .meaning__inner,
   .roadmap__inner,
   .conversion__inner {
-    max-inline-size: var(--frame);
-    margin-inline: auto;
+    max-inline-size: none;
+    margin-inline: 0;
   }
 
   .rooms,
@@ -1308,15 +1308,10 @@
     grid-template-columns: calc(var(--u) * 190) minmax(0, 1fr);
   }
 
-  /* In the mock the navy corner IS the block's left edge. Once the frame is
-     centred in a wider screen it would float with blue to its left, so the
-     column bleeds back out to the viewport edge. The padding restores the same
-     width to its content box, which keeps the glyph optically where the mock
-     puts it. */
+  /* The block runs edge to edge, so the navy corner is already flush with the
+     viewport and needs no bleed of its own. */
   .meaning__mark {
     place-items: center;
-    margin-inline-start: calc((var(--frame) - 100vw) / 2);
-    padding-inline-start: calc((100vw - var(--frame)) / 2);
     border-inline-end: calc(var(--u) * 4) solid #f5c518;
     background: #0d2b6b;
   }
@@ -1420,14 +1415,25 @@
     line-height: normal;
   }
 
+  /* Running edge to edge makes each card ~474px wide, and at the mock's own
+     card height that is a 4.7:1 bar instead of the 2.1:1 block it draws. So the
+     row takes the page's leftover height rather than only its content height,
+     and stops at the height the mock WOULD give a card this wide
+     (132 mock-px at the pure-width scale, i.e. 132 x 0.078125vw). Short windows
+     simply shrink it — the cards flatten before anything overflows. */
   .roadmap__list {
     grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-auto-rows: minmax(0, 1fr);
+    flex: 1 1 auto;
+    min-block-size: 0;
+    max-block-size: 10.3125vw;
     gap: calc(var(--u) * 14);
     inline-size: 100%;
     margin-block-start: calc(var(--u) * 14);
   }
 
   .roadmap-item {
+    min-block-size: 0;
     gap: calc(var(--u) * 10);
     padding: calc(var(--u) * 22) calc(var(--u) * 22) calc(var(--u) * 24);
   }
