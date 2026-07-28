@@ -112,7 +112,18 @@
   white-space: nowrap;
 }
 
-/* The single navy crisis band follows main and precedes the final sign-off. */
+/* Every content block and its navy crisis band form one page. The content row
+   takes the flexible space while the band closes the page at its natural
+   height. The light sign-off row remains separate and appears once at the end. */
+.screen {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+}
+
+.screen > :first-child {
+  min-block-size: 0;
+}
+
 .crisis-band {
   background: var(--brand-navy);
   color: var(--brand-off-white);
