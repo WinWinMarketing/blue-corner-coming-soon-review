@@ -190,23 +190,51 @@
     const submitButton = form.querySelector("[data-submit]");
     const status = form.querySelector("[data-form-status]");
     const fieldGroup = form.querySelector("[data-form-fields]");
+    const disclosureId = form.getAttribute("aria-describedby")?.split(/\s+/).find(Boolean);
+    const disclosure = disclosureId ? document.getElementById(disclosureId) : null;
+    const originalDisclosure = disclosure?.textContent ?? "";
+    let validationAttempted = false;
+
+    if (disclosure) disclosure.dataset.originalText = originalDisclosure;
+
+    const syncValidationSummary = () => {
+      if (!disclosure) return;
+      const firstInvalid = fields.find((field) => {
+        const hasExistingError = field.getAttribute("aria-invalid") === "true";
+        return Boolean(errorFor(field)) && (validationAttempted || hasExistingError);
+      });
+      const message = firstInvalid ? errorFor(firstInvalid) : "";
+      disclosure.textContent = message || originalDisclosure;
+      disclosure.classList.toggle("has-validation-error", Boolean(message));
+      if (message) {
+        disclosure.dataset.validationState = "error";
+      } else {
+        delete disclosure.dataset.validationState;
+      }
+    };
 
     fields.forEach((field) => {
-      field.addEventListener("blur", () => renderFieldState(form, field));
+      field.addEventListener("blur", () => {
+        renderFieldState(form, field);
+        syncValidationSummary();
+      });
       field.addEventListener(field.type === "radio" ? "change" : "input", () => {
         if (field.name === "role") {
           fields.filter((candidate) => candidate.name === "role").forEach((candidate) => renderFieldState(form, candidate));
-        } else if (field.getAttribute("aria-invalid") === "true") {
+        } else if (validationAttempted || field.getAttribute("aria-invalid") === "true") {
           renderFieldState(form, field);
         }
+        syncValidationSummary();
       });
     });
 
     form.addEventListener("submit", (event) => {
       event.preventDefault();
       if (form.dataset.state === "loading" || form.dataset.state === "success") return;
+      validationAttempted = true;
       const validity = fields.map((field) => renderFieldState(form, field));
       const firstInvalid = fields.find((field, index) => !validity[index]);
+      syncValidationSummary();
       if (firstInvalid) {
         firstInvalid.focus();
         return;
@@ -222,9 +250,11 @@
 
       window.setTimeout(() => {
         form.reset();
+        validationAttempted = false;
         fields.forEach((field) => field.removeAttribute("aria-invalid"));
         form.querySelector("[data-role-group]")?.classList.remove("has-error");
         form.querySelectorAll("[data-field-error], [data-role-error]").forEach((node) => { node.textContent = ""; });
+        syncValidationSummary();
         fieldGroup.hidden = true;
         submitButton.removeAttribute("aria-busy");
         const title = status.querySelector("[data-status-title]");

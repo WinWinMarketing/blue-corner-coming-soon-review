@@ -99,9 +99,9 @@ export const sourceCopy = Object.freeze({
       Object.freeze({ name: "phone", label: "Phone", type: "tel", inputmode: "tel", placeholder: "(000) 000 0000" }),
     ]),
   }),
-  // The navy crisis band closes every screen. Someone in trouble scans for a
-  // number, so the numbers are tap targets, not underlined links, and the
-  // helpline is named so there is no doubt about who picks up.
+  // The single navy crisis band closes the landing page. Someone in trouble
+  // scans for a number, so the numbers are tap targets, not underlined links,
+  // and the helpline is named so there is no doubt about who picks up.
   crisis: Object.freeze({
     line: "Nobody fights alone.",
     lineAccent: "alone.",
