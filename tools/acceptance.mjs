@@ -284,8 +284,8 @@ for (const viewport of VIEWPORTS) {
       crisisTargets: document.querySelectorAll(".crisis-action").length,
       smallTargets,
       roadmapCards: heightOf(".roadmap__list"),
-      roadmapSection: heightOf(".roadmap"),
-      conversionSection: heightOf(".conversion"),
+      cornerScreen: heightOf(".screen--corner"),
+      joinScreen: heightOf(".screen--join"),
       headerHero: (heightOf(".site-header") || 0) + (heightOf(".screen--hero") || 0),
       headingRight: heading ? Math.round(heading.getBoundingClientRect().right) : null,
       frameRight: heading ? Math.round(heading.closest(".roadmap").getBoundingClientRect().right) : null,
@@ -356,8 +356,8 @@ for (const viewport of VIEWPORTS) {
 
   if (viewport.width === 2048 && viewport.height === 870) {
     check("plan: heading fits inside its frame", measured.headingRight <= measured.frameRight, `${measured.headingRight} <= ${measured.frameRight}`);
-    check("plan: reviewed therapy block keeps its intrinsic height", measured.roadmapSection === 413, `${measured.roadmapSection}px`);
-    check("conversion: reviewed signup block keeps its intrinsic height", measured.conversionSection === 699, `${measured.conversionSection}px`);
+    check("corner: manifesto and plan share one desktop viewport", measured.cornerScreen === measured.viewportHeight, `${measured.cornerScreen} vs ${measured.viewportHeight}`);
+    check("conversion: signup and crisis band share one desktop viewport", measured.joinScreen === measured.viewportHeight, `${measured.joinScreen} vs ${measured.viewportHeight}`);
     check("hero: header plus hero screen is one viewport", measured.headerHero === measured.viewportHeight, `${measured.headerHero} vs ${measured.viewportHeight}`);
     // Design review item 5: the kicker sits on ONE line, and it got there by
     // widening its block rather than shrinking the type.
