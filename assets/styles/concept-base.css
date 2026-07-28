@@ -331,8 +331,14 @@
    55ch measure, so it read as a different voice from the left column. It now
    takes the same family, weight, size and leading as .concept-hero__lead and a
    short measure, and it starts at the image's left edge. */
+/* 42ch, not 34ch: at 34ch this line broke to THREE lines and the orphaned
+   "opens soon." read as a stray fragment. Two lines is the shape the review
+   draws. The measure is the only thing that changed - size, weight and leading
+   are untouched. Measured: two lines hold from 39ch to 62ch at 2048 down to
+   1100, so 42ch sits inside that band with room on both sides, and 42ch is
+   586px against a 969px column at 2048 and 496px against 508px at 1100. */
 .concept-hero__body {
-  max-inline-size: 34ch;
+  max-inline-size: 42ch;
   margin: 0;
   font-size: clamp(1.375rem, 1.78vw, 1.75rem);
   font-weight: var(--font-weight-bold);
