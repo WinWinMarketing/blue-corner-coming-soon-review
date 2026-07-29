@@ -61,22 +61,24 @@ const documentHead = ({ title, description, canonicalStyles = true }) => `    <m
 /* The navy crisis band closes every screen. The numbers are large tap targets
    rather than underlined links, and the helpline is named so nobody has to
    guess who answers. Nothing inside carries an id because it is emitted five
-   times on the landing page. */
+   times on the landing page.
+
+   Two blocks, not three: the label and the helpline name sit together on the
+   left and the numbers close the right. The retired third block was a repeat of
+   the hero line, which stacked the label, the numbers and the note into a
+   column and made every band ~50px taller than the information in it needed. */
 const renderCrisisBand = () => {
   const { crisis } = sourceCopy;
-  const [line, accent] = [crisis.line, crisis.lineAccent];
-  const lead = line.slice(0, line.length - accent.length);
   const actions = crisis.actions.map((action) => `
-            <a class="crisis-action crisis-action--${escapeHtml(action.tone)}" href="${escapeHtml(action.href)}">${escapeHtml(action.label)}</a>`).join("");
+              <a class="crisis-action crisis-action--${escapeHtml(action.tone)}" href="${escapeHtml(action.href)}">${escapeHtml(action.label)}</a>`).join("");
   return `
         <aside class="crisis-band" aria-label="Crisis support">
           <div class="crisis-band__inner page-frame">
-            <p class="crisis-band__line">${escapeHtml(lead)}<span class="crisis-band__accent">${escapeHtml(accent)}</span></p>
             <div class="crisis-band__support">
               <p class="crisis-band__label">${escapeHtml(crisis.label)}</p>
-              <div class="crisis-band__actions">${actions}
-              </div>
               <p class="crisis-band__note">${escapeHtml(crisis.note)}</p>
+            </div>
+            <div class="crisis-band__actions">${actions}
             </div>
           </div>
         </aside>`;
@@ -178,6 +180,7 @@ export const renderHomePage = () => {
               <li class="roadmap-item ${index === 0 ? "roadmap-item--current" : "roadmap-item--future"}">
                 <span class="roadmap-item__status">${escapeHtml(item.status)}</span>
                 <span class="roadmap-item__name">${escapeHtml(item.name)}</span>
+                <span class="roadmap-item__detail">${escapeHtml(item.detail)}</span>
               </li>`).join("");
 
   return `<!doctype html>
@@ -209,14 +212,14 @@ ${documentHead({
           <div class="concept-hero__inner page-frame">
             <div class="concept-hero__copy" data-reveal>
               <p class="eyebrow">${escapeHtml(sourceCopy.hero.eyebrow)}</p>
-              <h1 id="hero-title" aria-label="Nobody Fights Alone."><span class="concept-hero__headline-line" aria-hidden="true">Nobody</span><span class="concept-hero__headline-line" aria-hidden="true">Fights <span class="concept-hero__accent concept-hero__underline">Alone.</span></span></h1>
+              <h1 id="hero-title" aria-label="Nobody Fights Alone."><span class="concept-hero__headline-line" aria-hidden="true">Nobody Fights</span><span class="concept-hero__headline-line" aria-hidden="true"><span class="concept-hero__accent concept-hero__underline">Alone.</span></span></h1>
             </div>
             <figure class="concept-hero__media image-frame" data-image-frame data-image-fallback-label="Blue Corner hero image">
               <img class="concept-hero__image" src="assets/art/${escapeHtml(referenceHero.image)}?v=${cacheKeys.hero}" width="${escapeHtml(referenceHero.width)}" height="${escapeHtml(referenceHero.height)}" alt="${escapeHtml(referenceHero.alt)}" loading="eager" fetchpriority="high" decoding="async" data-fallback-image>
             </figure>
-            <p class="concept-hero__lead" data-reveal><span class="concept-hero__lead-line"><span class="concept-hero__underline">Three</span> in four suicides in Canada are men.</span> <span class="concept-hero__lead-line">${escapeHtml(sourceCopy.hero.leadSecond)}</span></p>
+            <p class="concept-hero__lead" data-reveal><span class="concept-hero__lead-line">${escapeHtml(sourceCopy.hero.leadFirst)}</span> <span class="concept-hero__lead-line">${escapeHtml(sourceCopy.hero.leadSecond)}</span></p>
             <div class="concept-hero__details" data-reveal>
-              <p class="concept-hero__body">${escapeHtml(sourceCopy.hero.body)}</p>
+              <p class="concept-hero__body"><span class="concept-hero__body-line">${escapeHtml(sourceCopy.hero.bodyFirst)}</span> <span class="concept-hero__body-line">${escapeHtml(sourceCopy.hero.bodySecond)}</span></p>
             </div>
           </div>
         </section>
