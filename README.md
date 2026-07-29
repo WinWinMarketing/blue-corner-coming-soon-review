@@ -38,10 +38,11 @@ Two items from the 2026-07-26 design review cannot be finished without a shoot. 
 ## Privacy and safety
 
 - The form validates only in the browser and neither sends nor stores details.
+- The sign-up card no longer carries a standing "Prototype" notice. The privacy page states the same thing at length, the CSP enforces it, and the element itself remains as the form's only *visible* error summary — the per-field messages are screen-reader-only, so it rests empty, holds its reserved height, and paints only on a validation error.
 - Patient/Therapist selection is required before local success feedback.
 - The page uses licensed Adobe Typekit Proxima Nova Condensed; it is not copied or self-hosted.
 - The CSP blocks connections and form actions while allowing only `https://use.typekit.net` for stylesheet and font loading.
-- The crisis band repeats on every screen: 9-8-8 call and text as yellow tap targets, 9-1-1 for immediate danger, and the helpline named so nobody has to guess who answers.
-- The 85%, #1, and ~300% claims remain design-review copy and require source verification before production launch.
+- The crisis band repeats on every screen: 9-8-8 call and text as yellow tap targets, 9-1-1 for immediate danger, and the helpline named so nobody has to guess who answers. It is two blocks — the named helpline beside its numbers. It no longer repeats "Nobody fights alone."; that line belongs to the hero, and saying it five more times added a third stacked row and ~50px of height to every screen.
+- The 85%, #1, and 3× claims remain design-review copy and require source verification before production launch. "3×" is stated as a multiple of the help-seeking baseline; confirm against the CMAJ figure before it goes public, since "3× more" and "300% more" are not the same quantity.
 
 GitHub Pages publishes from the repository root with Jekyll disabled.

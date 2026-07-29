@@ -2,7 +2,7 @@ import { readFile, readdir, stat } from "node:fs/promises";
 import { createHash } from "node:crypto";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { referenceHero, sourceCopy } from "./source-copy.mjs";
+import { referenceHero, safetyCopy, sourceCopy } from "./source-copy.mjs";
 import { CACHE_KEYED_ASSETS, fileCacheKey, renderHomePage, renderPrivacyPage, syncCacheKeys } from "./template.mjs";
 
 const toolsDirectory = path.dirname(fileURLToPath(import.meta.url));
@@ -77,22 +77,40 @@ if (/(?:concept-addition|data-module|data-concept-nav|gallery-|Twelve ways|Conce
 if (home.includes("Designer review only")) fail("Root must not expose the retired editorial review note");
 
 // ------------------------------------------------------------------ page 1
-if (!home.includes('class="concept-hero__lead-line"><span class="concept-hero__underline">Three</span> in four suicides in Canada are men.</span> <span class="concept-hero__lead-line">Let that sit for a second.</span>')) {
-  fail("Hero support copy must preserve the locked lines and yellow Three underline");
+// The yellow rule belongs to "Alone." and nothing else. Underlining "Three" as
+// well put two different yellow emphases in one eyeful of each other and made
+// the statistic compete with the headline it is supposed to be evidence for.
+if (!home.includes('class="concept-hero__lead-line">Three in four suicides in Canada are men.</span> <span class="concept-hero__lead-line">Let that sit for a second.</span>')) {
+  fail("Hero support copy must be the locked lines with no second underline");
 }
-if (!home.includes('class="concept-hero__headline-line" aria-hidden="true">Nobody</span><span class="concept-hero__headline-line" aria-hidden="true">Fights <span class="concept-hero__accent concept-hero__underline">Alone.</span>')) {
-  fail("Hero must keep the two-line lock with blue and yellow-underlined Alone.");
+if (/concept-hero__lead[\s\S]{0,120}concept-hero__underline/.test(home)) {
+  fail("The retired yellow underline under Three must remain removed");
+}
+// The break falls between the two words of the phrase, not inside it: "Nobody
+// Fights" is the sentence and "Alone." is the turn, so the yellow rule and the
+// blue both land on a line of their own.
+if (!home.includes('class="concept-hero__headline-line" aria-hidden="true">Nobody Fights</span><span class="concept-hero__headline-line" aria-hidden="true"><span class="concept-hero__accent concept-hero__underline">Alone.</span>')) {
+  fail("Hero must keep the two-line lock with Alone. alone on the second line");
 }
 // Design review item 2: the floating corner glyph over the photograph is gone.
 if (/concept-hero__corner/.test(home)) fail("The hero photograph must not carry the floating corner glyph");
-// Design review item 4: the right-column line matches the left column's voice.
-if (!home.includes(`<p class="concept-hero__body">${sourceCopy.hero.body.replaceAll("'", "&#39;")}</p>`)) {
-  fail("Hero right-column copy must be the approved line");
+// Design review item 4: the right-column line matches the left column's voice,
+// and it now breaks on its own sentence so the two columns square up line for
+// line instead of the right one wrapping mid-clause after "Not for much".
+if (!home.includes(`<p class="concept-hero__body"><span class="concept-hero__body-line">${sourceCopy.hero.bodyFirst}</span> <span class="concept-hero__body-line">${sourceCopy.hero.bodySecond.replaceAll("'", "&#39;")}</span></p>`)) {
+  fail("Hero right-column copy must be the two approved sentences, one per line");
 }
-// 42ch, not 34ch: 34ch broke this line to three and orphaned "opens soon.".
-// The measure is the only thing that moved; size, weight and leading are pinned
-// here exactly as before so widening cannot become a licence to shrink the type.
-if (!/\.concept-hero__body\s*\{[^}]*max-inline-size:\s*42ch;[^}]*font-size:\s*clamp\(1\.375rem, 1\.78vw, 1\.75rem\);[^}]*font-weight:\s*var\(--font-weight-bold\);[^}]*line-height:\s*1\.2;/.test(await readFile(path.join(rootDirectory, "assets/styles/concept-base.css"), "utf8"))) {
+if (`${sourceCopy.hero.bodyFirst} ${sourceCopy.hero.bodySecond}` !== sourceCopy.hero.body) {
+  fail("The hero's two right-column lines must still read as the approved og:description sentence");
+}
+if (!/@media \(min-width: 48\.0625rem\)\s*\{\s*\.concept-hero__lead-line,\s*\.concept-hero__body-line\s*\{\s*display:\s*block;/.test(await readFile(path.join(rootDirectory, "assets/styles/concept-base.css"), "utf8"))) {
+  fail("Both hero columns must take their locked line breaks at the same breakpoint");
+}
+// 50ch, not 42ch: with the break explicit the measure only has to hold the
+// longer of the two sentences without wrapping it a third time. Size, weight
+// and leading stay pinned here so widening cannot become a licence to shrink
+// the type.
+if (!/\.concept-hero__body\s*\{[^}]*max-inline-size:\s*50ch;[^}]*font-size:\s*clamp\(1\.375rem, 1\.78vw, 1\.75rem\);[^}]*font-weight:\s*var\(--font-weight-bold\);[^}]*line-height:\s*1\.2;/.test(await readFile(path.join(rootDirectory, "assets/styles/concept-base.css"), "utf8"))) {
   fail("Hero right-column line must share the left column's family, weight, size and leading on a short measure");
 }
 
@@ -145,7 +163,15 @@ if (count(home, "roadmap-item--current") !== 1
   || !home.includes('class="roadmap-item__status">Live at launch</span>')) {
   fail("The plan must be four cards: Therapy live at launch and three labelled Next");
 }
+// A card holding one word had to be inflated to ~250px to look like a card at
+// all. Every service now carries a line of detail, so the box is earned and can
+// size to its own content.
+if (count(home, 'class="roadmap-item__detail">') !== sourceCopy.roadmap.items.length
+  || sourceCopy.roadmap.items.some((item) => !item.detail || !home.includes(`<span class="roadmap-item__detail">${item.detail}</span>`))) {
+  fail("Every plan card must carry its one-line description");
+}
 if (home.includes("IV Wellness")) fail("Nutrition and IV Wellness must stay collapsed into one item");
+if (home.includes("Nutrition &amp; wellness")) fail("The plan card is titled Nutrition; its detail line carries the wellness half");
 
 // ------------------------------------------------------------------ page 6
 if (!home.includes('<h2 id="conversion-title" aria-label="Be first in the corner.">Be <span class="marker-band">first</span> in the corner.</h2>')) {
@@ -402,10 +428,23 @@ if (!/\.section-heading h2 > span\s*\{[^}]*display:\s*block;/.test(conceptCss)
   || !/\.marker-band\s*\{[^}]*display:\s*inline;/.test(conceptCss)) {
   fail("Heading line locks must not force nested marker bands into full-width rows");
 }
+// The block insets wrap the ink, they do not trace the text box. Measured in
+// Proxima Nova Condensed Bold: the inline box is 1.4258em with the baseline
+// 1.0645em down it, the tallest banded ink rises 0.7031em above the baseline
+// and the deepest falls 0.1953em below, so the full box left 0.361em of dead
+// yellow above the letters against 0.166em below. That imbalance is what made
+// the band under "climb." sit high and reach into the line above it.
 if (!/\.marker-band\s*\{[^}]*position:\s*relative;[^}]*padding-inline:\s*0;[^}]*white-space:\s*nowrap;/.test(conceptCss)
-  || !/\.marker-band::before\s*\{[^}]*z-index:\s*-1;[^}]*inset-block:\s*0;[^}]*inset-inline:\s*-0\.125em;[^}]*background:\s*var\(--brand-yellow\);/.test(conceptCss)
+  || !/\.marker-band::before\s*\{[^}]*z-index:\s*-1;[^}]*inset-block:\s*0\.28em;[^}]*inset-inline:\s*-0\.125em;[^}]*background:\s*var\(--brand-yellow\);/.test(conceptCss)
   || /transparent 0 14%|--marker-band-height/.test(`${conceptCss}\n${brandCss}`)) {
-  fail("Marker highlights must preserve the no-padding selection box with balanced visual inline breathing room");
+  fail("Marker highlights must wrap their ink evenly on a no-padding inline with balanced inline breathing room");
+}
+// An em inset is only balanced against the font it was measured on. Archivo
+// reports a 1.093em inline box against Proxima Nova Condensed's 1.426em, so the
+// three Archivo headings need their own figure or the same rule clips their
+// caps. Any future banded section must declare which of the two it is in.
+if (!/\.rooms \.marker-band::before,\s*\.meaning \.marker-band::before,\s*\.conversion \.marker-band::before\s*\{\s*inset-block:\s*0\.055em 0\.1em;\s*\}/.test(conceptCss)) {
+  fail("Marker highlights in the Archivo sections must use Archivo's own measured inset");
 }
 if (!/\.concept-hero h1,\s*\.section-heading h2,\s*\.meaning h2\s*\{[^}]*isolation:\s*isolate;/.test(conceptCss)) {
   fail("Headings holding a marker band must isolate, or the band sinks behind the section background");
@@ -423,8 +462,18 @@ if (!/\.crisis-band\s*\{[^}]*background:\s*var\(--brand-navy\);/.test(conceptCss
   || !/\.crisis-action\s*\{[^}]*min-block-size:\s*2\.75rem;/.test(conceptCss)
   || !/\.crisis-action--signal\s*\{[^}]*background:\s*var\(--brand-yellow\);[^}]*color:\s*var\(--brand-navy\);/.test(conceptCss)
   || !/\.crisis-action--outline\s*\{[^}]*border:\s*2px solid var\(--brand-off-white\);/.test(conceptCss)
-  || !/\.crisis-band__accent\s*\{[^}]*color:\s*var\(--brand-yellow\);/.test(conceptCss)) {
-  fail("The crisis band must be navy with yellow 44px tap targets and a yellow closing accent");
+  || !/\.crisis-band__label\s*\{[^}]*color:\s*var\(--brand-yellow\);/.test(conceptCss)) {
+  fail("The crisis band must be navy with yellow 44px tap targets under a yellow label");
+}
+// "Nobody fights alone." belongs to the hero. Repeated in all five bands it
+// added a third stacked row to each one, cost ~50px of every screen, and put a
+// slogan where the only thing that has to be found fast is a phone number.
+if (/crisis-band__(?:line|accent)/.test(`${home}\n${privacy}\n${conceptCss}\n${sharedCss}`)
+  || count(home, "Nobody fights") !== 0) {
+  fail("The crisis band must not repeat the hero line");
+}
+if (!/<div class="crisis-band__support">\s*<p class="crisis-band__label">[^<]*<\/p>\s*<p class="crisis-band__note">[^<]*<\/p>\s*<\/div>\s*<div class="crisis-band__actions">/.test(home)) {
+  fail("The crisis band must be two blocks: the named helpline beside its numbers");
 }
 if (!/@media \(pointer: coarse\)[\s\S]*?\.crisis-action\s*\{[^}]*min-block-size:\s*3\.25rem;/.test(sharedCss)) {
   fail("Crisis tap targets must grow on coarse pointers");
@@ -521,35 +570,50 @@ const mobileContractCss = mobileContractStart >= 0 && mobileContractEnd > mobile
 // pins the mock's own number, which is a stricter contract than the old rem was.
 const u = (n) => String.raw`calc\(var\(--u\) \* ${n}\)`;
 const desktopFeedbackContracts = [
-  ["rooms screen auto-height", /\.screen--rooms\s*\{[^}]*min-block-size:\s*0;/],
+  // Pinned, not auto. A 3:4 tile in a quarter-width column is ~630px tall on a
+  // 2048px screen, which put this block 110px over one page at 1200 and 459px
+  // over at 830 — the one screen you had to scroll inside. A definite height
+  // gives the grid row something to shrink against.
+  ["rooms screen is one page", /\.screen--rooms\s*\{[^}]*block-size:\s*100svh;/],
+  ["rooms photographs take the slack", /\.rooms__grid\s*\{[^}]*flex:\s*1 1 auto;[^}]*min-block-size:\s*0;/],
+  ["rooms captions keep their height", /\.room__slot\s*\{[^}]*flex:\s*1 1 auto;[^}]*min-block-size:\s*0;[\s\S]*?\.room__copy\s*\{[^}]*flex:\s*0 0 auto;/],
   ["reviewed scale unit", /\.screen--corner,\s*\.screen--join\s*\{\s*--u:\s*min\(0\.078125vw,\s*0.1115svh\);\s*--frame:\s*calc\(var\(--u\) \* 1280\);/],
   // Full bleed, like every other band. A centred frame held the mock's ratios
   // more exactly but left empty gutters down both sides that matched neither
   // the mock nor the rest of the page.
   ["reviewed blocks run full bleed", /\.meaning__inner,\s*\.roadmap__inner,\s*\.conversion__inner\s*\{[^}]*max-inline-size:\s*none;[^}]*margin-inline:\s*0;/],
-  // At full width a card is ~474px, and at the mock's own card height that is a
-  // 4.7:1 bar. The row takes the page's leftover height instead, stopping at the
-  // height the mock would give a card this wide.
-  ["plan cards take the page's slack", /\.roadmap__list\s*\{[^}]*grid-auto-rows:\s*minmax\(0, 1fr\);[^}]*flex:\s*1 1 auto;[^}]*min-block-size:\s*0;[^}]*max-block-size:\s*10\.3125vw;/],
+  // Sized to content. Stretching the row to the page's leftover height is what
+  // produced a ~250px card holding one word in its top corner and nothing
+  // underneath; the leftover belongs to the block, split evenly above and below.
+  ["plan cards are sized to their content", /\.roadmap__list\s*\{[^}]*flex:\s*0 0 auto;/],
+  ["plan block padding is even", new RegExp(String.raw`\.roadmap__inner\s*\{[^}]*padding:\s*${u(56)};`)],
   ["rooms field", /\.rooms,\s*\.roadmap\s*\{[^}]*background:\s*#eef3fb;/],
-  ["rooms padding", /\.rooms__inner\s*\{[^}]*padding:\s*3\.5rem 3rem 3\.75rem;/],
-  ["rooms heading rhythm", /\.rooms__heading\s*\{[^}]*gap:\s*1\.375rem;/],
+  // Vertical values scale continuously with svh so a short window spends its
+  // height on the photographs rather than on padding; the ceilings are still
+  // the reviewed 1280px mock's own numbers, so a tall window is unchanged.
+  ["rooms padding", /\.rooms__inner\s*\{[^}]*padding:\s*clamp\(1\.75rem, 4\.3svh, 3\.5rem\) 3rem clamp\(2rem, 4\.6svh, 3\.75rem\);/],
+  ["rooms heading rhythm", /\.rooms__heading\s*\{[^}]*gap:\s*clamp\(0\.75rem, 1\.6svh, 1\.375rem\);/],
   ["rooms kicker", /\.rooms__heading \.eyebrow\s*\{[^}]*padding:\s*0\.625rem 1\.125rem;[^}]*font-size:\s*1\.1875rem;[^}]*font-weight:\s*700;[^}]*letter-spacing:\s*0\.14em;/],
-  ["rooms heading", /\.rooms__heading h2\s*\{[^}]*max-inline-size:\s*20ch;[^}]*font-size:\s*4\.5rem;[^}]*font-weight:\s*800;[^}]*line-height:\s*0\.98;/],
-  ["rooms grid", /\.rooms__grid\s*\{[^}]*grid-template-columns:\s*repeat\(4, minmax\(0, 1fr\)\);[^}]*gap:\s*1\.25rem;[^}]*margin-block-start:\s*2\.75rem;/],
+  ["rooms heading", /\.rooms__heading h2\s*\{[^}]*max-inline-size:\s*20ch;[^}]*font-size:\s*min\(4\.5rem, 7\.2svh\);[^}]*font-weight:\s*800;[^}]*line-height:\s*0\.98;/],
+  ["rooms grid", /\.rooms__grid\s*\{[^}]*grid-template-columns:\s*repeat\(4, minmax\(0, 1fr\)\);[^}]*gap:\s*1\.25rem;[^}]*margin-block-start:\s*clamp\(1\.25rem, 3\.4svh, 2\.75rem\);/],
   ["rooms portrait slots", /\.room__slot\s*\{[^}]*aspect-ratio:\s*3 \/ 4;/],
   ["rooms copy panel", /\.room__copy\s*\{[^}]*gap:\s*0\.5rem;[^}]*padding:\s*1\.125rem 1\.125rem 1\.375rem;[^}]*background:\s*#0d2b6b;/],
   ["rooms title", /\.room__copy h3\s*\{[^}]*color:\s*#f5c518;[^}]*font-size:\s*1\.5rem;/],
   ["rooms support", /\.room__copy p\s*\{[^}]*color:\s*#c6d5f2;[^}]*font-size:\s*0\.875rem;/],
   ["meaning field", /\.meaning\s*\{[^}]*min-block-size:\s*auto;[^}]*background:\s*#1273e0;/],
-  ["meaning rail", new RegExp(String.raw`\.meaning__inner\s*\{[^}]*grid-template-columns:\s*${u(190)} minmax\(0, 1fr\);`)],
-  ["meaning divider", new RegExp(String.raw`\.meaning__mark\s*\{[^}]*border-inline-end:\s*${u(4)} solid #f5c518;[^}]*background:\s*#0d2b6b;`)],
+  // The corner mark closes the RIGHT edge. Held on the left it read as a
+  // floating slab and left the band's whole right two-thirds over.
+  ["meaning rail closes the right edge", new RegExp(String.raw`\.meaning__inner\s*\{[^}]*grid-template-columns:\s*minmax\(0, 1fr\) ${u(190)};`)],
+  ["meaning divider", new RegExp(String.raw`\.meaning__mark\s*\{[^}]*grid-column:\s*2;[^}]*border-inline-end:\s*0;[^}]*border-inline-start:\s*${u(4)} solid #f5c518;[^}]*background:\s*#0d2b6b;`)],
   ["meaning corner mark", new RegExp(String.raw`\.meaning__mark::before\s*\{[^}]*inline-size:\s*${u(64)};[^}]*block-size:\s*${u(64)};[^}]*border-block-start:\s*${u(20)} solid #eef3fb;[^}]*border-inline-end:\s*${u(20)} solid #eef3fb;`)],
-  ["meaning content", new RegExp(String.raw`\.meaning__copy\s*\{[^}]*gap:\s*${u(20)};[^}]*padding:\s*${u(52)} ${u(56)} ${u(56)};`)],
+  // The corner screen is one page, so its bands are a zero-sum split: the height
+  // the crisis band gave back goes to the manifesto, not to the plan block below
+  // it, which is where the reviewed mock puts it.
+  ["meaning content", new RegExp(String.raw`\.meaning__copy\s*\{[^}]*grid-column:\s*1;[^}]*gap:\s*${u(20)};[^}]*padding:\s*${u(76)} ${u(56)} ${u(80)};`)],
   ["meaning heading", new RegExp(String.raw`\.meaning h2\s*\{[^}]*font-size:\s*${u(62)};`)],
   ["meaning final marker clearance reset", /\.meaning h2:has\(> span:last-child > \.marker-band:last-child\)\s*\{[^}]*padding-block-end:\s*0;/],
-  ["meaning body", new RegExp(String.raw`\.meaning__body\s*\{[^}]*max-inline-size:\s*46ch;[^}]*color:\s*#dce9fb;[^}]*font-size:\s*${u(22)};[^}]*text-wrap:\s*pretty;[^}]*white-space:\s*normal;`)],
-  ["roadmap padding", new RegExp(String.raw`\.roadmap__inner\s*\{[^}]*gap:\s*${u(22)};[^}]*padding:\s*${u(56)} ${u(56)} ${u(60)};`)],
+  ["meaning body", new RegExp(String.raw`\.meaning__body\s*\{[^}]*max-inline-size:\s*46ch;[^}]*color:\s*#dce9fb;[^}]*font-size:\s*max\(1\.5rem, ${u(22)}\);[^}]*text-wrap:\s*pretty;[^}]*white-space:\s*normal;`)],
+  ["roadmap padding", new RegExp(String.raw`\.roadmap__inner\s*\{[^}]*gap:\s*${u(22)};`)],
   ["roadmap heading", new RegExp(String.raw`\.roadmap__heading h2\s*\{[^}]*font-size:\s*${u(62)};`)],
   ["proposed-panel eyebrow leading", new RegExp(String.raw`\.meaning__copy \.eyebrow,\s*\.roadmap__heading \.eyebrow,\s*\.conversion__heading \.eyebrow\s*\{[^}]*font-size:\s*${u(15)};[^}]*line-height:\s*normal;`)],
   ["roadmap support", new RegExp(String.raw`\.roadmap__support\s*\{[^}]*color:\s*#31508f;[^}]*font-size:\s*${u(20)};[^}]*line-height:\s*normal;`)],
@@ -558,12 +622,17 @@ const desktopFeedbackContracts = [
   ["roadmap live palette", /\.roadmap-item--current\s*\{[^}]*background:\s*#0d2b6b;[^}]*color:\s*#fff;/],
   ["roadmap future palette", /\.roadmap-item--future\s*\{[^}]*background:\s*#dbe4f4;[^}]*color:\s*#31508f;/],
   ["roadmap status", new RegExp(String.raw`\.roadmap-item__status\s*\{[^}]*font-size:\s*${u(11)};[^}]*line-height:\s*normal;`)],
+  // Full navy. NEXT is the label that says a service is not live yet, and at
+  // 11px the retired #5b6f9c was the least readable thing on the page: 3.91:1,
+  // under the 4.5:1 small-text rule.
+  ["plan NEXT label is readable", /\.roadmap-item--future \.roadmap-item__status,\s*\.roadmap-item--future \.roadmap-item__name\s*\{\s*color:\s*#0d2b6b;/],
   ["roadmap name", new RegExp(String.raw`\.roadmap-item__name\s*\{[^}]*font-size:\s*${u(28)};[^}]*line-height:\s*normal;`)],
+  ["roadmap detail", new RegExp(String.raw`\.roadmap-item__detail\s*\{[^}]*font-size:\s*${u(15)};`)],
   ["signup field", /\.conversion\s*\{[^}]*background:\s*#1273e0;/],
   ["signup grid", new RegExp(String.raw`\.conversion__inner\s*\{[^}]*grid-template-columns:\s*minmax\(0, 1\.15fr\) minmax\(0, 1fr\);[^}]*gap:\s*${u(48)};[^}]*padding:\s*${u(56)} ${u(56)} ${u(60)};`)],
   ["signup heading rhythm", new RegExp(String.raw`\.conversion__heading\s*\{[^}]*gap:\s*${u(26)};`)],
   ["signup heading", new RegExp(String.raw`\.conversion__heading h2\s*\{[^}]*font-size:\s*${u(56)};`)],
-  ["signup body", new RegExp(String.raw`\.conversion__body\s*\{[^}]*max-inline-size:\s*38ch;[^}]*font-size:\s*${u(21)};`)],
+  ["signup body", new RegExp(String.raw`\.conversion__body\s*\{[^}]*max-inline-size:\s*38ch;[^}]*font-size:\s*max\(1\.5rem, ${u(21)}\);`)],
   ["signup panel", new RegExp(String.raw`\.conversion-path\s*\{[^}]*gap:\s*${u(22)};[^}]*padding:\s*${u(34)} ${u(34)} ${u(38)};[^}]*background:\s*#eef3fb;`)],
   ["signup signal border", new RegExp(String.raw`\.conversion-path--member\s*\{[^}]*border-block-start:\s*${u(8)} solid #f5c518;`)],
   ["signup semantic fieldset inset", new RegExp(String.raw`\.conversion \.prototype-form > fieldset\s*\{[^}]*padding-block-start:\s*${u(10)};[^}]*padding-block-end:\s*0;`)],
@@ -637,6 +706,26 @@ if (!/\.field input\s*\{[^}]*min-block-size:\s*2\.75rem;/.test(sharedCss)
 if (!/\.prototype-disclosure\s*\{[^}]*padding:\s*0\.375rem var\(--space-sm\);[^}]*border:\s*1px solid color-mix\([^;]+\);[^}]*background:\s*color-mix\(in oklch, var\(--brand-yellow\) 9%, var\(--brand-off-white\)\);[^}]*font-size:\s*var\(--font-size-support\);[^}]*font-weight:\s*var\(--font-weight-regular\);/.test(conceptCss)
   || /\.prototype-disclosure\s*\{[^}]*(?:opacity:\s*0\s*;|font-size:\s*(?:0(?:rem|em|px)?|(?:[1-9]|1[0-3])(?:\.\d+)?px)\s*;)/.test(conceptCss)) {
   fail("Prototype disclosure must remain readable and visually quiet");
+}
+// The standing notice is gone from the card — the privacy page carries it and
+// the CSP enforces it — but the element is NOT: it is this form's only visible
+// error summary, because the per-field messages are screen-reader-only. Empty
+// it must paint nothing and still hold its reserved height, or a failed submit
+// either looks like nothing happened or moves the button under the cursor.
+if (safetyCopy.prototypeDisclosure !== "") fail("The sign-up card must not carry a standing prototype notice");
+if (!home.includes('<p class="prototype-disclosure" id="member-prototype-disclosure"></p>')) {
+  fail("The error-summary element must still render, and render empty");
+}
+// :empty may only change what the slot PAINTS, never what it occupies. A
+// margin, height or display change here stops applying the moment a message
+// arrives, which moves the submit button under the cursor at the exact instant
+// it was clicked. Measured at 11px and reverted; this guard is the receipt.
+if (!/\.prototype-disclosure:empty\s*\{\s*border-color:\s*transparent;\s*background:\s*transparent;\s*\}/.test(conceptCss)
+  || /\.prototype-disclosure:empty\s*\{[^}]*(?:display|block-size|min-block-size|visibility|margin|padding|inset)/.test(conceptCss)) {
+  fail("The empty error summary must be invisible without giving up any of the space it reserves");
+}
+if (!/aria-describedby="member-prototype-disclosure"/.test(home) || count(home, "data-form-status") !== 1) {
+  fail("The form must keep its accessible description and status wiring");
 }
 const roleInputRule = conceptCss.match(/\.prototype-role__choice input\s*\{([^}]*)\}/)?.[1] ?? "";
 if (!/position:\s*absolute;/.test(roleInputRule)

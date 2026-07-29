@@ -139,23 +139,13 @@
   padding-block: clamp(0.75rem, 1.9svh, 1.75rem);
 }
 
-.crisis-band__line {
-  max-inline-size: 14ch;
-  margin: 0;
-  font-size: clamp(1.75rem, min(3vw, 5.4svh), 3.25rem);
-  font-weight: var(--font-weight-bold);
-  letter-spacing: -0.035em;
-  line-height: 0.98;
-}
-
-.crisis-band__accent {
-  color: var(--brand-yellow);
-}
-
+/* Two short lines beside the numbers rather than a three-row column above them.
+   The retired hero repeat forced the column and cost every screen ~50px of
+   height for a line the hero already says once, properly, at display size. */
 .crisis-band__support {
   display: flex;
   flex-direction: column;
-  gap: clamp(0.4rem, 0.9svh, 0.75rem);
+  gap: clamp(0.2rem, 0.5svh, 0.4rem);
 }
 
 .crisis-band__label {
@@ -283,12 +273,28 @@
   text-decoration-skip-ink: none;
 }
 
-/* Based on the browser text-selection box, with a small optical inline bleed.
-   The pseudo-element extends beyond the measured text box without padding the
-   inline, so wrapping and display geometry stay unchanged. It must remain a
-   z-index:-1 layer: the content box is 1.43em tall against a 0.9 line-height,
-   and a plain background would paint over the line above. nowrap keeps the
-   band to one fragment while only the pseudo-element carries the bleed. */
+/* A highlighter mark, not the browser's selection box. The pseudo-element
+   extends beyond the measured text box without padding the inline, so wrapping
+   and display geometry stay unchanged. It must remain a z-index:-1 layer: a
+   plain background would paint over the line above.
+
+   The block insets are measured, not guessed. In Proxima Nova Condensed Bold
+   the inline content box is 1.4258em tall with the baseline 1.0645em down it;
+   the tallest ink in any banded phrase rises 0.7031em above that baseline
+   ("first") and the deepest falls 0.1953em below it (the y in "an ordinary
+   week."). The full box therefore left 0.361em of dead yellow above the letters
+   against 0.166em below — top-heavy, half again as tall as it needed to be, and
+   reaching up into the line above, which is what made the band under "climb."
+   read as misaligned.
+
+   0.28em on both sides is measured off the BASELINE, not the descenders: it
+   leaves an even 0.081em of yellow above the tallest ink and 0.081em below the
+   baseline, and it starts the band below the line box instead of inside the
+   previous line. Three of the four banded phrases have no descender at all, so
+   pushing the band down to clear the one that does ("an ordinary week.", which
+   is unbanded on desktop anyway) would make every other one sag. A tail hanging
+   past the mark is what a real highlighter does. nowrap keeps the band to one
+   fragment while only the pseudo-element carries the inline bleed. */
 .marker-band {
   position: relative;
   display: inline;
@@ -301,9 +307,22 @@
   content: "";
   position: absolute;
   z-index: -1;
-  inset-block: 0;
+  inset-block: 0.28em;
   inset-inline: -0.125em;
   background: var(--brand-yellow);
+}
+
+/* The inset above is Proxima Nova Condensed's. Archivo — which sets the rooms,
+   corner and sign-up headings — reports an inline box of 1.093em against
+   Proxima's 1.426em, so the identical em inset there cut 6px off the caps of
+   "A Corner." and clipped the baseline under it. Measured in Archivo Bold:
+   the baseline sits 0.884em down the box and the tallest banded ink reaches
+   0.7474em above it (the f and t of "first"), so 0.055em/0.1em leaves the same
+   ~0.07-0.09em of yellow around the letters that the Proxima rule does. */
+.rooms .marker-band::before,
+.meaning .marker-band::before,
+.conversion .marker-band::before {
+  inset-block: 0.055em 0.1em;
 }
 
 .concept-hero__lead {
@@ -317,7 +336,8 @@
 }
 
 @media (min-width: 48.0625rem) {
-  .concept-hero__lead-line {
+  .concept-hero__lead-line,
+  .concept-hero__body-line {
     display: block;
   }
 }
@@ -331,14 +351,16 @@
    55ch measure, so it read as a different voice from the left column. It now
    takes the same family, weight, size and leading as .concept-hero__lead and a
    short measure, and it starts at the image's left edge. */
-/* 42ch, not 34ch: at 34ch this line broke to THREE lines and the orphaned
-   "opens soon." read as a stray fragment. Two lines is the shape the review
-   draws. The measure is the only thing that changed - size, weight and leading
-   are untouched. Measured: two lines hold from 39ch to 62ch at 2048 down to
-   1100, so 42ch sits inside that band with room on both sides, and 42ch is
-   586px against a 969px column at 2048 and 496px against 508px at 1100. */
+/* 50ch, not 42ch: the two lines are now an explicit break between the two
+   SENTENCES rather than wherever a 42ch measure happened to run out, which had
+   been snapping the line after "Not for much" and leaving "longer" orphaned on
+   the second row. The measure now only has to hold the longer of the two
+   sentences (57 characters) without wrapping it a third time, so it widens
+   just far enough to do that and no further. Size, weight and leading are
+   untouched, and they still match .concept-hero__lead so the two columns square
+   up line for line. */
 .concept-hero__body {
-  max-inline-size: 42ch;
+  max-inline-size: 50ch;
   margin: 0;
   font-size: clamp(1.375rem, 1.78vw, 1.75rem);
   font-weight: var(--font-weight-bold);
@@ -722,6 +744,12 @@
   line-height: 1.05;
 }
 
+.roadmap-item__detail {
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.4;
+}
+
 .roadmap-item--current {
   background: var(--brand-navy);
   color: var(--brand-off-white);
@@ -776,8 +804,8 @@
   }
 
   /* Four columns are still in play in this band but each is only ~185px wide,
-     and the 4rem floor pushed "~300%" past its content box. Scale the numeral
-     with the column here; mobile keeps the floor. */
+     and the 4rem floor pushed the widest figure past its content box. Scale the
+     numeral with the column here; mobile keeps the floor. */
   .stat__value {
     font-size: clamp(2.5rem, 6.2vw, 3.5rem);
   }
@@ -839,6 +867,19 @@
   font-weight: var(--font-weight-regular);
   line-height: 1.5;
 }
+
+/* The standing "Prototype" notice is gone from the card — the privacy page says
+   it at length and the CSP enforces it — but the element stays, because it is
+   also this form's only VISIBLE error summary: the per-field messages are
+   screen-reader-only, so without it a failed submit would look like nothing
+   happened. Empty it paints nothing and keeps its reserved height, so the
+   message that appears on a validation error cannot shift the button under the
+   cursor. :empty is exact here: the script writes text content or clears it. */
+.prototype-disclosure:empty {
+  border-color: transparent;
+  background: transparent;
+}
+
 
 .prototype-disclosure[data-validation-state="error"] {
   border-color: var(--brand-navy);
@@ -1187,8 +1228,16 @@
 }
 
 @media (min-width: 64.0625rem) {
+  /* Pinned, not auto. The four portrait tiles are the only content on the site
+     that cannot fit a short window at its natural size: a 3:4 slot in a
+     quarter-width column is ~630px tall on a 2048px screen, which put this
+     block 110px over one page at 1200 and 459px over at 830. It was the one
+     screen you had to scroll inside. A definite height gives the grid row
+     something to shrink against, so the chrome tightens with the window and the
+     photographs — which are object-fit: cover and crop rather than squash —
+     take whatever is left. Tall windows still get the full 3:4 tile. */
   .screen--rooms {
-    min-block-size: 0;
+    block-size: 100svh;
   }
 
   /* The reviewed mock is authored at 1280px wide and every value in it is a
@@ -1226,16 +1275,20 @@
     background: #eef3fb;
   }
 
+  /* Every vertical value here scales continuously with svh so a short window
+     spends its height on the photographs instead of on padding. The ceilings
+     are the reviewed 1280px mock's own numbers, so a tall window is unchanged. */
   .rooms__inner {
+    min-block-size: 0;
     justify-content: flex-start;
-    padding: 3.5rem 3rem 3.75rem;
+    padding: clamp(1.75rem, 4.3svh, 3.5rem) 3rem clamp(2rem, 4.6svh, 3.75rem);
   }
 
   .rooms__heading {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 1.375rem;
+    gap: clamp(0.75rem, 1.6svh, 1.375rem);
   }
 
   .rooms__heading .eyebrow {
@@ -1254,7 +1307,7 @@
     margin: 0;
     padding-block-end: 0;
     color: #0d2b6b;
-    font-size: 4.5rem;
+    font-size: min(4.5rem, 7.2svh);
     font-weight: 800;
     letter-spacing: -0.035em;
     line-height: 0.98;
@@ -1267,14 +1320,25 @@
 
   .rooms__grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-auto-rows: minmax(0, 1fr);
     gap: 1.25rem;
-    flex: none;
-    margin-block-start: 2.75rem;
+    flex: 1 1 auto;
+    min-block-size: 0;
+    margin-block-start: clamp(1.25rem, 3.4svh, 2.75rem);
   }
 
+  .room {
+    min-block-size: 0;
+  }
+
+  /* 3:4 is the tile's natural size and its ceiling, not a floor. When the row
+     is shorter than that the slot gives up the difference and the photograph
+     crops through object-fit; the caption keeps its measured height, so the
+     picture is the only thing that moves. */
   .room__slot {
     aspect-ratio: 3 / 4;
-    flex: 0 0 auto;
+    flex: 1 1 auto;
+    min-block-size: 0;
   }
 
   .room__slot:has(img) > .room__slot-label,
@@ -1284,7 +1348,7 @@
 
   .room__copy {
     min-block-size: 7.5625rem;
-    flex: 1 1 auto;
+    flex: 0 0 auto;
     gap: 0.5rem;
     padding: 1.125rem 1.125rem 1.375rem;
     background: #0d2b6b;
@@ -1310,15 +1374,24 @@
     background: #1273e0;
   }
 
+  /* The corner panel closes the RIGHT edge. Held on the left it read as a
+     floating slab with the headline beside it and the band's whole right
+     two-thirds left over; moved across, the same emptiness becomes measured
+     margin between the line and the mark that closes the band. The copy is
+     placed explicitly rather than reordered in the DOM — the mark is decorative
+     and aria-hidden, so only the visual order moves. */
   .meaning__inner {
-    grid-template-columns: calc(var(--u) * 190) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) calc(var(--u) * 190);
   }
 
   /* The block runs edge to edge, so the navy corner is already flush with the
      viewport and needs no bleed of its own. */
   .meaning__mark {
+    grid-column: 2;
+    grid-row: 1;
     place-items: center;
-    border-inline-end: calc(var(--u) * 4) solid #f5c518;
+    border-inline-end: 0;
+    border-inline-start: calc(var(--u) * 4) solid #f5c518;
     background: #0d2b6b;
   }
 
@@ -1334,11 +1407,19 @@
     border-inline-end: calc(var(--u) * 20) solid #eef3fb;
   }
 
+  /* The corner screen is one page, so its three bands are a zero-sum split:
+     the crisis band gave back ~50px when it stopped repeating the hero line,
+     and that height goes to the manifesto rather than to the light section
+     below it, which is where the reviewed mock puts it (blue 34%, light 54%,
+     crisis 12%). Growing the padding here is what stops the plan block
+     inheriting the slack as yet more empty space. */
   .meaning__copy {
+    grid-column: 1;
+    grid-row: 1;
     align-items: flex-start;
     justify-content: center;
     gap: calc(var(--u) * 20);
-    padding: calc(var(--u) * 52) calc(var(--u) * 56) calc(var(--u) * 56);
+    padding: calc(var(--u) * 76) calc(var(--u) * 56) calc(var(--u) * 80);
   }
 
   .meaning__copy .eyebrow,
@@ -1379,22 +1460,32 @@
     background: #f5c518;
   }
 
+  /* max(), not the bare mock unit. --u carries an svh term, so on a short window
+     this dropped to ~21px — under the 24px WCAG large-text threshold, which is
+     the only thing letting muted off-white sit on the brand blue at 3.75:1. The
+     base rule pins 1.5rem for exactly this reason and the mock scale was
+     overriding it; the floor puts it back without capping the mock on a tall
+     window. Measured: 3.75:1 at 21px is a fail, the same colour at 24px is a
+     pass. */
   .meaning__body {
     max-inline-size: 46ch;
     margin: 0;
     color: #dce9fb;
-    font-size: calc(var(--u) * 22);
+    font-size: max(1.5rem, calc(var(--u) * 22));
     font-weight: 500;
     line-height: 1.45;
     text-wrap: pretty;
     white-space: normal;
   }
 
+  /* Even top and bottom. The 56/60 split was drawn against a card row that
+     stretched to fill the block; with the cards sized to their own content the
+     leftover is real whitespace, and uneven whitespace reads as a mistake. */
   .roadmap__inner {
     align-items: flex-start;
     justify-content: center;
     gap: calc(var(--u) * 22);
-    padding: calc(var(--u) * 56) calc(var(--u) * 56) calc(var(--u) * 60);
+    padding: calc(var(--u) * 56);
   }
 
   .roadmap__heading {
@@ -1421,18 +1512,15 @@
     line-height: normal;
   }
 
-  /* Running edge to edge makes each card ~474px wide, and at the mock's own
-     card height that is a 4.7:1 bar instead of the 2.1:1 block it draws. So the
-     row takes the page's leftover height rather than only its content height,
-     and stops at the height the mock WOULD give a card this wide
-     (132 mock-px at the pure-width scale, i.e. 132 x 0.078125vw). Short windows
-     simply shrink it — the cards flatten before anything overflows. */
+  /* Sized to content now. Stretching the row to the page's leftover height was
+     what produced a ~250px card holding one word in its top corner and nothing
+     underneath — the box was inflated to fill space rather than because it had
+     anything in it. Each card now carries a line of detail under the service
+     name and takes exactly the height that needs; the leftover goes back to the
+     block, where .roadmap__inner splits it evenly above and below. */
   .roadmap__list {
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    grid-auto-rows: minmax(0, 1fr);
-    flex: 1 1 auto;
-    min-block-size: 0;
-    max-block-size: 10.3125vw;
+    flex: 0 0 auto;
     gap: calc(var(--u) * 14);
     inline-size: 100%;
     margin-block-start: calc(var(--u) * 14);
@@ -1466,8 +1554,12 @@
     color: #f5c518;
   }
 
-  .roadmap-item--future .roadmap-item__status {
-    color: #5b6f9c;
+  /* Full navy, not #5b6f9c. NEXT is the label that tells you a service is not
+     live yet, and at 11px on a pale card the old grey-blue was the least
+     readable thing on the page — 3.91:1, under the 4.5:1 small-text rule. */
+  .roadmap-item--future .roadmap-item__status,
+  .roadmap-item--future .roadmap-item__name {
+    color: #0d2b6b;
   }
 
   .roadmap-item__name {
@@ -1475,6 +1567,16 @@
     font-weight: 800;
     letter-spacing: -0.02em;
     line-height: normal;
+  }
+
+  .roadmap-item__detail {
+    font-size: calc(var(--u) * 15);
+    font-weight: 500;
+    line-height: 1.35;
+  }
+
+  .roadmap-item--current .roadmap-item__detail {
+    color: #c6d5f2;
   }
 
   .conversion {
@@ -1520,11 +1622,12 @@
     background: #f5c518;
   }
 
+  /* Same 24px large-text floor as .meaning__body, and for the same reason. */
   .conversion__body {
     max-inline-size: 38ch;
     margin: 0;
     color: #dce9fb;
-    font-size: calc(var(--u) * 21);
+    font-size: max(1.5rem, calc(var(--u) * 21));
     font-weight: 500;
     line-height: 1.45;
   }
@@ -1557,6 +1660,11 @@
     line-height: normal;
   }
 
+  /* Tempting to claw back the gap this now-invisible slot leaves under the
+     title with a :empty negative margin. Do not: :empty stops matching the
+     moment a validation message arrives, so the card grows by a gap and moves
+     the submit button 11px under the cursor at the exact moment you clicked it.
+     Measured and reverted. The reserve is constant in both states by design. */
   .prototype-disclosure {
     block-size: calc(var(--u) * 41);
     margin: 0;
@@ -1699,6 +1807,11 @@
     --page-gutter: 2.5rem;
   }
 
+  /* Narrow enough that the two blocks stack; the numbers get the full width. */
+  .crisis-band__inner {
+    gap: clamp(0.75rem, 2svh, 1.25rem);
+  }
+
   .concept-hero__inner {
     grid-template-columns: minmax(0, 48fr) minmax(0, 52fr);
     column-gap: 0;
@@ -1722,10 +1835,6 @@
 
   .roadmap__list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .crisis-band__line {
-    max-inline-size: none;
   }
 }
 

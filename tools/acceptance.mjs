@@ -317,6 +317,18 @@ for (const viewport of VIEWPORTS) {
     const luminance = ([r, g, b]) => 0.2126 * channel(r) + 0.7152 * channel(g) + 0.0722 * channel(b);
     const ratio = (a, b) => { const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x); return +((hi + 0.05) / (lo + 0.05)).toFixed(2); };
     const backdrop = (el) => {
+      // A marker band paints its field on a z-index:-1 ::before layer, not on
+      // the element itself, so walking straight up reported the section colour
+      // BEHIND the highlight and flagged navy-on-yellow — a real 8:1 — as a
+      // 2.89:1 failure on every run. Read the painted layer first, but only
+      // when it is actually painted: the rooms heading drops its band entirely
+      // on desktop and must still be measured against the section.
+      const layer = getComputedStyle(el, "::before");
+      if (el.classList.contains("marker-band")
+        && layer.display !== "none"
+        && !/rgba\(0, 0, 0, 0\)/.test(layer.backgroundColor)) {
+        return layer.backgroundColor;
+      }
       let node = el;
       while (node && node !== document.documentElement) {
         const bg = getComputedStyle(node).backgroundColor;
@@ -472,7 +484,10 @@ const EXPECTED_FORM_ERRORS = {
   email: "Please enter your email address.",
   phone: "Please enter your phone number.",
 };
-const PROTOTYPE_NOTICE = "Prototype — use test details only. Nothing is transmitted or stored.";
+/* The card no longer carries a standing "Prototype" notice; the element behind
+   it stays as the form's only visible error summary and rests empty, so what a
+   correction has to restore is the empty state, not a sentence. */
+const PROTOTYPE_NOTICE = "";
 for (const [width, height] of FORM_VIEWPORTS) {
   const page = await openPage(width, height);
   await page.goto(target, { waitUntil: "networkidle" });
@@ -569,7 +584,7 @@ for (const [width, height] of FORM_VIEWPORTS) {
       height: Math.abs(blurBefore[key].height - blurCorrected.geometry[key].height),
     };
   }
-  check(`form ${width}: pre-submit correction restores notice without shift`,
+  check(`form ${width}: pre-submit correction clears the summary without shift`,
     blurCorrected.summary === PROTOTYPE_NOTICE
       && !blurCorrected.summaryState
       && blurCorrected.ariaInvalid === "false"
@@ -669,7 +684,7 @@ for (const [width, height] of FORM_VIEWPORTS) {
       overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
     };
   });
-  check(`form ${width}: correction restores the prototype notice`,
+  check(`form ${width}: correction clears the error summary`,
     corrected.summary === PROTOTYPE_NOTICE
       && !corrected.state
       && !corrected.hasClass

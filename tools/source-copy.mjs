@@ -12,6 +12,11 @@ export const sourceCopy = Object.freeze({
     heading: "Nobody Fights Alone.",
     leadFirst: "Three in four suicides in Canada are men.",
     leadSecond: "Let that sit for a second.",
+    // The right column breaks on its own sentence, not wherever the measure runs
+    // out. Two sentences, two lines, so it squares up with the two lines of the
+    // left column instead of reading as a ragged paragraph beside them.
+    bodyFirst: "Most men fight this alone and in silence.",
+    bodySecond: "Not for much longer — Canada's corner for men opens soon.",
     body: "Most men fight this alone and in silence. Not for much longer — Canada's corner for men opens soon.",
     memberCta: "Get early access",
     therapistCta: "Therapists, join us",
@@ -23,7 +28,7 @@ export const sourceCopy = Object.freeze({
       Object.freeze({ value: "85%", label: "of working men have already hit burnout" }),
       Object.freeze({ value: "2×", label: "anxiety disorders have doubled in a decade" }),
       Object.freeze({ value: "#1", label: "cause of death for men 20 to 49 is overdose" }),
-      Object.freeze({ value: "~300%", label: "more young men now seeking gambling help" }),
+      Object.freeze({ value: "3×", label: "more young men now seeking gambling help" }),
     ]),
     source: "Sources: Statistics Canada · Public Health Agency of Canada · CMAJ · Cogent Mental Health.",
     gamblingSource: "Gambling figure: help-seeking among men aged 15 to 24 in Ontario after online betting was legalized in 2022 (CMAJ, 2026).",
@@ -81,11 +86,16 @@ export const sourceCopy = Object.freeze({
     eyebrow: "This is just the first bell",
     heading: "We start with therapy.",
     support: "The rest of the corner is on its way.",
+    // One line of detail per service. A card holding a single word had to be
+    // padded to 250px to look like a card at all; with a description under the
+    // name the box is earned and sizes to its own content. "Nutrition &
+    // wellness" shortens to "Nutrition" here because the detail line carries
+    // what the second word was doing.
     items: Object.freeze([
-      Object.freeze({ name: "Therapy", status: "Live at launch" }),
-      Object.freeze({ name: "Coaching", status: "Next" }),
-      Object.freeze({ name: "Nutrition & wellness", status: "Next" }),
-      Object.freeze({ name: "Diagnostics", status: "Next" }),
+      Object.freeze({ name: "Therapy", status: "Live at launch", detail: "Registered therapists, one-to-one." }),
+      Object.freeze({ name: "Coaching", status: "Next", detail: "Habits, work, direction." }),
+      Object.freeze({ name: "Nutrition", status: "Next", detail: "Food, sleep, training." }),
+      Object.freeze({ name: "Diagnostics", status: "Next", detail: "Bloodwork and screening." }),
     ]),
   }),
   conversion: Object.freeze({
@@ -102,9 +112,10 @@ export const sourceCopy = Object.freeze({
   // The single navy crisis band closes the landing page. Someone in trouble
   // scans for a number, so the numbers are tap targets, not underlined links,
   // and the helpline is named so there is no doubt about who picks up.
+  // The band no longer repeats "Nobody fights alone." — that line belongs to the
+  // hero, and saying it five more times stretched every band by ~50px while
+  // pushing the only thing worth finding fast into a corner.
   crisis: Object.freeze({
-    line: "Nobody fights alone.",
-    lineAccent: "alone.",
     label: "Need someone now",
     actions: Object.freeze([
       Object.freeze({ label: "Call 9-8-8", href: "tel:988", tone: "signal" }),
@@ -150,8 +161,14 @@ export const privacyCopy = Object.freeze({
   back: "Back to The Blue Corner",
 });
 
+/* The card no longer carries a standing "Prototype" notice: the privacy page
+   says the same thing at length and the CSP (connect-src/form-action 'none')
+   enforces it. The element stays because it is ALSO the form's only visible
+   error summary — the per-field messages are screen-reader-only on desktop — so
+   it renders empty, holds its reserved height, and paints only on a validation
+   error. Deleting it outright would leave a submit that visibly does nothing. */
 export const safetyCopy = Object.freeze({
-  prototypeDisclosure: "Prototype — use test details only. Nothing is transmitted or stored.",
+  prototypeDisclosure: "",
   prototypeLoading: "Checking…",
   prototypeSuccessTitle: "Prototype complete.",
   prototypeSuccessBody: "Your details were checked on this device only. Nothing was sent, stored, or added to a waitlist.",
