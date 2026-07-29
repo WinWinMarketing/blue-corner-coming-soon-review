@@ -103,8 +103,11 @@ if (!home.includes(`<p class="concept-hero__body"><span class="concept-hero__bod
 if (`${sourceCopy.hero.bodyFirst} ${sourceCopy.hero.bodySecond}` !== sourceCopy.hero.body) {
   fail("The hero's two right-column lines must still read as the approved og:description sentence");
 }
-if (!/@media \(min-width: 48\.0625rem\)\s*\{\s*\.concept-hero__lead-line,\s*\.concept-hero__body-line\s*\{\s*display:\s*block;/.test(await readFile(path.join(rootDirectory, "assets/styles/concept-base.css"), "utf8"))) {
-  fail("Both hero columns must take their locked line breaks at the same breakpoint");
+// The right column's break is UNCONDITIONAL. Scoped to a breakpoint it only
+// held below 769px when the measure happened to run out in the right place;
+// the two sentences sharing a line is the failure this prevents.
+if (!/\.concept-hero__body-line\s*\{\s*display:\s*block;\s*\}/.test(await readFile(path.join(rootDirectory, "assets/styles/concept-base.css"), "utf8"))) {
+  fail("The hero's right column must take its sentence break at every width");
 }
 // 50ch, not 42ch: with the break explicit the measure only has to hold the
 // longer of the two sentences without wrapping it a third time. Size, weight

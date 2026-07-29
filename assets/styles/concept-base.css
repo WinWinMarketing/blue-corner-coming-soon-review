@@ -335,9 +335,18 @@
   line-height: 1.2;
 }
 
+/* Unconditional, unlike the lead beside it. Below 769px the right column used
+   to fall back to plain inline wrapping, so "Not for much longer" only started
+   its own line when the measure happened to run out in the right place — it
+   held by luck, not by rule. The break is a stated requirement, so it is a
+   rule at every width. The second sentence may still wrap within itself on a
+   narrow phone; what cannot happen is the two sentences sharing a line. */
+.concept-hero__body-line {
+  display: block;
+}
+
 @media (min-width: 48.0625rem) {
-  .concept-hero__lead-line,
-  .concept-hero__body-line {
+  .concept-hero__lead-line {
     display: block;
   }
 }
@@ -1331,10 +1340,14 @@
     min-block-size: 0;
   }
 
-  /* 3:4 is the tile's natural size and its ceiling, not a floor. When the row
-     is shorter than that the slot gives up the difference and the photograph
-     crops through object-fit; the caption keeps its measured height, so the
-     picture is the only thing that moves. */
+  /* 3:4 is the tile's BASIS, not a ceiling. The row always fills the page, so
+     the slot gives up the difference on a short window and takes the surplus on
+     a tall one — measured 1.11:1 at 1600x830 through 0.75:1 near 1600x1020 and
+     on to 0.60:1 at 1600x1200. Either way the photograph crops through
+     object-fit rather than squashing, and the caption keeps its measured
+     height, so the picture is the only thing that moves. Capping growth at 3:4
+     would just trade the surplus for dead space under the row, which is the
+     thing the review asked to remove. */
   .room__slot {
     aspect-ratio: 3 / 4;
     flex: 1 1 auto;
@@ -1595,10 +1608,18 @@
     border: 0;
   }
 
+  /* Centred against the card, not pinned to the top of it. The heading block is
+     ~211px beside a ~582px form, so start-aligning it left a single 486px well
+     of blue under three lines of type — the emptiness the review flagged on this
+     screen, and it grew by the ~57px the crisis band gave back. Centring does
+     not remove the slack (the screen is one page and the form sets its height)
+     but it stops it pooling in one corner: the line now sits opposite the middle
+     of the card and the space reads as margin instead of a hole. */
   .conversion__heading {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
+    align-self: center;
     gap: calc(var(--u) * 26);
   }
 

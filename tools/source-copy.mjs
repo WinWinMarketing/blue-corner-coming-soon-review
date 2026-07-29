@@ -16,8 +16,8 @@ export const sourceCopy = Object.freeze({
     // out. Two sentences, two lines, so it squares up with the two lines of the
     // left column instead of reading as a ragged paragraph beside them.
     bodyFirst: "Most men fight this alone and in silence.",
-    bodySecond: "Not for much longer — Canada's corner for men opens soon.",
-    body: "Most men fight this alone and in silence. Not for much longer — Canada's corner for men opens soon.",
+    bodySecond: "Not for much longer — your corner opens soon.",
+    body: "Most men fight this alone and in silence. Not for much longer — your corner opens soon.",
     memberCta: "Get early access",
     therapistCta: "Therapists, join us",
   }),
