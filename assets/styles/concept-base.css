@@ -1955,8 +1955,17 @@
     max-inline-size: 100%;
   }
 
+  /* On a phone the 3:2 frame renders the man and his ring card at thumbnail
+     size — the page's most important photograph stops communicating. A taller
+     crop keeps the corner context while the subject stays legible; the source
+     art is untouched, this is a viewport-specific window onto it. */
   .concept-hero__media {
     max-block-size: none;
+    aspect-ratio: 1 / 1;
+  }
+
+  .concept-hero__image {
+    object-position: 68% 50%;
   }
 
   .concept-hero h1 {
@@ -1971,7 +1980,21 @@
   .rooms__inner,
   .roadmap__inner {
     inline-size: 100%;
-    padding-block: var(--space-4xl);
+    padding-block: var(--space-3xl);
+  }
+
+  /* The locked line is "an ordinary week." — the base min(4.5rem, 7.2svh) size
+     has no WIDTH term, so on phones it overflowed the document (16px of real
+     horizontal scroll at 414px) and the old ≤390px -0.11em tracking crush only
+     papered over the two tested widths while jamming the words together. The
+     vw term keeps the line inside its column at every phone width; tracking
+     returns to the face's natural set. */
+  .rooms .rooms__heading h2 {
+    font-size: min(4.5rem, 7.2svh, 10.2vw);
+  }
+
+  .rooms .rooms__heading h2 > span:last-child {
+    letter-spacing: -0.02em;
   }
 
   .stats__grid {
@@ -1995,7 +2018,7 @@
   }
 
   .meaning__mark {
-    min-block-size: 7rem;
+    min-block-size: 5.5rem;
     place-items: center start;
     padding-inline: var(--page-gutter);
     border-inline-end: 0;
@@ -2007,7 +2030,7 @@
   }
 
   .meaning__copy {
-    padding: var(--space-4xl) var(--page-gutter);
+    padding: var(--space-3xl) var(--page-gutter);
   }
 
   .meaning h2 {
@@ -2018,6 +2041,22 @@
     grid-template-columns: 1fr;
     gap: var(--space-2xl);
     padding-block: var(--space-3xl);
+  }
+
+  /* The empty error-summary slot must keep its reserved height (no-shift
+     contract), but resting between the card title and the first field it reads
+     as a rendering hole on a narrow card. Flex order moves the SLOT to the
+     card's end — where reserved space reads as padding and where a message
+     paints beside the submit button the user just pressed. DOM order, the
+     aria-describedby wiring, and every reserved height are unchanged. */
+  .conversion-path {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .conversion .prototype-disclosure {
+    order: 9;
+    margin-block: clamp(0.25rem, 0.8svh, 0.625rem) 0;
   }
 
   .crisis-band__inner {
@@ -2086,10 +2125,6 @@
   .meaning h2,
   .conversion__heading h2 {
     font-size: clamp(2.625rem, 13.5vw, 3.375rem);
-  }
-
-  .rooms__heading h2 > span:last-child {
-    letter-spacing: -0.11em;
   }
 
   .prose h1 {
