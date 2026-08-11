@@ -483,6 +483,7 @@ const EXPECTED_FORM_ERRORS = {
   name: "Please enter your name.",
   email: "Please enter your email address.",
   phone: "Please enter your phone number.",
+  consent: "Tick the box so we know we can email you.",
 };
 /* The card no longer carries a standing "Prototype" notice; the element behind
    it stays as the form's only visible error summary and rests empty, so what a
@@ -626,6 +627,7 @@ for (const [width, height] of FORM_VIEWPORTS) {
         name: document.querySelector('[data-field-error="name"]').textContent.trim(),
         email: document.querySelector('[data-field-error="email"]').textContent.trim(),
         phone: document.querySelector('[data-field-error="phone"]').textContent.trim(),
+        consent: document.querySelector('[data-field-error="consent"]').textContent.trim(),
       },
       invalidIds: [...document.querySelectorAll('[aria-invalid="true"]')].map((node) => node.id),
       checkedRoles: document.querySelectorAll('input[name="role"]:checked').length,
@@ -643,7 +645,7 @@ for (const [width, height] of FORM_VIEWPORTS) {
       overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
     };
   });
-  const expectedInvalidIds = ["member-role-patient", "member-role-therapist", "member-name", "member-email", "member-phone"];
+  const expectedInvalidIds = ["member-role-patient", "member-role-therapist", "member-name", "member-email", "member-phone", "member-consent"];
   check(`form ${width}: empty errors and aria-invalid are exact`,
     JSON.stringify(invalidState.errors) === JSON.stringify(EXPECTED_FORM_ERRORS)
       && JSON.stringify(invalidState.invalidIds) === JSON.stringify(expectedInvalidIds),
@@ -672,6 +674,9 @@ for (const [width, height] of FORM_VIEWPORTS) {
   await page.locator("#member-name").fill("Test Person");
   await page.locator("#member-email").fill("test@example.com");
   await page.locator("#member-phone").fill("4165550100");
+  /* Ticked last, and never pre-ticked in the markup, so "correction clears the
+     summary" only passes once express consent has actually been given. */
+  await page.locator("#member-consent").check({ force: true });
   await page.waitForTimeout(50);
   const corrected = await page.evaluate(() => {
     const disclosure = document.querySelector(".prototype-disclosure");

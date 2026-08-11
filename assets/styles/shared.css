@@ -334,6 +334,7 @@ button {
 .reveal-prep .conversion-path[data-reveal] > .prototype-disclosure,
 .reveal-prep .conversion-path[data-reveal] .prototype-role,
 .reveal-prep .conversion-path[data-reveal] .field-grid,
+.reveal-prep .conversion-path[data-reveal] .prototype-consent,
 .reveal-prep .conversion-path[data-reveal] [data-submit],
 .reveal-prep .conversion-path[data-reveal] .conversion-path__note {
   opacity: 0;
@@ -364,6 +365,7 @@ button {
 .reveal-ready .conversion-path[data-reveal] > .prototype-disclosure,
 .reveal-ready .conversion-path[data-reveal] .prototype-role,
 .reveal-ready .conversion-path[data-reveal] .field-grid,
+.reveal-ready .conversion-path[data-reveal] .prototype-consent,
 .reveal-ready .conversion-path[data-reveal] [data-submit],
 .reveal-ready .conversion-path[data-reveal] .conversion-path__note {
   opacity: 0;
@@ -379,6 +381,7 @@ button {
 .reveal-ready .conversion-path[data-reveal].is-visible > .prototype-disclosure,
 .reveal-ready .conversion-path[data-reveal].is-visible .prototype-role,
 .reveal-ready .conversion-path[data-reveal].is-visible .field-grid,
+.reveal-ready .conversion-path[data-reveal].is-visible .prototype-consent,
 .reveal-ready .conversion-path[data-reveal].is-visible [data-submit],
 .reveal-ready .conversion-path[data-reveal].is-visible .conversion-path__note {
   opacity: 1;
@@ -401,9 +404,13 @@ button {
   --conversion-reveal-delay: 240ms;
 }
 
+.reveal-ready .conversion-path[data-reveal] .prototype-consent {
+  --conversion-reveal-delay: 270ms;
+}
+
 .reveal-ready .conversion-path[data-reveal] [data-submit],
 .reveal-ready .conversion-path[data-reveal] .conversion-path__note {
-  --conversion-reveal-delay: 270ms;
+  --conversion-reveal-delay: 300ms;
 }
 
 .reveal-ready .concept-hero__lead,

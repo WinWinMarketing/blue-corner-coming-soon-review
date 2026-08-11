@@ -1,0 +1,72 @@
+# Blue Corner — Caddy site config.
+#
+# {$BLUE_CORNER_HOST} comes from /etc/default/caddy so the same file serves the
+# temporary <ip>.nip.io verification host and, later, the real domain, with no
+# edit to this file. Change the variable, `caddy validate`, then reload.
+#
+# The Content-Security-Policy is deliberately NOT set here. It lives in the
+# <meta> tag emitted by tools/template.mjs and is asserted by check-site.mjs.
+# Two sources of truth for one policy is exactly how the comms box shipped a
+# CSP regression: Caddy's header silently overrode the app's and the two drifted
+# for weeks. Only headers a meta tag physically cannot set belong below.
+
+# www redirects to the apex rather than serving a duplicate, so there is exactly
+# one canonical origin. That matters beyond tidiness: the sign-up API refuses any
+# request whose Origin header is not ALLOWED_ORIGIN, and serving both names would
+# mean a form submitted from www gets a 403.
+{$BLUE_CORNER_WWW:www.localhost.invalid} {
+	redir https://{$BLUE_CORNER_HOST}{uri} permanent
+}
+
+{$BLUE_CORNER_HOST} {
+	encode zstd gzip
+	root * /srv/blue-corner
+
+	header {
+		# No `preload`, and no `includeSubDomains`: the domain owner may point
+		# subdomains at services we do not control, and committing them all to
+		# HTTPS forever is not ours to decide.
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options "nosniff"
+		# frame-ancestors cannot be set from a meta CSP, so clickjacking
+		# protection has to come from here.
+		X-Frame-Options "DENY"
+		Referrer-Policy "no-referrer"
+		Permissions-Policy "camera=(), microphone=(), geolocation=(), interest-cohort=()"
+		-Server
+	}
+
+	# The sign-up endpoint is the only part of the API that is public.
+	handle /api/signup {
+		reverse_proxy 127.0.0.1:8787
+	}
+	# /api/health stays reachable only on the box itself, via localhost:8787.
+	handle /api/* {
+		respond 404
+	}
+
+	handle {
+		# Assets carrying a ?v= key are immutable: the key is the first eight
+		# characters of the file's own SHA-256, so any content change mints a
+		# new URL. Anything else under /assets (icons, logos) has a stable name
+		# and only gets a day.
+		@versioned {
+			path /assets/*
+			query v=*
+		}
+		header @versioned Cache-Control "public, max-age=31536000, immutable"
+
+		@unversioned {
+			path /assets/*
+			not query v=*
+		}
+		header @unversioned Cache-Control "public, max-age=86400"
+
+		# The HTML references the current ?v= keys, so it must never be held by
+		# a warm cache or a deploy stays invisible until the user clears it.
+		@documents path / /index.html /privacy.html /robots.txt
+		header @documents Cache-Control "no-cache, must-revalidate"
+
+		file_server
+	}
+}

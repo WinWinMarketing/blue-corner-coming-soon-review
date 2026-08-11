@@ -199,6 +199,33 @@ for (const role of ["Patient", "Therapist"]) {
 if (count(home, "data-role-error") !== 1) {
   fail("Root role selector must have the local accessible validation contract");
 }
+/* The consent tick is a legal control, not a design element. CASL needs express
+   consent before a launch email can go to a Canadian address, and consent that
+   was pre-ticked for the user is not consent. A future restyle must not quietly
+   add `checked` or drop `required`. */
+const consentInput = home.match(/<input\b(?=[^>]*\bname="consent"(?=[\s>]))[^>]*>/i)?.[0] ?? "";
+if (!consentInput || !/\stype="checkbox"(?=[\s>])/i.test(consentInput)) {
+  fail("Root form must retain the consent checkbox");
+}
+if (!/\srequired(?:\s|=|\/?>)/i.test(consentInput) || !/\saria-describedby="member-consent-error"(?:\s|\/?>)/i.test(consentInput)) {
+  fail("Consent checkbox must retain required accessible validation");
+}
+if (/\schecked(?:\s|=|\/?>)/i.test(consentInput)) fail("Consent checkbox must never be pre-ticked");
+if (count(home, 'data-field-error="consent"') !== 1) fail("Consent checkbox must have its error node");
+/* The honeypot must stay unreachable by any human route — out of the
+   accessibility tree, out of the tab order, and never required, or a screen
+   reader user is asked to fill a trap they cannot see. */
+const honeypotInput = home.match(/<input\b(?=[^>]*\bdata-honeypot(?=[\s>]))[^>]*>/i)?.[0] ?? "";
+if (!honeypotInput || !/\stabindex="-1"(?=[\s>])/i.test(honeypotInput)) {
+  fail("Root form must retain the honeypot, kept out of the tab order");
+}
+if (/\srequired(?:\s|=|\/?>)/i.test(honeypotInput)) fail("Honeypot must never be required");
+if (!/<div class="hp-field" aria-hidden="true">/.test(home)) {
+  fail("Honeypot wrapper must stay hidden from assistive technology");
+}
+if (count(home, 'data-endpoint="/api/signup"') !== 1) {
+  fail("Sign-up form must post to the same-origin endpoint");
+}
 
 // ------------------------------------------------------------------ page 7
 // The navy support route closes every content screen; the light sign-off row
@@ -236,7 +263,7 @@ for (const [label, page] of [["Homepage", home], ["Privacy page", privacy]]) {
   if (count(page, 'href="https://use.typekit.net/ciy6txz.css"') !== 1
     || !page.includes("style-src 'self' https://use.typekit.net;")
     || !page.includes("font-src 'self' https://use.typekit.net;")
-    || !page.includes("connect-src 'none'; form-action 'none';")) {
+    || !page.includes("connect-src 'self'; form-action 'none';")) {
     fail(`${label} needs the Typekit stylesheet and the constrained style/font/connect CSP`);
   }
   if (count(page, `href="assets/styles/concept-base.css?v=${cacheKeys.conceptCss}"`) !== 1
@@ -760,11 +787,32 @@ if (!/:focus-visible\s*\{[^}]*outline:\s*3px solid/.test(sharedCss)
   || !/@media \(hover: hover\) and \(pointer: fine\)[\s\S]*?\.button:hover/.test(sharedCss)) {
   fail("Interactive states must retain 3px focus rings, forced-colors distinction, and pointer-gated hover");
 }
+/* display:none is the one honeypot implementation that defeats the trap — the
+   bots worth catching skip hidden inputs and fill off-screen ones. */
+if (!/\.hp-field\s*\{[^}]*clip-path:\s*inset\(50%\)/.test(conceptCss)
+  || /\.hp-field\s*\{[^}]*display:\s*none/.test(conceptCss)) {
+  fail("Honeypot must be positioned off-screen, not display:none");
+}
 if (count(impeccableSpec, "720px maximum card") !== 1 || impeccableSpec.includes("680px maximum card")) {
   fail("Impeccable specification must pin the conversion card maximum to 720px");
 }
-if (/(?:concept-addition|data-module|data-concept-nav|initializeSentenceStarter|navigator\.clipboard|localStorage|sessionStorage|fetch\()/.test(sharedScript)) {
+if (/(?:concept-addition|data-module|data-concept-nav|initializeSentenceStarter|navigator\.clipboard|localStorage|sessionStorage)/.test(sharedScript)) {
   fail("Shared runtime includes retired variant or privacy-sensitive behavior");
+}
+/* This assertion used to be a blanket ban on the token `fetch(`, which was
+   correct while the form was a local-only prototype. The form now sends, so the
+   ban is narrowed rather than dropped — the property worth protecting was never
+   "no network calls", it is "this page cannot be made to talk to anywhere except
+   its own origin". Three clauses, all of which must hold:
+     1. exactly ONE fetch call exists in the whole runtime,
+     2. its target is that one root-relative path (never an absolute URL, so it
+        cannot be repointed at a third party by an injected attribute), and
+     3. no absolute URL appears anywhere in the file.
+   Widening any of these is a deliberate act that has to be argued for here. */
+if ((sharedScript.match(/fetch\(/g) ?? []).length !== 1
+  || !/await fetch\(form\.dataset\.endpoint \|\| "\/api\/signup", \{/.test(sharedScript)
+  || /["'`](?:https?:)?\/\//.test(sharedScript)) {
+  fail("Shared runtime must make exactly one same-origin request, to /api/signup");
 }
 if (!/const SOURCE = path\.join\(ROOT, "assets\/art\/blue-corner-reference-ring\.webp"\);/.test(recolorScript)
   || !/const ROPE_SEGMENTS = \[/.test(recolorScript)

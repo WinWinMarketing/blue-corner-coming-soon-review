@@ -29,6 +29,14 @@ export const syncCacheKeys = async () => {
   return { ...cacheKeys };
 };
 
+/* The ONLY absolute origin in the shipped HTML. Every other reference on both
+   pages is project-relative, which is why this site drops into any web root
+   unchanged — so this constant is the single line to change when the real
+   domain lands. og:image has to be absolute: scrapers do not resolve relative
+   URLs. Override with SITE_ORIGIN=https://example.ca node tools/generate.mjs. */
+export const SITE_ORIGIN = (process.env.SITE_ORIGIN?.trim().replace(/\/+$/, ""))
+  || "https://thebluecorner.ca";
+
 const escapeHtml = (value) => String(value)
   .replaceAll("&", "&amp;")
   .replaceAll("<", "&lt;")
@@ -36,20 +44,34 @@ const escapeHtml = (value) => String(value)
   .replaceAll('"', "&quot;")
   .replaceAll("'", "&#39;");
 
-const CSP = "default-src 'self'; script-src 'self'; style-src 'self' https://use.typekit.net; img-src 'self' data:; font-src 'self' https://use.typekit.net; connect-src 'none'; form-action 'none'; object-src 'none'; base-uri 'none'; media-src 'none'; worker-src 'none'; upgrade-insecure-requests";
+/* connect-src is 'self', not 'none': the sign-up form posts to /api/signup on
+   this same origin. It is deliberately NOT widened to the email provider —
+   the browser never talks to Resend, only our own server does, so the API key
+   is never in a bundle and a compromised page cannot reach a third party.
 
-const documentHead = ({ title, description, canonicalStyles = true }) => `    <meta charset="utf-8">
+   form-action stays 'none'. The handler calls preventDefault() and sends the
+   request itself, so no native form POST ever happens; leaving the directive
+   shut means a script injection cannot repoint the form at another origin. */
+const CSP = "default-src 'self'; script-src 'self'; style-src 'self' https://use.typekit.net; img-src 'self' data:; font-src 'self' https://use.typekit.net; connect-src 'self'; form-action 'none'; object-src 'none'; base-uri 'none'; media-src 'none'; worker-src 'none'; upgrade-insecure-requests";
+
+/* `path` is the page's own path, used for the canonical URL. Both pages carry
+   one now that the site is indexable: www 301s to the apex so there is no
+   duplicate to collapse, but a canonical also pins the URL that gets shared and
+   stops query strings from splitting the page in search results. */
+const documentHead = ({ title, description, canonicalStyles = true, path = "/" }) => `    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <meta name="robots" content="noindex, nofollow, noarchive">
+    <meta name="robots" content="index, follow">
     <meta name="referrer" content="no-referrer">
     <meta http-equiv="Content-Security-Policy" content="${CSP}">
     <title>${escapeHtml(title)}</title>
     <meta name="description" content="${escapeHtml(description)}">
+    <link rel="canonical" href="${escapeHtml(SITE_ORIGIN)}${escapeHtml(path)}">
     <meta name="theme-color" content="#197CE3">${canonicalStyles ? `
     <meta property="og:title" content="The Blue Corner — Nobody Fights Alone.">
     <meta property="og:description" content="${escapeHtml(sourceCopy.hero.body)}">
     <meta property="og:type" content="website">
-    <meta property="og:image" content="https://winwinmarketing.github.io/blue-corner-coming-soon-review/assets/art/${escapeHtml(referenceHero.image)}?v=${cacheKeys.hero}">` : ""}
+    <meta property="og:url" content="${escapeHtml(SITE_ORIGIN)}${escapeHtml(path)}">
+    <meta property="og:image" content="${escapeHtml(SITE_ORIGIN)}/assets/art/${escapeHtml(referenceHero.image)}?v=${cacheKeys.hero}">` : ""}
     <link rel="icon" href="assets/brand/mark-blue.png" type="image/png">
     <script src="assets/scripts/boot.js?v=${cacheKeys.boot}"></script>
     <link rel="stylesheet" href="https://use.typekit.net/ciy6txz.css">
@@ -96,12 +118,16 @@ const renderFields = () => sourceCopy.conversion.fields.map((field) => {
 }).join("");
 
 const renderMemberForm = () => {
-  const { member } = sourceCopy.conversion;
+  const { member, consent, honeypot } = sourceCopy.conversion;
   return `
             <article class="conversion-path conversion-path--member" id="member-form" data-reveal>
               <h3>${escapeHtml(member.heading)}</h3>
               <p class="prototype-disclosure" id="member-prototype-disclosure">${escapeHtml(safetyCopy.prototypeDisclosure)}</p>
-              <form class="prototype-form" data-prototype-form data-loading-label="${escapeHtml(safetyCopy.prototypeLoading)}" data-success-title="${escapeHtml(safetyCopy.prototypeSuccessTitle)}" data-success-body="${escapeHtml(safetyCopy.prototypeSuccessBody)}" method="post" autocomplete="off" aria-describedby="member-prototype-disclosure" novalidate>
+              <form class="prototype-form" data-prototype-form data-endpoint="/api/signup" data-loading-label="${escapeHtml(safetyCopy.prototypeLoading)}" data-success-title="${escapeHtml(safetyCopy.prototypeSuccessTitle)}" data-success-body="${escapeHtml(safetyCopy.prototypeSuccessBody)}" data-error-message="${escapeHtml(safetyCopy.sendErrorMessage)}" method="post" autocomplete="off" aria-describedby="member-prototype-disclosure" novalidate>
+                <div class="hp-field" aria-hidden="true">
+                  <label for="member-${escapeHtml(honeypot.name)}">${escapeHtml(honeypot.label)}</label>
+                  <input id="member-${escapeHtml(honeypot.name)}" name="${escapeHtml(honeypot.name)}" type="text" tabindex="-1" autocomplete="off" data-honeypot>
+                </div>
                 <fieldset data-form-fields>
                   <legend class="sr-only">Early-access interest</legend>
                   <fieldset class="prototype-role" data-role-group>
@@ -119,6 +145,13 @@ const renderMemberForm = () => {
                     <p class="field-error" id="member-role-error" data-role-error aria-live="polite"></p>
                   </fieldset>
                   <div class="field-grid">${renderFields()}
+                  </div>
+                  <div class="prototype-consent" data-consent-group>
+                    <label class="prototype-consent__choice" for="member-${escapeHtml(consent.name)}">
+                      <input id="member-${escapeHtml(consent.name)}" name="${escapeHtml(consent.name)}" type="checkbox" value="yes" autocomplete="off" required aria-describedby="member-consent-error">
+                      <span>${escapeHtml(consent.label)}</span>
+                    </label>
+                    <p class="field-error" id="member-consent-error" data-field-error="${escapeHtml(consent.name)}" aria-live="polite"></p>
                   </div>
                   <button class="button button--signal" type="submit" data-submit>${escapeHtml(member.button)}</button>
                   <p class="conversion-path__note">${escapeHtml(member.note)}</p>
@@ -319,7 +352,7 @@ export const renderPrivacyPage = () => {
   return `<!doctype html>
 <html lang="en-CA">
   <head>
-${documentHead({ title: privacyCopy.title, description: privacyCopy.lead, canonicalStyles: false })}
+${documentHead({ title: privacyCopy.title, description: privacyCopy.lead, canonicalStyles: false, path: "/privacy.html" })}
   </head>
   <body class="concept-page concept-page--prose">
     <a class="skip-link" href="#main">Skip to main content</a>
