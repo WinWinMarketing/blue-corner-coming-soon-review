@@ -2059,28 +2059,20 @@
     font-size: var(--font-size-support);
   }
 
-  /* Desktop gives the corner glyph its own rail beside the manifesto; the
-     phone keeps that idea at minimum size — a slim navy rail on the LEFT with
-     the mark at its top, instead of a full-width band above the copy. */
+  /* The glyph rail is a desktop device; at phone widths every variant of it
+     (band, strip, left rail) read as clutter, so the mark sits out entirely
+     and the manifesto runs as one clean light-blue block. */
   .meaning__inner {
-    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-columns: 1fr;
     min-block-size: 0;
   }
 
   .meaning__mark {
-    min-block-size: 0;
-    grid-column: 1;
-    place-items: start;
-    padding: 0.625rem;
-    border-inline-end: 0.1875rem solid var(--brand-yellow);
-  }
-
-  .meaning__mark img {
-    inline-size: 1.5rem;
+    display: none;
   }
 
   .meaning__copy {
-    padding: var(--space-2xl) var(--page-gutter) var(--space-2xl) var(--space-lg);
+    padding: var(--space-2xl) var(--page-gutter);
   }
 
   .meaning h2 {
