@@ -108,6 +108,23 @@ export const sourceCopy = Object.freeze({
       Object.freeze({ name: "email", label: "Email", type: "email", inputmode: "email", placeholder: "you@email.com" }),
       Object.freeze({ name: "phone", label: "Phone", type: "tel", inputmode: "tel", placeholder: "(000) 000 0000" }),
     ]),
+    /* Express consent, unchecked by default. CASL requires it before a single
+       launch email can go out to a Canadian address, and an implied-consent
+       reading of "they typed their address in" does not survive contact with
+       the fact that this is a health brand. The checker asserts it is present,
+       required, and NOT pre-checked. */
+    consent: Object.freeze({
+      name: "consent",
+      label: "Email me when The Blue Corner opens.",
+    }),
+    /* Bot trap. Not display:none — scrapers increasingly skip those — and
+       aria-hidden + tabindex="-1" keep it away from assistive tech and the tab
+       order, so no human ever reaches it. A filled value is answered with a
+       normal success response so the bot learns nothing. */
+    honeypot: Object.freeze({
+      name: "website",
+      label: "Leave this field empty",
+    }),
   }),
   // The single navy crisis band closes the landing page. Someone in trouble
   // scans for a number, so the numbers are tap targets, not underlined links,
@@ -135,41 +152,67 @@ export const sourceCopy = Object.freeze({
   }),
 });
 
+/* This page is load-bearing, not decoration. Until 2026-07-29 it promised that
+   nothing left your device, which was true of the prototype form. The form now
+   sends. Every sentence here was rewritten in the same change that turned it on
+   — a privacy page describing a version of the site that no longer exists is
+   worse than no privacy page at all. If the form changes again, this changes
+   with it, in the same commit. */
 export const privacyCopy = Object.freeze({
   title: "Privacy — The Blue Corner",
   heading: "Privacy",
-  eyebrow: "What this prototype does with your details",
-  lead: "Nothing on this page is transmitted, stored, or added to a waitlist.",
+  eyebrow: "What we do with the details you leave",
+  lead: "One form, one purpose: to email you when we open. Nothing else, and nobody else.",
   sections: Object.freeze([
     Object.freeze({
-      heading: "The form",
-      body: "The early-access form is a prototype. It validates in your browser and nothing more. There is no server, no database, and no third-party form service behind it. The page's Content-Security-Policy blocks outbound connections and form submissions outright, so the details you type cannot leave your device even by accident.",
+      heading: "What the form collects",
+      body: "Whether you are joining as a patient or a therapist, your name, your email address, your phone number, and your tick confirming we may email you. The form only sends when you tick that box, and it is never ticked for you. Nothing is collected anywhere else on this site.",
+    }),
+    Object.freeze({
+      heading: "Where it goes",
+      body: "Straight to The Blue Corner team as a single email, and nowhere else. It is not added to a mailing list, an advertising audience, or a customer database, and it is never sold or shared. That email, and the confirmation we send you, are delivered by Resend, our email provider, which processes them on servers in the United States. If delivery to us fails, your details are held in a private file on our server so your signup is not lost, and nothing else is kept.",
     }),
     Object.freeze({
       heading: "Analytics and cookies",
-      body: "There are none. No analytics, no tag manager, no advertising pixels, no cookies, and no local or session storage.",
+      body: "There are none. No analytics, no tag manager, no advertising pixels, no cookies, and no local or session storage. We do not track you across this site or any other.",
     }),
     Object.freeze({
       heading: "What loads from elsewhere",
       body: "One stylesheet and its font files load from Adobe Typekit at use.typekit.net, which is how the licensed brand typeface is served. Everything else — images, styles, and scripts — is served from this site.",
     }),
     Object.freeze({
+      heading: "What you'll receive",
+      body: "An email straight away confirming we have your details, then someone from The Blue Corner getting in touch personally to put you on the list, and a note on the day we open. No newsletter, and nothing from anybody else.",
+    }),
+    Object.freeze({
+      heading: "Changing your mind",
+      body: "Reply to either email and we will take you off the list and delete your details, with no questions and no delay. You can do that at any time, including before we launch.",
+    }),
+    Object.freeze({
       heading: "When we launch",
-      body: "The live Blue Corner will collect and protect personal health information under Canadian privacy law, and it will publish its own policy before anyone can sign up. This page covers the coming-soon prototype only.",
+      body: "The live Blue Corner will collect and protect personal health information under Canadian privacy law, and it will publish its own fuller policy before anyone can book care. This page covers the coming-soon page and its one form.",
     }),
   ]),
   back: "Back to The Blue Corner",
 });
 
-/* The card no longer carries a standing "Prototype" notice: the privacy page
-   says the same thing at length and the CSP (connect-src/form-action 'none')
-   enforces it. The element stays because it is ALSO the form's only visible
-   error summary — the per-field messages are screen-reader-only on desktop — so
-   it renders empty, holds its reserved height, and paints only on a validation
-   error. Deleting it outright would leave a submit that visibly does nothing. */
+/* The card carries no standing notice: the privacy page says it at length. The
+   element stays because it is the form's only visible message surface — the
+   per-field messages are screen-reader-only on desktop — so it renders empty,
+   holds its reserved height, and paints only when there is something to say.
+   Deleting it outright would leave a submit that visibly does nothing.
+
+   It now carries TWO kinds of message: local validation errors (as before) and
+   send failures. Reusing it for both is deliberate — a separate failure element
+   would add a second reserved height to an already height-locked card, and the
+   acceptance suite checks this card does not shift when messages appear. */
 export const safetyCopy = Object.freeze({
   prototypeDisclosure: "",
-  prototypeLoading: "Checking…",
-  prototypeSuccessTitle: "Prototype complete.",
-  prototypeSuccessBody: "Your details were checked on this device only. Nothing was sent, stored, or added to a waitlist.",
+  prototypeLoading: "Sending…",
+  prototypeSuccessTitle: "You're in.",
+  prototypeSuccessBody: "We've got your details. Someone will reach out to you personally to get you on the list.",
+  /* Shown in the disclosure when the request fails. It must not imply the
+     signup was saved — it wasn't — and it must invite a retry, because the
+     fields stay filled and enabled on failure. */
+  sendErrorMessage: "We couldn't send that just now. Please try again in a moment.",
 });

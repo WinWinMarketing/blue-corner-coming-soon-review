@@ -1,0 +1,49 @@
+[Unit]
+Description=Blue Corner sign-up API
+Documentation=https://github.com/WinWinMarketing/blue-corner-coming-soon-review
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=bluecorner
+Group=bluecorner
+ExecStart=/usr/bin/node /opt/blue-corner/api/signup-api.mjs
+# Read by systemd as root BEFORE dropping to the service user, so this file can
+# stay 0600 root-owned and the service account itself can never read the key.
+EnvironmentFile=/etc/blue-corner/api.env
+Restart=on-failure
+RestartSec=2
+
+# The process needs to do exactly two things: listen on loopback and make an
+# HTTPS call to Resend. Everything else is closed off.
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectProc=invisible
+ProtectClock=true
+ProtectHostname=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectKernelLogs=true
+ProtectControlGroups=true
+RestrictAddressFamilies=AF_INET AF_INET6
+RestrictNamespaces=true
+RestrictRealtime=true
+RestrictSUIDSGID=true
+LockPersonality=true
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+# Deliberately NOT enabled: V8 needs to map pages writable-then-executable to
+# JIT, and turning this on makes node exit immediately. Left here, named and
+# explained, so nobody "hardens" it back on and spends an afternoon on it.
+MemoryDenyWriteExecute=false
+# ProtectSystem=strict makes the whole filesystem read-only; this is the single
+# exception, for the failed-send recovery log.
+ReadWritePaths=/var/lib/blue-corner
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target

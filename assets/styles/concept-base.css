@@ -968,6 +968,64 @@
   outline-offset: 2px;
 }
 
+/* The consent tick. A real checkbox with accent-color rather than a custom
+   control: this is a legal affirmation, so it has to read as an ordinary
+   checkbox to every user and every assistive technology, and it has to be
+   obvious when it is NOT ticked. The role radios can afford to be styled
+   boxes; this cannot. */
+.prototype-consent {
+  min-inline-size: 0;
+}
+
+.prototype-consent__choice {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--space-2xs);
+  align-items: start;
+  cursor: pointer;
+  color: var(--brand-navy);
+  font-size: var(--font-size-support);
+  line-height: 1.35;
+}
+
+.prototype-consent__choice input {
+  inline-size: 1.125rem;
+  block-size: 1.125rem;
+  /* Optically aligns the box with the cap height of the first line rather than
+     its line box, which sits it visibly high. */
+  margin: 0.125rem 0 0;
+  accent-color: var(--brand-navy);
+  cursor: pointer;
+}
+
+.prototype-consent__choice:has(input:focus-visible) {
+  outline: 3px solid var(--brand-navy);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 6px var(--color-focus);
+}
+
+.prototype-consent.has-error .prototype-consent__choice {
+  outline: 2px solid var(--brand-yellow);
+  outline-offset: 2px;
+}
+
+/* Bot trap. Deliberately NOT display:none — a growing share of form bots skip
+   hidden inputs but still fill off-screen ones. aria-hidden and tabindex="-1"
+   in the markup keep it out of the accessibility tree and the tab order, so no
+   person reaches it by any route. */
+.hp-field {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  border: 0;
+  white-space: nowrap;
+}
+
 .conversion .prototype-form,
 .conversion .prototype-form fieldset {
   gap: clamp(0.4rem, 1.1svh, 1rem);
@@ -1860,8 +1918,24 @@
 }
 
 @media (max-width: 48rem) {
+  /* PHONE COMPACTION. The desktop design is five editorial screens; scaled
+     down literally it produced ~8400px of scroll and crisis bands that never
+     fit a fold. On phones the display scale steps down, the stat/room/plan
+     lists become 2-up grids, and every band tightens — same content, same
+     order, roughly half the page height. */
   .concept-page {
-    --page-gutter: 1.75rem;
+    --page-gutter: 1.25rem;
+  }
+
+  .concept-page .eyebrow {
+    padding: 0.3125rem 0.5625rem;
+    font-size: 0.9375rem;
+  }
+
+  .concept-page .section-heading h2,
+  .concept-page .meaning h2,
+  .concept-page .conversion__heading h2 {
+    font-size: clamp(2.125rem, 9.8vw, 2.75rem);
   }
 
   .site-header {
@@ -1886,8 +1960,8 @@
       "lead"
       "details";
     grid-template-columns: 1fr;
-    gap: var(--space-xl);
-    padding-block: var(--space-3xl);
+    gap: var(--space-lg);
+    padding-block: var(--space-xl) var(--space-2xl);
   }
 
   .concept-hero__copy,
@@ -1897,12 +1971,21 @@
     max-inline-size: 100%;
   }
 
+  /* On a phone the 3:2 frame renders the man and his ring card at thumbnail
+     size — the page's most important photograph stops communicating. A taller
+     crop keeps the corner context while the subject stays legible; the source
+     art is untouched, this is a viewport-specific window onto it. */
   .concept-hero__media {
     max-block-size: none;
+    aspect-ratio: 1 / 1;
+  }
+
+  .concept-hero__image {
+    object-position: 68% 50%;
   }
 
   .concept-hero h1 {
-    font-size: clamp(3.75rem, 12.5vw, 5.5rem);
+    font-size: clamp(2.75rem, 11vw, 3.75rem);
   }
 
   .concept-hero__body {
@@ -1913,7 +1996,52 @@
   .rooms__inner,
   .roadmap__inner {
     inline-size: 100%;
-    padding-block: var(--space-4xl);
+    padding-block: var(--space-2xl);
+  }
+
+  .stats__grid {
+    padding: var(--space-lg);
+  }
+
+  .stat__value {
+    font-size: clamp(2.25rem, 9vw, 3rem);
+  }
+
+  .stat p {
+    margin-block-start: 0.35rem;
+    font-size: 1rem;
+  }
+
+  .room__slot {
+    min-block-size: 0;
+    aspect-ratio: 4 / 3;
+  }
+
+  .room__copy h3 {
+    font-size: 1.125rem;
+  }
+
+  .room__copy p {
+    font-size: 0.9375rem;
+  }
+
+  .roadmap-item {
+    min-block-size: 0;
+    padding: var(--space-sm) var(--space-md) var(--space-md);
+  }
+
+  /* The locked line is "an ordinary week." — the base min(4.5rem, 7.2svh) size
+     has no WIDTH term, so on phones it overflowed the document (16px of real
+     horizontal scroll at 414px) and the old ≤390px -0.11em tracking crush only
+     papered over the two tested widths while jamming the words together. The
+     vw term keeps the line inside its column at every phone width; tracking
+     returns to the face's natural set. */
+  .rooms .rooms__heading h2 {
+    font-size: min(4.5rem, 7.2svh, 10.2vw);
+  }
+
+  .rooms .rooms__heading h2 > span:last-child {
+    letter-spacing: -0.02em;
   }
 
   .stats__grid {
@@ -1931,25 +2059,20 @@
     font-size: var(--font-size-support);
   }
 
+  /* The glyph rail is a desktop device; at phone widths every variant of it
+     (band, strip, left rail) read as clutter, so the mark sits out entirely
+     and the manifesto runs as one clean light-blue block. */
   .meaning__inner {
     grid-template-columns: 1fr;
     min-block-size: 0;
   }
 
   .meaning__mark {
-    min-block-size: 7rem;
-    place-items: center start;
-    padding-inline: var(--page-gutter);
-    border-inline-end: 0;
-    border-block-end: 0.375rem solid var(--brand-yellow);
-  }
-
-  .meaning__mark img {
-    inline-size: 4rem;
+    display: none;
   }
 
   .meaning__copy {
-    padding: var(--space-4xl) var(--page-gutter);
+    padding: var(--space-2xl) var(--page-gutter);
   }
 
   .meaning h2 {
@@ -1958,14 +2081,51 @@
 
   .conversion__inner {
     grid-template-columns: 1fr;
-    gap: var(--space-2xl);
-    padding-block: var(--space-3xl);
+    gap: var(--space-lg);
+    padding-block: var(--space-2xl);
+  }
+
+  /* Compacted below 24px this line leaves WCAG's large-text band and its blue
+     cannot reach 4.5:1 (white measures 4.17). 19px bold re-enters the band
+     (>=18.66px bold), where 4.17:1 clears the 3:1 requirement. */
+  .conversion__body {
+    color: #fff;
+    font-size: 1.1875rem;
+    font-weight: var(--font-weight-bold);
+  }
+
+  .roadmap-item__name {
+    font-size: 1.25rem;
+  }
+
+  /* The empty error-summary slot must keep its reserved height (no-shift
+     contract), but resting between the card title and the first field it reads
+     as a rendering hole on a narrow card. Flex order moves the SLOT to the
+     card's end — where reserved space reads as padding and where a message
+     paints beside the submit button the user just pressed. DOM order, the
+     aria-describedby wiring, and every reserved height are unchanged. */
+  .conversion-path {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .conversion .prototype-disclosure {
+    order: 9;
+    margin-block: clamp(0.25rem, 0.8svh, 0.625rem) 0;
+  }
+
+  /* The band must close every screen (reviewer mandate) but five tall bands
+     were most of the excess scroll — and none of them fit a phone fold. Thinner
+     rule, tighter rows, same three 44px actions. */
+  .crisis-band {
+    border-block-start-width: 0.375rem;
   }
 
   .crisis-band__inner {
     flex-direction: column;
     align-items: flex-start;
-    padding-block: var(--space-xl);
+    gap: var(--space-sm);
+    padding-block: var(--space-md);
   }
 
   .concept-footer__signoff {
@@ -1989,7 +2149,7 @@
   }
 
   .concept-hero h1 {
-    font-size: clamp(2.625rem, 13.8vw, 3.375rem);
+    font-size: clamp(2.25rem, 11vw, 2.75rem);
   }
 
   .prototype-role__choices {
@@ -2000,13 +2160,9 @@
     white-space: normal;
   }
 
-  .stats__grid,
+  /* The stat, room and plan grids stay 2-up on phones — collapsing them to a
+     single column was the biggest single source of scroll. */
   .stats__sources {
-    grid-template-columns: 1fr;
-  }
-
-  .rooms__grid,
-  .roadmap__list {
     grid-template-columns: 1fr;
   }
 
@@ -2024,14 +2180,20 @@
     --page-gutter: 1rem;
   }
 
-  .section-heading h2,
-  .meaning h2,
-  .conversion__heading h2 {
-    font-size: clamp(2.625rem, 13.5vw, 3.375rem);
+  .concept-page .section-heading h2,
+  .concept-page .meaning h2,
+  .concept-page .conversion__heading h2 {
+    font-size: clamp(1.875rem, 9.8vw, 2.375rem);
   }
 
-  .rooms__heading h2 > span:last-child {
-    letter-spacing: -0.11em;
+  /* "Diagnostics" is the longest plan-card name; at 320px its column is
+     ~112px, so the name steps down with the card padding to stay inside. */
+  .roadmap-item {
+    padding-inline: var(--space-sm);
+  }
+
+  .roadmap-item__name {
+    font-size: 1.125rem;
   }
 
   .prose h1 {
