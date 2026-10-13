@@ -70,3 +70,9 @@
 		file_server
 	}
 }
+
+# Other sites on this box (staging for the Next.js app in WinWinMarketing/blue-corner)
+# live in their own files, installed by that repo's deploy/remote-install.sh, so
+# this file never has to carry them. A glob that matches nothing is a warning,
+# not an error: this line is safe on a box with no extra sites.
+import /etc/caddy/sites-enabled/*.caddy
